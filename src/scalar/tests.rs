@@ -1,6 +1,6 @@
 use approx::assert_relative_eq;
 
-use super::{FloatRepr, FloatScalar, Scalar};
+use super::{FloatScalar, Scalar};
 
 fn scalar_identities<T: Scalar>() -> (T, T) {
     (T::ZERO, T::ONE)
@@ -18,16 +18,12 @@ fn round_trip<T: FloatScalar>(value: T) -> T {
     (value + T::ONE) - T::ONE
 }
 
-fn from_f32_via_repr<T: FloatRepr>(value: f32) -> T {
-    T::from_f32(value)
-}
-
-fn from_f64_via_repr<T: FloatRepr>(value: f64) -> T {
-    T::from_f64(value)
-}
-
-fn from_float_via_repr<T: FloatRepr, V: FloatRepr>(value: V) -> T {
-    T::from_float(value)
+macro_rules! assert_as_scalar_targets {
+    ($value:expr, [$($target:ty),+ $(,)?]) => {
+        $(
+            let _: $target = ($value).as_scalar::<$target>();
+        )+
+    };
 }
 
 #[test]
@@ -49,6 +45,91 @@ fn float_constants_match_for_f32_and_f64() {
     assert!(f64_nan.is_nan());
 }
 
+fn min_via_scalar<T: Scalar>(a: T, b: T) -> T {
+    super::MinMax::min(a, b)
+}
+
+fn max_via_scalar<T: Scalar>(a: T, b: T) -> T {
+    super::MinMax::max(a, b)
+}
+
+#[test]
+fn min_max_works_for_integer_scalars() {
+    assert_eq!(min_via_scalar(3_i32, 7_i32), 3_i32);
+    assert_eq!(max_via_scalar(3_i32, 7_i32), 7_i32);
+
+    assert_eq!(min_via_scalar(10_u16, 2_u16), 2_u16);
+    assert_eq!(max_via_scalar(10_u16, 2_u16), 10_u16);
+}
+
+#[test]
+fn min_max_works_for_float_scalars() {
+    assert_relative_eq!(min_via_scalar(3.0_f32, 7.0_f32), 3.0_f32, epsilon = 1.0e-6);
+    assert_relative_eq!(max_via_scalar(3.0_f32, 7.0_f32), 7.0_f32, epsilon = 1.0e-6);
+
+    assert_relative_eq!(min_via_scalar(10.0_f64, 2.0_f64), 2.0_f64, epsilon = 1.0e-12);
+    assert_relative_eq!(max_via_scalar(10.0_f64, 2.0_f64), 10.0_f64, epsilon = 1.0e-12);
+}
+
+#[test]
+fn min_max_nan_behavior_for_float_scalars() {
+    let nan32 = <f32 as FloatScalar>::NAN;
+    assert_eq!(min_via_scalar(nan32, 4.0_f32), 4.0_f32);
+    assert_eq!(max_via_scalar(nan32, 4.0_f32), 4.0_f32);
+    assert!(min_via_scalar(nan32, nan32).is_nan());
+    assert!(max_via_scalar(nan32, nan32).is_nan());
+
+    let nan64 = <f64 as FloatScalar>::NAN;
+    assert_eq!(min_via_scalar(nan64, 4.0_f64), 4.0_f64);
+    assert_eq!(max_via_scalar(nan64, 4.0_f64), 4.0_f64);
+    assert!(min_via_scalar(nan64, nan64).is_nan());
+    assert!(max_via_scalar(nan64, nan64).is_nan());
+}
+
+#[test]
+fn float_scalar_predicates_work_for_f32_and_f64() {
+    let finite32 = 1.0_f32;
+    assert!(finite32.is_finite());
+    assert!(!finite32.is_infinite());
+    assert!(!finite32.is_nan());
+
+    let inf32 = <f32 as FloatScalar>::INFINITY;
+    assert!(!inf32.is_finite());
+    assert!(inf32.is_infinite());
+    assert!(!inf32.is_nan());
+
+    let nan32 = <f32 as FloatScalar>::NAN;
+    assert!(!nan32.is_finite());
+    assert!(!nan32.is_infinite());
+    assert!(nan32.is_nan());
+
+    let finite64 = 1.0_f64;
+    assert!(finite64.is_finite());
+    assert!(!finite64.is_infinite());
+    assert!(!finite64.is_nan());
+
+    let inf64 = <f64 as FloatScalar>::INFINITY;
+    assert!(!inf64.is_finite());
+    assert!(inf64.is_infinite());
+    assert!(!inf64.is_nan());
+
+    let nan64 = <f64 as FloatScalar>::NAN;
+    assert!(!nan64.is_finite());
+    assert!(!nan64.is_infinite());
+    assert!(nan64.is_nan());
+}
+
+#[test]
+fn float_scalar_is_zero_works_for_f32_and_f64() {
+    assert!(0.0_f32.is_zero());
+    assert!(<f32 as Scalar>::ZERO.is_zero());
+    assert!(!1.0_f32.is_zero());
+
+    assert!(0.0_f64.is_zero());
+    assert!(<f64 as Scalar>::ZERO.is_zero());
+    assert!(!1.0_f64.is_zero());
+}
+
 #[test]
 fn corefloat_and_approx_work_through_floatscalar_for_f32_and_f64() {
     let sin_zero_f32 = sin_via_floatscalar::<f32>(0.0);
@@ -68,38 +149,108 @@ fn generic_round_trip_works_for_f32_and_f64() {
 }
 
 #[test]
-fn float_repr_as_converters_work_for_f32_and_f64() {
-    let x32 = 1.25_f32;
-    assert_relative_eq!(x32.as_f32(), 1.25_f32, epsilon = 1.0e-6);
-    assert_relative_eq!(x32.as_f64(), 1.25_f64, epsilon = 1.0e-12);
+fn scalar_as_scalar_converts_between_f32_and_f64() {
+    let as_f64 = 1.25_f32.as_scalar::<f64>();
+    assert_relative_eq!(as_f64, 1.25_f64, epsilon = 1.0e-12);
 
-    let x64 = 2.5_f64;
-    assert_relative_eq!(x64.as_f32(), 2.5_f32, epsilon = 1.0e-6);
-    assert_relative_eq!(x64.as_f64(), 2.5_f64, epsilon = 1.0e-12);
+    let as_f32 = 2.5_f64.as_scalar::<f32>();
+    assert_relative_eq!(as_f32, 2.5_f32, epsilon = 1.0e-6);
 }
 
 #[test]
-fn float_repr_from_primitive_converters_work_for_f32_and_f64() {
-    let f32_from_f32 = from_f32_via_repr::<f32>(1.25_f32);
-    assert_relative_eq!(f32_from_f32, 1.25_f32, epsilon = 1.0e-6);
+fn scalar_from_scalar_matches_as_scalar_for_f32_and_f64() {
+    let from_f64 = <f64 as Scalar>::from_scalar(1.25_f32);
+    let as_f64 = 1.25_f32.as_scalar::<f64>();
+    assert_relative_eq!(from_f64, as_f64, epsilon = 1.0e-12);
 
-    let f32_from_f64 = from_f64_via_repr::<f32>(1.25_f64);
-    assert_relative_eq!(f32_from_f64, 1.25_f32, epsilon = 1.0e-6);
-
-    let f64_from_f32 = from_f32_via_repr::<f64>(2.5_f32);
-    assert_relative_eq!(f64_from_f32, 2.5_f64, epsilon = 1.0e-12);
-
-    let f64_from_f64 = from_f64_via_repr::<f64>(2.5_f64);
-    assert_relative_eq!(f64_from_f64, 2.5_f64, epsilon = 1.0e-12);
+    let from_f32 = <f32 as Scalar>::from_scalar(2.5_f64);
+    let as_f32 = 2.5_f64.as_scalar::<f32>();
+    assert_relative_eq!(from_f32, as_f32, epsilon = 1.0e-6);
 }
 
 #[test]
-fn float_repr_from_float_converter_works_across_f32_and_f64() {
-    let f32_from_f64 = from_float_via_repr::<f32, _>(1.25_f64);
-    assert_relative_eq!(f32_from_f64, 1.25_f32, epsilon = 1.0e-6);
+fn scalar_as_scalar_matrix_compiles_for_all_supported_types() {
+    assert_as_scalar_targets!(
+        1.5_f32,
+        [f32, f64, u8, u16, u32, u64, i8, i16, i32, i64, usize, isize]
+    );
+    assert_as_scalar_targets!(
+        2.5_f64,
+        [f32, f64, u8, u16, u32, u64, i8, i16, i32, i64, usize, isize]
+    );
+    assert_as_scalar_targets!(7_u8, [f32, f64, u8, u16, u32, u64, i8, i16, i32, i64, usize, isize]);
+    assert_as_scalar_targets!(
+        8_u16,
+        [f32, f64, u8, u16, u32, u64, i8, i16, i32, i64, usize, isize]
+    );
+    assert_as_scalar_targets!(
+        9_u32,
+        [f32, f64, u8, u16, u32, u64, i8, i16, i32, i64, usize, isize]
+    );
+    assert_as_scalar_targets!(
+        10_u64,
+        [f32, f64, u8, u16, u32, u64, i8, i16, i32, i64, usize, isize]
+    );
+    assert_as_scalar_targets!(
+        (-7_i8),
+        [f32, f64, u8, u16, u32, u64, i8, i16, i32, i64, usize, isize]
+    );
+    assert_as_scalar_targets!(
+        (-8_i16),
+        [f32, f64, u8, u16, u32, u64, i8, i16, i32, i64, usize, isize]
+    );
+    assert_as_scalar_targets!(
+        (-9_i32),
+        [f32, f64, u8, u16, u32, u64, i8, i16, i32, i64, usize, isize]
+    );
+    assert_as_scalar_targets!(
+        (-10_i64),
+        [f32, f64, u8, u16, u32, u64, i8, i16, i32, i64, usize, isize]
+    );
+    assert_as_scalar_targets!(
+        11_usize,
+        [f32, f64, u8, u16, u32, u64, i8, i16, i32, i64, usize, isize]
+    );
+    assert_as_scalar_targets!(
+        (-11_isize),
+        [f32, f64, u8, u16, u32, u64, i8, i16, i32, i64, usize, isize]
+    );
+}
 
-    let f64_from_f32 = from_float_via_repr::<f64, _>(2.5_f32);
-    assert_relative_eq!(f64_from_f32, 2.5_f64, epsilon = 1.0e-12);
+#[test]
+fn scalar_as_scalar_cross_family_edges_are_correct_for_representable_values() {
+    let f32_from_i32 = (-7_i32).as_scalar::<f32>();
+    assert_relative_eq!(f32_from_i32, -7.0_f32, epsilon = 1.0e-6);
+
+    let f64_from_u16 = 42_u16.as_scalar::<f64>();
+    assert_relative_eq!(f64_from_u16, 42.0_f64, epsilon = 1.0e-12);
+
+    let i64_from_f32 = 9.9_f32.as_scalar::<i64>();
+    assert_eq!(i64_from_f32, 9_i64);
+
+    let u8_from_f64 = 255.0_f64.as_scalar::<u8>();
+    assert_eq!(u8_from_f64, 255_u8);
+
+    let usize_from_i16 = 12_i16.as_scalar::<usize>();
+    assert_eq!(usize_from_i16, 12_usize);
+}
+
+#[test]
+fn scalar_as_scalar_works_for_int_and_float_targets() {
+    let value_f32 = 1.25_f32;
+    let to_f64 = value_f32.as_scalar::<f64>();
+    assert_relative_eq!(to_f64, 1.25_f64, epsilon = 1.0e-12);
+
+    let value_f64 = 2.5_f64;
+    let to_f32 = value_f64.as_scalar::<f32>();
+    assert_relative_eq!(to_f32, 2.5_f32, epsilon = 1.0e-6);
+    let x_u32 = 123_u32;
+    let as_f64 = x_u32.as_scalar::<f64>();
+    assert_relative_eq!(as_f64, 123.0_f64, epsilon = 1.0e-12);
+
+    let x_f64 = 200.5_f64;
+    let as_i16 = x_f64.as_scalar::<i16>();
+    assert_eq!(as_i16, 200_i16);
 }
 
 #[cfg(feature = "std")]

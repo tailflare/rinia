@@ -1,6 +1,6 @@
 #![no_std]
 #![deny(rustdoc::broken_intra_doc_links)]
 
-mod scalar;
+pub(crate) mod scalar;
 
-pub use self::scalar::*;
+pub use self::scalar::{FloatScalar, IntScalar, Scalar};

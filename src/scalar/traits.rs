@@ -6,10 +6,6 @@ use core::{
 use approx::{AbsDiffEq, RelativeEq, UlpsEq};
 use core_maths::CoreFloat;
 
-use super::macros::define_float_repr_trait;
-
-define_float_repr_trait!(f32, f64);
-
 /// A trait representing a scalar type with the minimal set of operations and constants required
 /// for mathematical computations.
 pub trait Scalar:
@@ -17,6 +13,7 @@ pub trait Scalar:
     + Debug
     + PartialEq
     + PartialOrd
+    + MinMax
     + Add<Output = Self>
     + AddAssign
     + Sub<Output = Self>
@@ -25,20 +22,35 @@ pub trait Scalar:
     + MulAssign
     + Div<Output = Self>
     + DivAssign
-    + Neg
 {
     /// The additive identity (zero) for the scalar type.
     const ZERO: Self;
 
     /// The multiplicative identity (one) for the scalar type.
     const ONE: Self;
+
+    #[inline]
+    fn from_scalar<T: Scalar>(value: T) -> Self
+    where
+        Self: FromScalar<T>,
+    {
+        <Self as FromScalar<T>>::from_scalar(value)
+    }
+
+    #[inline]
+    fn as_scalar<T: Scalar>(&self) -> T
+    where
+        Self: FromScalar<T>,
+    {
+        <Self as FromScalar<T>>::as_scalar(self)
+    }
 }
 
 /// A trait representing a floating-point scalar type with additional constants and operations.
 pub trait FloatScalar:
     Scalar
-    + FloatRepr
     + CoreFloat
+    + Neg
     + AbsDiffEq<Epsilon = Self>
     + RelativeEq<Epsilon = Self>
     + UlpsEq<Epsilon = Self>
@@ -51,4 +63,30 @@ pub trait FloatScalar:
 
     /// NaN (Not a Number) for the scalar type.
     const NAN: Self;
+
+    /// Checks if the scalar value is NaN (Not a Number).
+    fn is_nan(self) -> bool;
+
+    /// Checks if the scalar value is finite (not infinite or NaN).
+    fn is_finite(self) -> bool;
+
+    /// Checks if the scalar value is infinite (positive or negative infinity).
+    fn is_infinite(self) -> bool;
+
+    /// Checks if the scalar value is zero.
+    fn is_zero(self) -> bool;
+}
+
+/// A trait representing an integer scalar type.
+pub trait IntScalar: Scalar {}
+
+pub trait MinMax {
+    fn min(self, other: Self) -> Self;
+    fn max(self, other: Self) -> Self;
+}
+
+/// A trait for converting between different scalar types.
+pub trait FromScalar<T>: Sized {
+    fn from_scalar(value: T) -> Self;
+    fn as_scalar(&self) -> T;
 }

@@ -1,5 +1,6 @@
-mod impl_f32;
-mod impl_f64;
+mod impl_common;
+mod impl_float;
+mod impl_int;
 pub(crate) mod macros;
 #[cfg(test)]
 mod tests;
