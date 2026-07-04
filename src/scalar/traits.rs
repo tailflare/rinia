@@ -6,6 +6,18 @@ use core::{
 use approx::{AbsDiffEq, RelativeEq, UlpsEq};
 use core_maths::CoreFloat;
 
+use super::macros::with_all_scalar_types;
+
+macro_rules! define_from_all_scalars_trait {
+    ($($ty:ty),+ $(,)?) => {
+        pub trait FromAllScalars: $(FromScalar<$ty> +)+ {}
+
+        impl<T> FromAllScalars for T where T: $(FromScalar<$ty> +)+ {}
+    };
+}
+
+with_all_scalar_types!(define_from_all_scalars_trait);
+
 /// A trait representing a scalar type with the minimal set of operations and constants required
 /// for mathematical computations.
 pub trait Scalar:
@@ -14,6 +26,7 @@ pub trait Scalar:
     + PartialEq
     + PartialOrd
     + MinMax
+    + FromAllScalars
     + Add<Output = Self>
     + AddAssign
     + Sub<Output = Self>
