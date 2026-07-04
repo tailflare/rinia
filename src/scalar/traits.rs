@@ -47,7 +47,7 @@ pub trait Scalar:
     where
         Self: FromScalar<T>,
     {
-        <Self as FromScalar<T>>::from_scalar(value)
+        <Self as FromScalar<T>>::from_scalar_impl(value)
     }
 
     #[inline]
@@ -55,7 +55,7 @@ pub trait Scalar:
     where
         Self: FromScalar<T>,
     {
-        <Self as FromScalar<T>>::as_scalar(self)
+        <Self as FromScalar<T>>::as_scalar_impl(self)
     }
 }
 
@@ -100,6 +100,6 @@ pub trait MinMax {
 
 /// A trait for converting between different scalar types.
 pub trait FromScalar<T>: Sized {
-    fn from_scalar(value: T) -> Self;
-    fn as_scalar(&self) -> T;
+    fn from_scalar_impl(value: T) -> Self;
+    fn as_scalar_impl(&self) -> T;
 }

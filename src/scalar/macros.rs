@@ -111,12 +111,12 @@ macro_rules! impl_from_scalar_for_all {
         $(
             impl $crate::scalar::FromScalar<$source> for $target {
                 #[inline]
-                fn from_scalar(value: $source) -> Self {
+                fn from_scalar_impl(value: $source) -> Self {
                     value as Self
                 }
 
                 #[inline]
-                fn as_scalar(&self) -> $source {
+                fn as_scalar_impl(&self) -> $source {
                     *self as $source
                 }
             }
