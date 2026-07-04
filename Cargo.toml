@@ -23,6 +23,8 @@ core_maths = "0.1.1"
 
 approx = { version = "0.5.1", default-features = false }
 
+pastey = "0.2.3"
+
 bytemuck = { version = "1.25.0", optional = true, default-features = false }
 
 zerocopy = { version = "0.8.52", optional = true, default-features = false, features = [

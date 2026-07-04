@@ -6,6 +6,10 @@ use core::{
 use approx::{AbsDiffEq, RelativeEq, UlpsEq};
 use core_maths::CoreFloat;
 
+use super::macros::define_float_repr_trait;
+
+define_float_repr_trait!(f32, f64);
+
 /// A trait representing a scalar type with the minimal set of operations and constants required
 /// for mathematical computations.
 pub trait Scalar:
@@ -32,7 +36,12 @@ pub trait Scalar:
 
 /// A trait representing a floating-point scalar type with additional constants and operations.
 pub trait FloatScalar:
-    Scalar + CoreFloat + AbsDiffEq<Epsilon = Self> + RelativeEq<Epsilon = Self> + UlpsEq<Epsilon = Self>
+    Scalar
+    + FloatRepr
+    + CoreFloat
+    + AbsDiffEq<Epsilon = Self>
+    + RelativeEq<Epsilon = Self>
+    + UlpsEq<Epsilon = Self>
 {
     /// Infinity for the scalar type.
     const INFINITY: Self;

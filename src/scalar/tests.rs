@@ -1,6 +1,6 @@
 use approx::assert_relative_eq;
 
-use super::{FloatScalar, Scalar};
+use super::{FloatRepr, FloatScalar, Scalar};
 
 fn scalar_identities<T: Scalar>() -> (T, T) {
     (T::ZERO, T::ONE)
@@ -16,6 +16,18 @@ fn sin_via_floatscalar<T: FloatScalar>(x: T) -> T {
 
 fn round_trip<T: FloatScalar>(value: T) -> T {
     (value + T::ONE) - T::ONE
+}
+
+fn from_f32_via_repr<T: FloatRepr>(value: f32) -> T {
+    T::from_f32(value)
+}
+
+fn from_f64_via_repr<T: FloatRepr>(value: f64) -> T {
+    T::from_f64(value)
+}
+
+fn from_float_via_repr<T: FloatRepr, V: FloatRepr>(value: V) -> T {
+    T::from_float(value)
 }
 
 #[test]
@@ -53,6 +65,41 @@ fn generic_round_trip_works_for_f32_and_f64() {
 
     let out_f64 = round_trip::<f64>(3.5);
     assert_relative_eq!(out_f64, 3.5, epsilon = 1.0e-12);
+}
+
+#[test]
+fn float_repr_as_converters_work_for_f32_and_f64() {
+    let x32 = 1.25_f32;
+    assert_relative_eq!(x32.as_f32(), 1.25_f32, epsilon = 1.0e-6);
+    assert_relative_eq!(x32.as_f64(), 1.25_f64, epsilon = 1.0e-12);
+
+    let x64 = 2.5_f64;
+    assert_relative_eq!(x64.as_f32(), 2.5_f32, epsilon = 1.0e-6);
+    assert_relative_eq!(x64.as_f64(), 2.5_f64, epsilon = 1.0e-12);
+}
+
+#[test]
+fn float_repr_from_primitive_converters_work_for_f32_and_f64() {
+    let f32_from_f32 = from_f32_via_repr::<f32>(1.25_f32);
+    assert_relative_eq!(f32_from_f32, 1.25_f32, epsilon = 1.0e-6);
+
+    let f32_from_f64 = from_f64_via_repr::<f32>(1.25_f64);
+    assert_relative_eq!(f32_from_f64, 1.25_f32, epsilon = 1.0e-6);
+
+    let f64_from_f32 = from_f32_via_repr::<f64>(2.5_f32);
+    assert_relative_eq!(f64_from_f32, 2.5_f64, epsilon = 1.0e-12);
+
+    let f64_from_f64 = from_f64_via_repr::<f64>(2.5_f64);
+    assert_relative_eq!(f64_from_f64, 2.5_f64, epsilon = 1.0e-12);
+}
+
+#[test]
+fn float_repr_from_float_converter_works_across_f32_and_f64() {
+    let f32_from_f64 = from_float_via_repr::<f32, _>(1.25_f64);
+    assert_relative_eq!(f32_from_f64, 1.25_f32, epsilon = 1.0e-6);
+
+    let f64_from_f32 = from_float_via_repr::<f64, _>(2.5_f32);
+    assert_relative_eq!(f64_from_f32, 2.5_f64, epsilon = 1.0e-12);
 }
 
 #[cfg(feature = "std")]
