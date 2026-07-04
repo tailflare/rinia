@@ -1,6 +1,7 @@
 use approx::assert_relative_eq;
 
 use super::{FloatScalar, Scalar};
+use crate::ops::{HasScalar, Select, Zero};
 
 fn scalar_identities<T: Scalar>() -> (T, T) {
     (T::ZERO, T::ONE)
@@ -33,6 +34,35 @@ fn scalar_constants_match_for_f32_and_f64() {
 }
 
 #[test]
+fn scalar_bounds_match_for_representative_types() {
+    assert_eq!(<f32 as Scalar>::MAX, f32::MAX);
+    assert_eq!(<f32 as Scalar>::MIN, f32::MIN);
+
+    assert_eq!(<f64 as Scalar>::MAX, f64::MAX);
+    assert_eq!(<f64 as Scalar>::MIN, f64::MIN);
+
+    assert_eq!(<u32 as Scalar>::MAX, u32::MAX);
+    assert_eq!(<u32 as Scalar>::MIN, u32::MIN);
+
+    assert_eq!(<i32 as Scalar>::MAX, i32::MAX);
+    assert_eq!(<i32 as Scalar>::MIN, i32::MIN);
+}
+
+fn assert_has_scalar_self<T>()
+where
+    T: Scalar + HasScalar<Scalar = T>,
+{
+}
+
+#[test]
+fn has_scalar_associated_type_is_self_for_scalars() {
+    assert_has_scalar_self::<f32>();
+    assert_has_scalar_self::<f64>();
+    assert_has_scalar_self::<u32>();
+    assert_has_scalar_self::<i32>();
+}
+
+#[test]
 fn float_constants_match_for_f32_and_f64() {
     let (f32_inf, f32_neg_inf, f32_nan) = float_constants::<f32>();
     assert!(f32_inf.is_infinite() && f32_inf.is_sign_positive());
@@ -46,11 +76,19 @@ fn float_constants_match_for_f32_and_f64() {
 }
 
 fn min_via_scalar<T: Scalar>(a: T, b: T) -> T {
-    super::MinMax::min(a, b)
+    a.min_val(b)
 }
 
 fn max_via_scalar<T: Scalar>(a: T, b: T) -> T {
-    super::MinMax::max(a, b)
+    a.max_val(b)
+}
+
+fn min_via_select<T: Select>(a: T, b: T) -> T {
+    a.min_val(b)
+}
+
+fn max_via_select<T: Select>(a: T, b: T) -> T {
+    a.max_val(b)
 }
 
 #[test]
@@ -60,6 +98,9 @@ fn min_max_works_for_integer_scalars() {
 
     assert_eq!(min_via_scalar(10_u16, 2_u16), 2_u16);
     assert_eq!(max_via_scalar(10_u16, 2_u16), 10_u16);
+
+    assert_eq!(min_via_select(3_i32, 7_i32), 3_i32);
+    assert_eq!(max_via_select(3_i32, 7_i32), 7_i32);
 }
 
 #[test]
@@ -122,11 +163,11 @@ fn float_scalar_predicates_work_for_f32_and_f64() {
 #[test]
 fn float_scalar_is_zero_works_for_f32_and_f64() {
     assert!(0.0_f32.is_zero());
-    assert!(<f32 as Scalar>::ZERO.is_zero());
+    assert!(f32::ZERO.is_zero());
     assert!(!1.0_f32.is_zero());
 
     assert!(0.0_f64.is_zero());
-    assert!(<f64 as Scalar>::ZERO.is_zero());
+    assert!(f64::ZERO.is_zero());
     assert!(!1.0_f64.is_zero());
 }
 

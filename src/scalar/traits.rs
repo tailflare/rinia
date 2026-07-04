@@ -6,27 +6,21 @@ use core::{
 use approx::{AbsDiffEq, RelativeEq, UlpsEq};
 use core_maths::CoreFloat;
 
-use super::macros::with_all_scalar_types;
-
-macro_rules! define_from_all_scalars_trait {
-    ($($ty:ty),+ $(,)?) => {
-        pub trait FromAllScalars: $(FromScalar<$ty> +)+ {}
-
-        impl<T> FromAllScalars for T where T: $(FromScalar<$ty> +)+ {}
-    };
-}
-
-with_all_scalar_types!(define_from_all_scalars_trait);
+use super::type_lists::with_all_scalar_types;
+use crate::ops::{HasScalar, One, Select, Zero};
 
 /// A trait representing a scalar type with the minimal set of operations and constants required
 /// for mathematical computations.
 pub trait Scalar:
     Copy
     + Debug
+    + HasScalar
+    + Zero
+    + One
+    + Select
     + PartialEq
     + PartialOrd
-    + MinMax
-    + FromAllScalars
+    + ScalarCasts
     + Add<Output = Self>
     + AddAssign
     + Sub<Output = Self>
@@ -36,26 +30,28 @@ pub trait Scalar:
     + Div<Output = Self>
     + DivAssign
 {
-    /// The additive identity (zero) for the scalar type.
-    const ZERO: Self;
+    /// The maximum finite value for the scalar type.
+    const MAX: Self;
 
-    /// The multiplicative identity (one) for the scalar type.
-    const ONE: Self;
+    /// The minimum finite value for the scalar type.
+    const MIN: Self;
 
+    /// Converts a value of type `T` into the implementing scalar type.
     #[inline]
     fn from_scalar<T: Scalar>(value: T) -> Self
     where
-        Self: FromScalar<T>,
+        Self: ScalarCast<T>,
     {
-        <Self as FromScalar<T>>::from_scalar_impl(value)
+        <Self as ScalarCast<T>>::from_scalar_impl(value)
     }
 
+    /// Converts the implementing scalar type into a value of type `T`.
     #[inline]
     fn as_scalar<T: Scalar>(&self) -> T
     where
-        Self: FromScalar<T>,
+        Self: ScalarCast<T>,
     {
-        <Self as FromScalar<T>>::as_scalar_impl(self)
+        <Self as ScalarCast<T>>::as_scalar_impl(self)
     }
 }
 
@@ -63,7 +59,7 @@ pub trait Scalar:
 pub trait FloatScalar:
     Scalar
     + CoreFloat
-    + Neg
+    + Neg<Output = Self>
     + AbsDiffEq<Epsilon = Self>
     + RelativeEq<Epsilon = Self>
     + UlpsEq<Epsilon = Self>
@@ -85,21 +81,29 @@ pub trait FloatScalar:
 
     /// Checks if the scalar value is infinite (positive or negative infinity).
     fn is_infinite(self) -> bool;
-
-    /// Checks if the scalar value is zero.
-    fn is_zero(self) -> bool;
 }
 
 /// A trait representing an integer scalar type.
-pub trait IntScalar: Scalar {}
+pub trait IntScalar: Scalar + Ord + Eq {}
 
-pub trait MinMax {
-    fn min(self, other: Self) -> Self;
-    fn max(self, other: Self) -> Self;
-}
+/// A trait representing an unsigned integer scalar type.
+pub trait UIntScalar: IntScalar {}
+
+/// A trait representing a signed integer scalar type.
+pub trait SIntScalar: IntScalar + Neg<Output = Self> {}
 
 /// A trait for converting between different scalar types.
-pub trait FromScalar<T>: Sized {
+pub trait ScalarCast<T>: Sized {
     fn from_scalar_impl(value: T) -> Self;
     fn as_scalar_impl(&self) -> T;
 }
+
+macro_rules! define_scalar_casts_trait {
+    ($($ty:ty),+ $(,)?) => {
+        pub trait ScalarCasts: $(ScalarCast<$ty> +)+ {}
+
+        impl<T> ScalarCasts for T where T: $(ScalarCast<$ty> +)+ {}
+    };
+}
+
+with_all_scalar_types!(define_scalar_casts_trait);
