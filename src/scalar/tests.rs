@@ -1,14 +1,14 @@
 use approx::assert_relative_eq;
 
-use super::{FloatScalar, Scalar};
-use crate::ops::{HasScalar, Select, Zero};
+use super::{Float, FloatScalar, Scalar};
+use crate::ops::{Abs, HasScalar, Infinity, NaN, Negate, One, Rounding, Select, Zero};
 
 fn scalar_identities<T: Scalar>() -> (T, T) {
     (T::ZERO, T::ONE)
 }
 
 fn float_constants<T: FloatScalar>() -> (T, T, T) {
-    (T::INFINITY, T::NEG_INFINITY, T::NAN)
+    (<T as Infinity>::INFINITY, <T as Infinity>::NEG_INFINITY, <T as NaN>::NAN)
 }
 
 fn sin_via_floatscalar<T: FloatScalar>(x: T) -> T {
@@ -114,13 +114,13 @@ fn min_max_works_for_float_scalars() {
 
 #[test]
 fn min_max_nan_behavior_for_float_scalars() {
-    let nan32 = <f32 as FloatScalar>::NAN;
+    let nan32 = <f32 as NaN>::NAN;
     assert_eq!(min_via_scalar(nan32, 4.0_f32), 4.0_f32);
     assert_eq!(max_via_scalar(nan32, 4.0_f32), 4.0_f32);
     assert!(min_via_scalar(nan32, nan32).is_nan());
     assert!(max_via_scalar(nan32, nan32).is_nan());
 
-    let nan64 = <f64 as FloatScalar>::NAN;
+    let nan64 = <f64 as NaN>::NAN;
     assert_eq!(min_via_scalar(nan64, 4.0_f64), 4.0_f64);
     assert_eq!(max_via_scalar(nan64, 4.0_f64), 4.0_f64);
     assert!(min_via_scalar(nan64, nan64).is_nan());
@@ -134,12 +134,12 @@ fn float_scalar_predicates_work_for_f32_and_f64() {
     assert!(!finite32.is_infinite());
     assert!(!finite32.is_nan());
 
-    let inf32 = <f32 as FloatScalar>::INFINITY;
+    let inf32 = <f32 as Infinity>::INFINITY;
     assert!(!inf32.is_finite());
     assert!(inf32.is_infinite());
     assert!(!inf32.is_nan());
 
-    let nan32 = <f32 as FloatScalar>::NAN;
+    let nan32 = <f32 as NaN>::NAN;
     assert!(!nan32.is_finite());
     assert!(!nan32.is_infinite());
     assert!(nan32.is_nan());
@@ -149,12 +149,12 @@ fn float_scalar_predicates_work_for_f32_and_f64() {
     assert!(!finite64.is_infinite());
     assert!(!finite64.is_nan());
 
-    let inf64 = <f64 as FloatScalar>::INFINITY;
+    let inf64 = <f64 as Infinity>::INFINITY;
     assert!(!inf64.is_finite());
     assert!(inf64.is_infinite());
     assert!(!inf64.is_nan());
 
-    let nan64 = <f64 as FloatScalar>::NAN;
+    let nan64 = <f64 as NaN>::NAN;
     assert!(!nan64.is_finite());
     assert!(!nan64.is_infinite());
     assert!(nan64.is_nan());
@@ -318,4 +318,125 @@ fn non_std_method_sin_still_works_for_f32_and_f64() {
     let x64 = 0.5_f64;
     let sin64 = x64.sin();
     assert_relative_eq!(sin64, sin_via_floatscalar::<f64>(x64), epsilon = 1.0e-12);
+}
+
+fn assert_is_float<T: Float>() {}
+
+#[test]
+fn float_trait_is_implemented_for_f32_and_f64() {
+    assert_is_float::<f32>();
+    assert_is_float::<f64>();
+}
+
+#[test]
+fn abs_works_for_f32_and_f64() {
+    assert_eq!(crate::ops::Abs::abs(-3.5_f32), 3.5_f32);
+    assert_eq!(crate::ops::Abs::abs(-7.25_f64), 7.25_f64);
+}
+
+#[test]
+fn nan_and_infinity_helpers_work() {
+    assert!(NaN::is_nan(f32::NAN));
+    assert!(Infinity::is_infinite(f32::INFINITY));
+    assert!(Infinity::is_finite(1.0_f32));
+    assert_eq!(<f32 as Infinity>::NEG_INFINITY, f32::NEG_INFINITY);
+}
+
+#[test]
+fn rounding_helpers_work() {
+    assert_eq!(crate::ops::Rounding::floor(1.75_f32), 1.0);
+    assert_eq!(crate::ops::Rounding::ceil(1.25_f32), 2.0);
+    assert_eq!(crate::ops::Rounding::round(1.5_f32), 2.0);
+    assert_eq!(crate::ops::Rounding::fract(2.75_f32), 0.75);
+}
+
+#[test]
+fn float_math_helpers_work() {
+    let s = Float::sin(0.0_f32);
+    let c = Float::cos(0.0_f32);
+    let q = Float::sqrt(9.0_f32);
+    let p = Float::powf(2.0_f32, 3.0_f32);
+
+    assert!(crate::ops::Abs::abs(s) < 1.0e-6);
+    assert!(crate::ops::Abs::abs(c - 1.0) < 1.0e-6);
+    assert_eq!(q, 3.0);
+    assert_eq!(p, 8.0);
+}
+
+#[test]
+fn float_math_extended_helpers_work() {
+    assert_relative_eq!(Float::tan(0.0_f32), 0.0_f32, epsilon = 1.0e-6);
+
+    let e = Float::exp(1.0_f32);
+    assert!(Abs::abs(e - 2.7182817_f32) < 1.0e-5);
+
+    assert_relative_eq!(Float::ln(1.0_f64), 0.0_f64, epsilon = 1.0e-12);
+
+    assert_eq!(Float::signum(12.0_f32), 1.0_f32);
+    assert_eq!(Float::signum(-12.0_f32), -1.0_f32);
+    assert!(Float::signum(f32::NAN).is_nan());
+}
+
+#[test]
+fn integer_ops_helpers_work_for_signed_and_unsigned() {
+    assert_eq!(<u32 as Zero>::ZERO, 0_u32);
+    assert_eq!(<u32 as One>::ONE, 1_u32);
+    assert!(Zero::is_zero(0_u32));
+    assert_eq!(Select::min_val(3_u32, 7_u32), 3_u32);
+    assert_eq!(Select::max_val(3_u32, 7_u32), 7_u32);
+    assert_eq!(Abs::abs(9_u32), 9_u32);
+
+    assert_eq!(<i32 as Zero>::ZERO, 0_i32);
+    assert_eq!(<i32 as One>::ONE, 1_i32);
+    assert!(Zero::is_zero(0_i32));
+    assert_eq!(Select::min_val(-5_i32, 2_i32), -5_i32);
+    assert_eq!(Select::max_val(-5_i32, 2_i32), 2_i32);
+    assert_eq!(Negate::negate(5_i32), -5_i32);
+    assert_eq!(Abs::abs(-9_i32), 9_i32);
+}
+
+#[test]
+fn float_math_extended_surface_methods_work() {
+    let x = 2.0_f64;
+
+    assert_eq!(Rounding::trunc(-3.7_f64), -3.0);
+    assert_eq!(Float::copysign(3.5_f64, -1.0), -3.5);
+    assert_relative_eq!(Float::mul_add(10.0_f64, 4.0, 60.0), 100.0, epsilon = 1.0e-12);
+
+    assert_eq!(Float::div_euclid(7.0_f64, 4.0), 1.0);
+    assert_eq!(Float::div_euclid(-7.0_f64, 4.0), -2.0);
+    assert_eq!(Float::rem_euclid(-7.0_f64, 4.0), 1.0);
+
+    assert_relative_eq!(Float::powi(x, 3), 8.0, epsilon = 1.0e-12);
+    assert_relative_eq!(Float::exp2(3.0_f64), 8.0, epsilon = 1.0e-12);
+    assert_relative_eq!(Float::log(25.0_f64, 5.0), 2.0, epsilon = 1.0e-12);
+    assert_relative_eq!(Float::log2(8.0_f64), 3.0, epsilon = 1.0e-12);
+    assert_relative_eq!(Float::log10(1000.0_f64), 3.0, epsilon = 1.0e-12);
+
+    assert_relative_eq!(Float::cbrt(27.0_f64), 3.0, epsilon = 1.0e-12);
+    assert_relative_eq!(Float::hypot(3.0_f64, 4.0), 5.0, epsilon = 1.0e-12);
+
+    assert_relative_eq!(Float::asin(1.0_f64), core::f64::consts::FRAC_PI_2, epsilon = 1.0e-12);
+    assert_relative_eq!(Float::acos(1.0_f64), 0.0, epsilon = 1.0e-12);
+    assert_relative_eq!(Float::atan(1.0_f64), core::f64::consts::FRAC_PI_4, epsilon = 1.0e-12);
+    assert_relative_eq!(
+        Float::atan2(1.0_f64, 1.0),
+        core::f64::consts::FRAC_PI_4,
+        epsilon = 1.0e-12
+    );
+
+    let (s, c) = Float::sin_cos(core::f64::consts::FRAC_PI_4);
+    assert_relative_eq!(s, core::f64::consts::FRAC_1_SQRT_2, epsilon = 1.0e-12);
+    assert_relative_eq!(c, core::f64::consts::FRAC_1_SQRT_2, epsilon = 1.0e-12);
+
+    assert_relative_eq!(Float::exp_m1(1.0e-6_f64), 1.0000005000001665e-6, epsilon = 1.0e-15);
+    assert_relative_eq!(Float::ln_1p(1.0e-6_f64), 9.999995000003334e-7, epsilon = 1.0e-15);
+
+    assert_relative_eq!(Float::sinh(1.0_f64), 1.1752011936438014, epsilon = 1.0e-12);
+    assert_relative_eq!(Float::cosh(1.0_f64), 1.5430806348152437, epsilon = 1.0e-12);
+    assert_relative_eq!(Float::tanh(1.0_f64), 0.7615941559557649, epsilon = 1.0e-12);
+
+    assert_relative_eq!(Float::asinh(1.0_f64), 0.881373587019543, epsilon = 1.0e-12);
+    assert_relative_eq!(Float::acosh(2.0_f64), 1.3169578969248166, epsilon = 1.0e-12);
+    assert_relative_eq!(Float::atanh(0.5_f64), 0.5493061443340548, epsilon = 1.0e-12);
 }

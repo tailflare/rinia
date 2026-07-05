@@ -1,13 +1,15 @@
 use core::{
     fmt::Debug,
-    ops::{Add, AddAssign, Div, DivAssign, Mul, MulAssign, Neg, Sub, SubAssign},
+    ops::{Add, AddAssign, Div, DivAssign, Mul, MulAssign, Sub, SubAssign},
 };
 
 use approx::{AbsDiffEq, RelativeEq, UlpsEq};
-use core_maths::CoreFloat;
 
 use super::type_lists::with_all_scalar_types;
-use crate::ops::{HasScalar, One, Select, Zero};
+use crate::{
+    ops::{Abs, HasScalar, Negate, One, Select, Zero},
+    scalar::Float,
+};
 
 /// A trait representing a scalar type with the minimal set of operations and constants required
 /// for mathematical computations.
@@ -57,30 +59,8 @@ pub trait Scalar:
 
 /// A trait representing a floating-point scalar type with additional constants and operations.
 pub trait FloatScalar:
-    Scalar
-    + CoreFloat
-    + Neg<Output = Self>
-    + AbsDiffEq<Epsilon = Self>
-    + RelativeEq<Epsilon = Self>
-    + UlpsEq<Epsilon = Self>
+    Scalar + Float + AbsDiffEq<Epsilon = Self> + RelativeEq<Epsilon = Self> + UlpsEq<Epsilon = Self>
 {
-    /// Infinity for the scalar type.
-    const INFINITY: Self;
-
-    /// Negative infinity for the scalar type.
-    const NEG_INFINITY: Self;
-
-    /// NaN (Not a Number) for the scalar type.
-    const NAN: Self;
-
-    /// Checks if the scalar value is NaN (Not a Number).
-    fn is_nan(self) -> bool;
-
-    /// Checks if the scalar value is finite (not infinite or NaN).
-    fn is_finite(self) -> bool;
-
-    /// Checks if the scalar value is infinite (positive or negative infinity).
-    fn is_infinite(self) -> bool;
 }
 
 /// A trait representing an integer scalar type.
@@ -90,7 +70,7 @@ pub trait IntScalar: Scalar + Ord + Eq {}
 pub trait UIntScalar: IntScalar {}
 
 /// A trait representing a signed integer scalar type.
-pub trait SIntScalar: IntScalar + Neg<Output = Self> {}
+pub trait SIntScalar: IntScalar + Negate + Abs {}
 
 /// A trait for converting between different scalar types.
 pub trait ScalarCast<T>: Sized {
