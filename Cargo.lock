@@ -70,7 +70,7 @@ dependencies = [
 
 [[package]]
 name = "rinia"
-version = "0.0.6"
+version = "0.0.7"
 dependencies = [
  "approx",
  "bytemuck",
