@@ -6,7 +6,13 @@
 [![Main CI Build Status](https://img.shields.io/github/actions/workflow/status/tailflare/rinia/ci.yml?label=main%20build)](https://github.com/tailflare/rinia/actions/workflows/ci.yml)
 [![License](https://img.shields.io/crates/l/rinia)](#license)
 
-Portable scalar abstractions for game and simulation math.
+Stable math primitives for graphics, animation, and simulation.
+
+Rinia provides a lightweight foundation of scalar, vector, and quaternion types for Rust applications. It defines consistent mathematical representations and operations that can be shared across engines, tools, runtimes, and data processing pipelines.
+
+Rinia is designed for projects that need stable math types across multiple systems without depending on a larger engine-specific math stack.
+
+Rinia is not intended to replace specialized math libraries where maximum performance or platform-specific optimizations are the primary goal. Instead, it provides a reliable mathematical foundation for systems that need to exchange data and behavior across project boundaries.
 
 ## Status
 

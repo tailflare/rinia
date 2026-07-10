@@ -33,16 +33,16 @@ pub mod types {
     use super::*;
 
     pub type Scalarf = f32;
-    pub type Vec2f = Vec2<f32>;
-    pub type Vec3f = Vec3<f32>;
-    pub type Vec4f = Vec4<f32>;
-    pub type Quatf = Quat<f32>;
+    pub type Vec2f = Vec2<Scalarf>;
+    pub type Vec3f = Vec3<Scalarf>;
+    pub type Vec4f = Vec4<Scalarf>;
+    pub type Quatf = Quat<Scalarf>;
 
     pub type Scalard = f64;
-    pub type Vec2d = Vec2<f64>;
-    pub type Vec3d = Vec3<f64>;
-    pub type Vec4d = Vec4<f64>;
-    pub type Quatd = Quat<f64>;
+    pub type Vec2d = Vec2<Scalard>;
+    pub type Vec3d = Vec3<Scalard>;
+    pub type Vec4d = Vec4<Scalard>;
+    pub type Quatd = Quat<Scalard>;
 }
 
 pub use self::types::*;
