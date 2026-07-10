@@ -5,7 +5,7 @@
 extern crate std;
 
 // Our modules
-pub mod core;
+pub mod common;
 pub mod ops;
 pub mod quaternion;
 pub mod scalar;
@@ -28,14 +28,32 @@ pub mod external {
     pub use mint;
 }
 
+// Convenience types
+pub mod types {
+    use super::*;
+
+    pub type Scalarf = f32;
+    pub type Vec2f = Vec2<f32>;
+    pub type Vec3f = Vec3<f32>;
+    pub type Vec4f = Vec4<f32>;
+    pub type Quatf = Quat<f32>;
+
+    pub type Scalard = f64;
+    pub type Vec2d = Vec2<f64>;
+    pub type Vec3d = Vec3<f64>;
+    pub type Vec4d = Vec4<f64>;
+    pub type Quatd = Quat<f64>;
+}
+
+pub use self::types::*;
+
 // Prelude module for convenient imports
 pub mod prelude {
     pub use super::{
-        external::{approx, libm},
         ops::*,
-        quaternion::*,
-        scalar::{Float, *},
-        tuple::*,
-        vector::*,
+        quaternion::{Quat, Quaternion},
+        scalar::{Float, Scalar},
+        types::*,
+        vector::{Vec2, Vec3, Vec4, Vector},
     };
 }
