@@ -1,17 +1,17 @@
-mod impl_common;
-mod impl_vec2;
-mod impl_vec3;
-mod impl_vec4;
-mod interop;
+mod impl_algebra;
+mod impl_compat_mint;
+mod impl_core;
+mod impl_numeric;
+mod impl_ops;
+mod impl_vector2;
+mod impl_vector3;
+mod impl_vector4;
 mod macros;
-mod macros_arith;
-mod macros_core;
-mod macros_equality;
-mod macros_ops;
-#[cfg(test)]
 mod tests;
-mod traits;
 mod types;
 
-pub(crate) use self::{macros_arith::*, macros_core::*, macros_equality::*, macros_ops::*};
-pub use self::{traits::*, types::*};
+pub(crate) use self::macros::*;
+pub use self::types::{
+    Vec2, Vec2d, Vec2f, Vec3, Vec3d, Vec3f, Vec4, Vec4d, Vec4f, Vector, Vector2Fields,
+    Vector3Fields, Vector4Fields,
+};

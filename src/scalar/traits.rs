@@ -1,89 +1,81 @@
-use core::{
-    fmt::Debug,
-    ops::{Add, AddAssign, Div, DivAssign, Mul, MulAssign, Sub, SubAssign},
-};
+use core::ops::{Add, Div, Mul, Neg, Sub};
 
-use approx::{AbsDiffEq, RelativeEq, UlpsEq};
-
-use super::type_lists::with_all_scalar_types;
 use crate::{
-    ops::{Abs, HasScalar, Negate, One, Select, Zero},
-    scalar::Float,
+    algebra::{ApproxEqAbs, ApproxEqRel, Lerp},
+    numeric::{
+        Abs, Bounded, Cbrt, Clamp, Exponential, Finite, Half, Hyperbolic, Hypot, Infinite, MinMax,
+        Nan, NegOne, One, Power, Rounding, Sqrt, Trigonometry, Two, Zero,
+    },
 };
 
-/// A trait representing a scalar type with the minimal set of operations and constants required
-/// for mathematical computations.
-pub trait Scalar:
-    Copy
-    + Debug
-    + HasScalar
-    + Zero
-    + One
-    + Select
+/// Marker trait for scalar types.
+pub trait Scalar {}
+
+/// Marker trait for signed scalar types.
+pub trait Signed: Scalar {}
+
+/// Marker trait for unsigned scalar types.
+pub trait Unsigned: Scalar {}
+
+/// Marker trait for floating-point scalar types.
+pub trait Float: Signed {}
+
+/// Marker trait for integer scalar types.
+pub trait Int: Scalar {}
+
+/// Marker trait for signed integer scalar types.
+pub trait SignedInt: Signed + Int {}
+
+/// Marker trait for unsigned integer scalar types.
+pub trait UnsignedInt: Unsigned + Int {}
+
+/// Marker trait for types that have an associated scalar type.
+pub trait HasScalar {
+    type Scalar: Scalar;
+}
+
+/// Marker trait for scalar types that implement the basic set of scalar math ops.
+pub trait ScalarMath:
+    Scalar
+    + Copy
+    + Default
+    + core::fmt::Debug
     + PartialEq
     + PartialOrd
-    + ScalarCasts
+    + MinMax
+    + Clamp
+    + Bounded
+    + Zero
+    + One
+    + Two
     + Add<Output = Self>
-    + AddAssign
     + Sub<Output = Self>
-    + SubAssign
     + Mul<Output = Self>
-    + MulAssign
     + Div<Output = Self>
-    + DivAssign
-{
-    /// The maximum finite value for the scalar type.
-    const MAX: Self;
-
-    /// The minimum finite value for the scalar type.
-    const MIN: Self;
-
-    /// Converts a value of type `T` into the implementing scalar type.
-    #[inline]
-    fn from_scalar<T: Scalar>(value: T) -> Self
-    where
-        Self: ScalarCast<T>,
-    {
-        <Self as ScalarCast<T>>::from_scalar_impl(value)
-    }
-
-    /// Converts the implementing scalar type into a value of type `T`.
-    #[inline]
-    fn as_scalar<T: Scalar>(&self) -> T
-    where
-        Self: ScalarCast<T>,
-    {
-        <Self as ScalarCast<T>>::as_scalar_impl(self)
-    }
-}
-
-/// A trait representing a floating-point scalar type with additional constants and operations.
-pub trait FloatScalar:
-    Scalar + Float + AbsDiffEq<Epsilon = Self> + RelativeEq<Epsilon = Self> + UlpsEq<Epsilon = Self>
 {
 }
 
-/// A trait representing an integer scalar type.
-pub trait IntScalar: Scalar + Ord + Eq {}
+/// Marker trait for signed scalar types that implement the basic set of signed scalar math ops.
+pub trait SignedMath: ScalarMath + Signed + Abs + Neg<Output = Self> + NegOne {}
 
-/// A trait representing an unsigned integer scalar type.
-pub trait UIntScalar: IntScalar {}
-
-/// A trait representing a signed integer scalar type.
-pub trait SIntScalar: IntScalar + Negate + Abs {}
-
-/// A trait for converting between different scalar types.
-pub trait ScalarCast<T>: Sized {
-    fn from_scalar_impl(value: T) -> Self;
-    fn as_scalar_impl(&self) -> T;
+/// Marker trait for floating-point scalar types that implement the basic set of floating-point math ops.
+pub trait FloatMath:
+    Float
+    + SignedMath
+    + Rounding
+    + Finite
+    + Infinite
+    + Nan
+    + Sqrt
+    + Trigonometry
+    + Exponential
+    + Power
+    + Cbrt
+    + Hyperbolic
+    + Hypot
+    + ApproxEqAbs<Tolerance = Self>
+    + ApproxEqRel<Tolerance = Self>
+    + Lerp<Scalar = Self>
+    + Half
+{
 }
-
-macro_rules! define_scalar_casts_trait {
-    ($($ty:ty),+ $(,)?) => {
-        pub trait ScalarCasts: $(ScalarCast<$ty> +)+ {}
-
-        impl<T> ScalarCasts for T where T: $(ScalarCast<$ty> +)+ {}
-    };
-}
-
-with_all_scalar_types!(define_scalar_casts_trait);

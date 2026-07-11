@@ -1,12 +1,17 @@
-mod float_compat;
-mod impl_common;
-mod impl_float;
-mod impl_int;
-mod macros_float;
-mod macros_int;
-#[cfg(test)]
+mod impl_algebra;
+mod impl_core;
+mod impl_markers;
+mod impl_numeric;
+mod macros;
 mod tests;
 mod traits;
-pub(crate) mod type_lists;
+mod types;
 
-pub use self::{float_compat::Float, traits::*};
+pub(crate) use self::macros::*;
+pub use self::{
+    traits::{
+        Float, FloatMath, HasScalar, Int, Scalar, ScalarMath, Signed, SignedInt, SignedMath,
+        Unsigned, UnsignedInt,
+    },
+    types::{Scalard, Scalarf},
+};
