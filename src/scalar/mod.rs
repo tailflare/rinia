@@ -10,8 +10,8 @@ mod types;
 pub(crate) use self::macros::*;
 pub use self::{
     traits::{
-        Float, FloatMath, HasScalar, Int, Scalar, ScalarMath, Signed, SignedInt, SignedMath,
-        Unsigned, UnsignedInt,
+        Float, FloatOps, HasScalar, Int, Scalar, ScalarOps, Signed, SignedInt, SignedOps, Unsigned,
+        UnsignedInt,
     },
     types::{Scalard, Scalarf},
 };

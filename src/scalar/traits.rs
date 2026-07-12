@@ -1,7 +1,7 @@
 use core::ops::{Add, Div, Mul, Neg, Sub};
 
 use crate::{
-    algebra::{ApproxEqAbs, ApproxEqRel, Lerp},
+    algebra::{ApproxEqAbs, ApproxEqRel},
     numeric::{
         Abs, Bounded, Cbrt, Clamp, Exponential, Finite, Half, Hyperbolic, Hypot, Infinite, MinMax,
         Nan, NegOne, One, Power, Rounding, Sqrt, Trigonometry, Two, Zero,
@@ -35,10 +35,9 @@ pub trait HasScalar {
 }
 
 /// Marker trait for scalar types that implement the basic set of scalar math ops.
-pub trait ScalarMath:
+pub trait ScalarOps:
     Scalar
     + Copy
-    + Default
     + core::fmt::Debug
     + PartialEq
     + PartialOrd
@@ -56,12 +55,12 @@ pub trait ScalarMath:
 }
 
 /// Marker trait for signed scalar types that implement the basic set of signed scalar math ops.
-pub trait SignedMath: ScalarMath + Signed + Abs + Neg<Output = Self> + NegOne {}
+pub trait SignedOps: ScalarOps + Signed + Abs + Neg<Output = Self> + NegOne {}
 
 /// Marker trait for floating-point scalar types that implement the basic set of floating-point math ops.
-pub trait FloatMath:
+pub trait FloatOps:
     Float
-    + SignedMath
+    + SignedOps
     + Rounding
     + Finite
     + Infinite
@@ -75,7 +74,6 @@ pub trait FloatMath:
     + Hypot
     + ApproxEqAbs<Tolerance = Self>
     + ApproxEqRel<Tolerance = Self>
-    + Lerp<Scalar = Self>
     + Half
 {
 }

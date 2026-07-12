@@ -1,7 +1,7 @@
 use crate::{
     common,
     scalar::{
-        Float, FloatMath, Int, Scalar, ScalarMath, Signed, SignedInt, SignedMath, Unsigned,
+        Float, FloatOps, Int, Scalar, ScalarOps, Signed, SignedInt, SignedOps, Unsigned,
         UnsignedInt,
     },
 };
@@ -32,12 +32,12 @@ common::impl_marker_trait!(UnsignedInt, [usize, u8, u16, u32, u64, u128,]);
 
 // Implement marker trait for scalar math for all scalar types.
 common::impl_marker_trait!(
-    ScalarMath,
+    ScalarOps,
     [usize, isize, u8, u16, u32, u64, u128, i8, i16, i32, i64, i128, f32, f64,]
 );
 
 // Implement marker trait for signed scalar math for all signed scalar types.
-common::impl_marker_trait!(SignedMath, [isize, i8, i16, i32, i64, i128, f32, f64,]);
+common::impl_marker_trait!(SignedOps, [isize, i8, i16, i32, i64, i128, f32, f64,]);
 
 // Implement marker trait for floating-point math for all floating-point scalar types.
-common::impl_marker_trait!(FloatMath, [f32, f64]);
+common::impl_marker_trait!(FloatOps, [f32, f64]);

@@ -34,8 +34,8 @@ pub mod prelude {
         numeric::*,
         quaternion::{Quat, Quatd, Quaternion, Quatf},
         scalar::{
-            Float, FloatMath, HasScalar, Int, Scalar, ScalarMath, Scalard, Scalarf, Signed,
-            SignedInt, SignedMath, Unsigned, UnsignedInt,
+            Float, FloatOps, HasScalar, Int, Scalar, ScalarOps, Scalard, Scalarf, Signed,
+            SignedInt, SignedOps, Unsigned, UnsignedInt,
         },
         vector::{Vec2, Vec2d, Vec2f, Vec3, Vec3d, Vec3f, Vec4, Vec4d, Vec4f, Vector},
     };
