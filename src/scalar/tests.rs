@@ -191,7 +191,7 @@ fn approx_eq_surface() {
 }
 
 #[test]
-fn float_predicates_surface() {
+fn predicates_surface() {
     fn zero<T: IsZero>(x: T) -> bool {
         x.is_zero()
     }
@@ -208,6 +208,7 @@ fn float_predicates_surface() {
         x.is_nan()
     }
 
+    // Zero
     assert!(zero(0_i32));
     assert!(!zero(1_i32));
     assert!(<i32 as IsZero>::is_zero(0));
@@ -224,19 +225,25 @@ fn float_predicates_surface() {
     assert!(<f32 as IsZero>::is_zero(0.0));
     assert!(!<f32 as IsZero>::is_zero(0.5));
 
+    // Finite
     assert!(finite(1.0_f32));
+    assert!(finite(1_u32));
 
     assert!(!finite(<f32 as Infinite>::INFINITY));
     assert!(!finite(<f32 as Nan>::NAN));
 
+    // Infinite
     assert!(infinite(<f32 as Infinite>::INFINITY));
     assert!(infinite(<f32 as Infinite>::NEG_INFINITY));
 
     assert!(!infinite(<f32 as Nan>::NAN));
+    assert!(!infinite(1_u32));
     assert!(!infinite(1.0_f32));
 
+    // NaN
     assert!(nan(<f32 as Nan>::NAN));
 
+    assert!(!nan(1_u32));
     assert!(!nan(1.0_f32));
     assert!(!nan(<f32 as Infinite>::INFINITY));
 }

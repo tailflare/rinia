@@ -1,6 +1,6 @@
 use crate::{common, numeric::Rounding, scalar};
 
-// Implement scalar constants for all scalars
+// Implement scalar constants for all scalars (ZERO, ONE, TWO, NEG_ONE, HALF)
 scalar::impl_scalar_constants!(
     [usize, zero: 0, one: 1, two: 2],
     [isize, zero: 0, one: 1, two: 2, neg_one: -1],
@@ -18,7 +18,16 @@ scalar::impl_scalar_constants!(
     [f64, zero: 0.0, one: 1.0, two: 2.0, neg_one: -1.0, half: 0.5],
 );
 
-// Implement Bounded for all scalar types.
+// Implement scalar constants for all floating-point scalars (INFINITY, NEG_INFINITY, NAN)
+scalar::impl_scalar_constants_float!(f32, f64);
+
+// Implement predicates for all floating-point scalars (is_zero, is_nan, is_infinite, is_finite)
+scalar::impl_scalar_predicates_float!(f32, f64);
+
+// Implement predicates for all integer scalars (is_zero, is_finite, is_infinite, is_nan)
+scalar::impl_scalar_predicates_int!(usize, isize, u8, u16, u32, u64, u128, i8, i16, i32, i64, i128);
+
+// Implement Bounded for all scalar types (MIN, MAX).
 scalar::impl_scalar_bounded!(
     [usize, usize::MIN, usize::MAX],
     [isize, isize::MIN, isize::MAX],
@@ -36,7 +45,7 @@ scalar::impl_scalar_bounded!(
     [f64, f64::MIN, f64::MAX],
 );
 
-// Implement Min/Max for all scalar types.
+// Implement Min/Max for all scalar types (minimum, maximum).
 scalar::impl_scalar_min_max!(
     usize, isize, u8, u16, u32, u64, u128, i8, i16, i32, i64, i128, f32, f64
 );
@@ -112,9 +121,6 @@ scalar::impl_scalar_trait!(
     [f32, f64],
     {binary, hypot, Self, [f32: libm::hypotf, f64: libm::hypot]}
 );
-
-// Implement Finite/Infinite/Nan for floating scalar types.
-scalar::impl_scalar_float_predicates!(f32, f64);
 
 // Implement Floor for floating scalar types.
 scalar::impl_scalar_trait!(
