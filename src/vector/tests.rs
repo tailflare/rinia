@@ -5,7 +5,7 @@ use alloc::vec::Vec;
 use crate::{
     algebra::{Dot, Length, LengthSquared, Lerp, Normalize},
     approx_eql_abs, approx_eql_abs_tol, approx_eql_rel, approx_eql_rel_tol,
-    numeric::{Finite, Infinite, Nan, Negate, One, Zero},
+    numeric::{Infinite, IsFinite, IsZero, Nan, Negate, One, Zero},
     tuple::{Tuple, TupleLike},
     vector::{Vec2, Vec3, Vec4, Vector},
 };
@@ -168,6 +168,13 @@ fn arithmetic_surface() {
 
 #[test]
 fn numeric_predicates_surface() {
+    let zero = Vector::<f32, 3>::ZERO;
+    let non_zero = Vector::<f32, 3>::from_array([0.0, 1.0, 0.0]);
+    assert!(zero.is_zero());
+    assert!(!non_zero.is_zero());
+    assert!(<Vector<f32, 3> as IsZero>::is_zero(zero));
+    assert!(!<Vector<f32, 3> as IsZero>::is_zero(non_zero));
+
     let all_finite = Vector::<f32, 3>::from_array([1.0, 2.0, 3.0]);
     let has_infinite = Vector::<f32, 3>::from_array([1.0, f32::INFINITY, 3.0]);
     let has_nan = Vector::<f32, 3>::from_array([1.0, f32::NAN, 3.0]);
@@ -196,7 +203,7 @@ fn numeric_predicates_surface() {
     assert!(neg_inf_trait.is_infinite());
     assert!(nan_trait.is_nan());
 
-    assert!(<Vector<f32, 3> as Finite>::is_finite(all_finite));
+    assert!(<Vector<f32, 3> as IsFinite>::is_finite(all_finite));
 }
 
 #[test]

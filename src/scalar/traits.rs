@@ -3,8 +3,9 @@ use core::ops::{Add, Div, Mul, Neg, Sub};
 use crate::{
     algebra::{ApproxEqAbs, ApproxEqRel},
     numeric::{
-        Abs, Bounded, Cbrt, Clamp, Exponential, Finite, Half, Hyperbolic, Hypot, Infinite, MinMax,
-        Nan, NegOne, One, Power, Rounding, Sqrt, Trigonometry, Two, Zero,
+        Abs, Bounded, Cbrt, Clamp, Exponential, Half, Hyperbolic, Hypot, Infinite, IsFinite,
+        IsInfinite, IsNan, MinMax, Nan, NegOne, One, Power, Rounding, Sqrt, Trigonometry, Two,
+        Zero,
     },
 };
 
@@ -62,9 +63,11 @@ pub trait FloatOps:
     Float
     + SignedOps
     + Rounding
-    + Finite
+    + IsFinite
     + Infinite
+    + IsInfinite
     + Nan
+    + IsNan
     + Sqrt
     + Trigonometry
     + Exponential

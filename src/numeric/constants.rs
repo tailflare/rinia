@@ -31,3 +31,18 @@ pub trait Bounded {
     /// The maximum value of the type.
     const MAX: Self;
 }
+
+/// The infinite constants for a type, representing positive and negative infinity.
+pub trait Infinite {
+    /// The positive infinity value.
+    const INFINITY: Self;
+
+    /// The negative infinity value.
+    const NEG_INFINITY: Self;
+}
+
+/// The NaN constant for a type.
+pub trait Nan {
+    /// The NaN value.
+    const NAN: Self;
+}

@@ -4,9 +4,9 @@ use crate::{
     algebra::{ApproxEqAbs, ApproxEqRel, Lerp},
     approx_eql_abs, approx_eql_abs_tol, approx_eql_rel, approx_eql_rel_tol,
     numeric::{
-        Abs, Bounded, Cbrt, Ceil, Exponential, Finite, Floor, Fract, Half, Hyperbolic, Hypot,
-        Infinite, MinMax, Nan, NegOne, One, Power, Round, Rounding, Sqrt, Trigonometry, Trunc, Two,
-        Zero,
+        Abs, Bounded, Cbrt, Ceil, Exponential, Floor, Fract, Half, Hyperbolic, Hypot, Infinite,
+        IsFinite, IsInfinite, IsNan, IsZero, MinMax, Nan, NegOne, One, Power, Round, Rounding,
+        Sqrt, Trigonometry, Trunc, Two, Zero,
     },
     scalar::{Float, Int, Scalar, Signed, SignedInt, Unsigned, UnsignedInt},
 };
@@ -192,17 +192,37 @@ fn approx_eq_surface() {
 
 #[test]
 fn float_predicates_surface() {
-    fn finite<T: Finite>(x: T) -> bool {
+    fn zero<T: IsZero>(x: T) -> bool {
+        x.is_zero()
+    }
+
+    fn finite<T: IsFinite>(x: T) -> bool {
         x.is_finite()
     }
 
-    fn infinite<T: Infinite>(x: T) -> bool {
+    fn infinite<T: IsInfinite>(x: T) -> bool {
         x.is_infinite()
     }
 
-    fn nan<T: Nan>(x: T) -> bool {
+    fn nan<T: IsNan>(x: T) -> bool {
         x.is_nan()
     }
+
+    assert!(zero(0_i32));
+    assert!(!zero(1_i32));
+    assert!(<i32 as IsZero>::is_zero(0));
+    assert!(!<i32 as IsZero>::is_zero(42));
+
+    assert!(zero(0_u64));
+    assert!(!zero(7_u64));
+    assert!(<u64 as IsZero>::is_zero(0));
+    assert!(!<u64 as IsZero>::is_zero(7));
+
+    assert!(zero(0.0_f32));
+    assert!(zero(-0.0_f32));
+    assert!(!zero(1.0_f32));
+    assert!(<f32 as IsZero>::is_zero(0.0));
+    assert!(!<f32 as IsZero>::is_zero(0.5));
 
     assert!(finite(1.0_f32));
 

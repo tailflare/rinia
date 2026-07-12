@@ -1,5 +1,23 @@
 use crate::{common, numeric::Rounding, scalar};
 
+// Implement scalar constants for all scalars
+scalar::impl_scalar_constants!(
+    [usize, zero: 0, one: 1, two: 2],
+    [isize, zero: 0, one: 1, two: 2, neg_one: -1],
+    [u8, zero: 0, one: 1, two: 2],
+    [u16, zero: 0, one: 1, two: 2],
+    [u32, zero: 0, one: 1, two: 2],
+    [u64, zero: 0, one: 1, two: 2],
+    [u128, zero: 0, one: 1, two: 2],
+    [i8, zero: 0, one: 1, two: 2, neg_one: -1],
+    [i16, zero: 0, one: 1, two: 2, neg_one: -1],
+    [i32, zero: 0, one: 1, two: 2, neg_one: -1],
+    [i64, zero: 0, one: 1, two: 2, neg_one: -1],
+    [i128, zero: 0, one: 1, two: 2, neg_one: -1],
+    [f32, zero: 0.0, one: 1.0, two: 2.0, neg_one: -1.0, half: 0.5],
+    [f64, zero: 0.0, one: 1.0, two: 2.0, neg_one: -1.0, half: 0.5],
+);
+
 // Implement Bounded for all scalar types.
 scalar::impl_scalar_bounded!(
     [usize, usize::MIN, usize::MAX],

@@ -2,39 +2,9 @@ use core::ops::{Add, Div, Mul, Sub};
 
 use crate::{
     algebra::{ApproxEqAbs, ApproxEqRel, Dot, Length, LengthSquared, Lerp, Normalize},
-    numeric::{One, Sqrt, Zero},
+    numeric::Sqrt,
     vector::Vector,
 };
-
-// Zero
-impl<T, const N: usize> Vector<T, N>
-where
-    T: Zero,
-{
-    pub const ZERO: Self = Self::from_array([T::ZERO; N]);
-}
-
-impl<T, const N: usize> Zero for Vector<T, N>
-where
-    T: Zero,
-{
-    const ZERO: Self = Vector::ZERO;
-}
-
-// One
-impl<T, const N: usize> Vector<T, N>
-where
-    T: One,
-{
-    pub const ONE: Self = Self::from_array([T::ONE; N]);
-}
-
-impl<T, const N: usize> One for Vector<T, N>
-where
-    T: One,
-{
-    const ONE: Self = Vector::ONE;
-}
 
 // Approx eq abs inherent
 impl<T, const N: usize> Vector<T, N>

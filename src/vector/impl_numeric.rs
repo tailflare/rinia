@@ -2,10 +2,65 @@ use core::ops::Neg;
 
 use crate::{
     common,
-    numeric::{Abs, Bounded, MinMax, Negate},
+    numeric::{Abs, Bounded, IsZero, MinMax, Negate, One, Zero},
     tuple::Tuple,
     vector::Vector,
 };
+
+// Zero inherent
+impl<T, const N: usize> Vector<T, N>
+where
+    T: Zero,
+{
+    pub const ZERO: Self = Self::from_array([T::ZERO; N]);
+}
+
+// Zero trait
+impl<T, const N: usize> Zero for Vector<T, N>
+where
+    T: Zero,
+{
+    const ZERO: Self = Vector::ZERO;
+}
+
+// IsZero inherent
+impl<T, const N: usize> Vector<T, N>
+where
+    T: Copy + Zero + PartialEq,
+{
+    /// Checks if the vector is equal to the zero vector.
+    #[inline]
+    pub fn is_zero(self) -> bool {
+        self == Self::ZERO
+    }
+}
+
+// IsZero trait
+impl<T, const N: usize> IsZero for Vector<T, N>
+where
+    T: Copy + Zero + PartialEq,
+{
+    #[inline]
+    fn is_zero(self) -> bool {
+        Vector::is_zero(self)
+    }
+}
+
+// One inherent
+impl<T, const N: usize> Vector<T, N>
+where
+    T: One,
+{
+    pub const ONE: Self = Self::from_array([T::ONE; N]);
+}
+
+// One trait
+impl<T, const N: usize> One for Vector<T, N>
+where
+    T: One,
+{
+    const ONE: Self = Vector::ONE;
+}
 
 // Bounded inherent
 impl<T, const N: usize> Vector<T, N>

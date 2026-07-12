@@ -1,8 +1,9 @@
 macro_rules! impl_tuple_wrapper_finite {
 	([$($impl_generics:tt)*], $outer:ty, item: $item:ty, len: $len:expr $(,)?) => {
-		impl<$($impl_generics)*> $outer
+		// IsFinite inherent
+        impl<$($impl_generics)*> $outer
 		where
-			$item: $crate::numeric::Finite + Copy,
+			$item: $crate::numeric::IsFinite + Copy,
 		{
 			#[inline]
 			pub fn is_finite(self) -> bool {
@@ -10,9 +11,10 @@ macro_rules! impl_tuple_wrapper_finite {
 			}
 		}
 
-		impl<$($impl_generics)*> $crate::numeric::Finite for $outer
+        // IsFinite trait
+		impl<$($impl_generics)*> $crate::numeric::IsFinite for $outer
 		where
-			$item: $crate::numeric::Finite + Copy,
+			$item: $crate::numeric::IsFinite + Copy,
 		{
 			#[inline]
 			fn is_finite(self) -> bool {
@@ -24,7 +26,8 @@ macro_rules! impl_tuple_wrapper_finite {
 
 macro_rules! impl_tuple_wrapper_infinite {
 	([$($impl_generics:tt)*], $outer:ty, item: $item:ty, len: $len:expr $(,)?) => {
-		impl<$($impl_generics)*> $outer
+		// Infinite inherent
+        impl<$($impl_generics)*> $outer
 		where
 			$item: $crate::numeric::Infinite + Copy,
 		{
@@ -33,20 +36,33 @@ macro_rules! impl_tuple_wrapper_infinite {
 
 			pub const NEG_INFINITY: Self =
 				Self::from_tuple($crate::tuple::Tuple::<$item, $len>::NEG_INFINITY);
-
-			#[inline]
-			pub fn is_infinite(self) -> bool {
-				self.into_tuple().is_infinite()
-			}
 		}
 
+        // Infinite trait
 		impl<$($impl_generics)*> $crate::numeric::Infinite for $outer
 		where
 			$item: $crate::numeric::Infinite + Copy,
 		{
 			const INFINITY: Self = <$outer>::INFINITY;
 			const NEG_INFINITY: Self = <$outer>::NEG_INFINITY;
+		}
 
+        // IsInfinite inherent
+        impl<$($impl_generics)*> $outer
+		where
+			$item: $crate::numeric::IsInfinite + Copy,
+		{
+			#[inline]
+			pub fn is_infinite(self) -> bool {
+				self.into_tuple().is_infinite()
+			}
+		}
+
+        // IsInfinite trait
+        impl<$($impl_generics)*> $crate::numeric::IsInfinite for $outer
+		where
+			$item: $crate::numeric::IsInfinite + Copy,
+		{
 			#[inline]
 			fn is_infinite(self) -> bool {
 				<$outer>::is_infinite(self)
@@ -57,24 +73,39 @@ macro_rules! impl_tuple_wrapper_infinite {
 
 macro_rules! impl_tuple_wrapper_nan {
 	([$($impl_generics:tt)*], $outer:ty, item: $item:ty, len: $len:expr $(,)?) => {
-		impl<$($impl_generics)*> $outer
+		// Nan inherent
+        impl<$($impl_generics)*> $outer
 		where
 			$item: $crate::numeric::Nan + Copy,
 		{
 			pub const NAN: Self = Self::from_tuple($crate::tuple::Tuple::<$item, $len>::NAN);
 
+		}
+
+        // Nan trait
+		impl<$($impl_generics)*> $crate::numeric::Nan for $outer
+		where
+			$item: $crate::numeric::Nan + Copy,
+		{
+			const NAN: Self = <$outer>::NAN;
+		}
+
+        // IsNan inherent
+        impl<$($impl_generics)*> $outer
+		where
+			$item: $crate::numeric::IsNan + Copy,
+		{
 			#[inline]
 			pub fn is_nan(self) -> bool {
 				self.into_tuple().is_nan()
 			}
 		}
 
-		impl<$($impl_generics)*> $crate::numeric::Nan for $outer
+        // IsNan trait
+        impl<$($impl_generics)*> $crate::numeric::IsNan for $outer
 		where
-			$item: $crate::numeric::Nan + Copy,
+			$item: $crate::numeric::IsNan + Copy,
 		{
-			const NAN: Self = <$outer>::NAN;
-
 			#[inline]
 			fn is_nan(self) -> bool {
 				<$outer>::is_nan(self)

@@ -17,6 +17,13 @@ macro_rules! impl_scalar_constants {
 		impl $crate::numeric::Zero for $ty {
 			const ZERO: Self = $zero;
 		}
+
+        impl $crate::numeric::IsZero for $ty {
+			#[inline]
+            fn is_zero(self) -> bool {
+                self == <$ty as $crate::numeric::Zero>::ZERO
+            }
+		}
 	};
 	(@maybe_impl_zero $ty:ty; $other_name:ident : $other_value:expr, $($rest_name:ident : $rest_value:expr,)*) => {
 		$crate::scalar::impl_scalar_constants!(@maybe_impl_zero $ty; $($rest_name : $rest_value,)*);
@@ -96,7 +103,7 @@ macro_rules! impl_scalar_min_max {
 macro_rules! impl_scalar_float_predicates {
 	($($ty:ty),+ $(,)?) => {
 		$(
-			impl $crate::numeric::Finite for $ty {
+			impl $crate::numeric::IsFinite for $ty {
 				#[inline]
 				fn is_finite(self) -> bool {
 					<$ty>::is_finite(self)
@@ -106,7 +113,9 @@ macro_rules! impl_scalar_float_predicates {
 			impl $crate::numeric::Infinite for $ty {
 				const INFINITY: Self = <$ty>::INFINITY;
 				const NEG_INFINITY: Self = <$ty>::NEG_INFINITY;
+			}
 
+            impl $crate::numeric::IsInfinite for $ty {
 				#[inline]
 				fn is_infinite(self) -> bool {
 					<$ty>::is_infinite(self)
@@ -115,7 +124,9 @@ macro_rules! impl_scalar_float_predicates {
 
 			impl $crate::numeric::Nan for $ty {
 				const NAN: Self = <$ty>::NAN;
+			}
 
+            impl $crate::numeric::IsNan for $ty {
 				#[inline]
 				fn is_nan(self) -> bool {
 					<$ty>::is_nan(self)

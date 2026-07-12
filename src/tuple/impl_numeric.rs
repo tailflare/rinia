@@ -1,5 +1,5 @@
 use crate::{
-    numeric::{Abs, Bounded, Finite, Infinite, MinMax, Nan},
+    numeric::{Abs, Bounded, Infinite, IsFinite, IsInfinite, IsNan, MinMax, Nan},
     tuple::Tuple,
 };
 
@@ -85,7 +85,7 @@ where
 // Finite inherent
 impl<T, const N: usize> Tuple<T, N>
 where
-    T: Copy + Finite,
+    T: Copy + IsFinite,
 {
     /// Returns true if all elements in the tuple are finite.
     #[inline]
@@ -95,9 +95,9 @@ where
 }
 
 // Finite trait
-impl<T, const N: usize> Finite for Tuple<T, N>
+impl<T, const N: usize> IsFinite for Tuple<T, N>
 where
-    T: Copy + Finite,
+    T: Copy + IsFinite,
 {
     #[inline]
     fn is_finite(self) -> bool {
@@ -115,7 +115,13 @@ where
 
     /// Returns a new tuple with all elements set to negative infinity.
     pub const NEG_INFINITY: Self = Self { inner: [T::NEG_INFINITY; N] };
+}
 
+// IsInfinite inherent
+impl<T, const N: usize> Tuple<T, N>
+where
+    T: Copy + IsInfinite,
+{
     /// Returns true if any element in the tuple is infinite.
     #[inline]
     pub fn is_infinite(self) -> bool {
@@ -131,7 +137,13 @@ where
     const INFINITY: Self = Tuple::INFINITY;
 
     const NEG_INFINITY: Self = Tuple::NEG_INFINITY;
+}
 
+// IsInfinite trait
+impl<T, const N: usize> IsInfinite for Tuple<T, N>
+where
+    T: Copy + IsInfinite,
+{
     #[inline]
     fn is_infinite(self) -> bool {
         Tuple::is_infinite(self)
@@ -145,12 +157,6 @@ where
 {
     /// Returns a new tuple with all elements set to NaN.
     pub const NAN: Self = Self { inner: [T::NAN; N] };
-
-    /// Returns true if any element in the tuple is NaN.
-    #[inline]
-    pub fn is_nan(self) -> bool {
-        self.inner.iter().any(|&x| x.is_nan())
-    }
 }
 
 // Nan trait
@@ -159,7 +165,25 @@ where
     T: Copy + Nan,
 {
     const NAN: Self = Tuple::NAN;
+}
 
+// IsNan inherent
+impl<T, const N: usize> Tuple<T, N>
+where
+    T: Copy + IsNan,
+{
+    /// Returns true if any element in the tuple is NaN.
+    #[inline]
+    pub fn is_nan(self) -> bool {
+        self.inner.iter().any(|&x| x.is_nan())
+    }
+}
+
+// IsNan trait
+impl<T, const N: usize> IsNan for Tuple<T, N>
+where
+    T: Copy + IsNan,
+{
     #[inline]
     fn is_nan(self) -> bool {
         Tuple::is_nan(self)

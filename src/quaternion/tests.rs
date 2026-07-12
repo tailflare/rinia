@@ -5,7 +5,7 @@ use alloc::vec::Vec;
 use crate::{
     algebra::{Dot, Identity, Inverse, Length, LengthSquared, Lerp, Normalize},
     approx_eql_abs, approx_eql_abs_tol, approx_eql_rel, approx_eql_rel_tol,
-    numeric::{Finite, Infinite, Nan, Negate},
+    numeric::{Infinite, IsFinite, IsZero, Nan, Negate},
     quaternion::Quaternion,
     tuple::{Tuple, TupleLike},
     vector::{Vec4, Vector},
@@ -150,6 +150,13 @@ fn arithmetic_surface() {
 
 #[test]
 fn numeric_predicates_surface() {
+    let zero = Quaternion::<f32>::ZERO;
+    let non_zero = Quaternion::<f32>::from_array([0.0, 1.0, 0.0, 0.0]);
+    assert!(zero.is_zero());
+    assert!(!non_zero.is_zero());
+    assert!(<Quaternion<f32> as IsZero>::is_zero(zero));
+    assert!(!<Quaternion<f32> as IsZero>::is_zero(non_zero));
+
     let all_finite = Quaternion::<f32>::from_array([1.0, 2.0, 3.0, 4.0]);
     let has_infinite = Quaternion::<f32>::from_array([1.0, f32::INFINITY, 3.0, 4.0]);
     let has_nan = Quaternion::<f32>::from_array([1.0, f32::NAN, 3.0, 4.0]);
@@ -178,7 +185,7 @@ fn numeric_predicates_surface() {
     assert!(neg_inf_trait.is_infinite());
     assert!(nan_trait.is_nan());
 
-    assert!(<Quaternion<f32> as Finite>::is_finite(all_finite));
+    assert!(<Quaternion<f32> as IsFinite>::is_finite(all_finite));
 }
 
 #[test]

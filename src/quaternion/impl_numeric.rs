@@ -2,7 +2,7 @@ use core::ops::Neg;
 
 use crate::{
     common,
-    numeric::{Negate, Zero},
+    numeric::{IsZero, Negate, Zero},
     quaternion::Quaternion,
 };
 
@@ -20,6 +20,29 @@ where
     T: Zero,
 {
     const ZERO: Self = Quaternion::ZERO;
+}
+
+// IsZero inherent
+impl<T> Quaternion<T>
+where
+    T: Copy + Zero + PartialEq,
+{
+    /// Checks if the quaternion is equal to the zero quaternion.
+    #[inline]
+    pub fn is_zero(self) -> bool {
+        self == Self::ZERO
+    }
+}
+
+// IsZero trait
+impl<T> IsZero for Quaternion<T>
+where
+    T: Copy + Zero + PartialEq,
+{
+    #[inline]
+    fn is_zero(self) -> bool {
+        Quaternion::is_zero(self)
+    }
 }
 
 // Implement Finite/Infinite/Nan for Quaternion<T>.

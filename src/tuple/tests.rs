@@ -3,7 +3,7 @@
 use alloc::vec::Vec;
 
 use crate::{
-    numeric::{Abs, Bounded, Finite, Infinite, MinMax, Nan},
+    numeric::{Abs, Bounded, Infinite, IsFinite, MinMax, Nan},
     tuple::{Tuple, TupleLike},
 };
 
@@ -187,7 +187,7 @@ fn numeric_predicates_surface() {
     assert!(neg_inf_trait.is_infinite());
     assert!(nan_trait.is_nan());
 
-    assert!(<Tuple<f32, 3> as Finite>::is_finite(all_finite));
+    assert!(<Tuple<f32, 3> as IsFinite>::is_finite(all_finite));
 }
 
 #[test]
