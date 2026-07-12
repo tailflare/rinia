@@ -102,7 +102,6 @@ dependencies = [
  "bytemuck",
  "libm",
  "mint",
- "pastey",
  "sakka",
  "zerocopy",
 ]
