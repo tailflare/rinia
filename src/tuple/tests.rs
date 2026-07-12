@@ -3,7 +3,7 @@
 use alloc::vec::Vec;
 
 use crate::{
-    numeric::{Abs, Bounded, Infinite, IsFinite, MinMax, Nan},
+    numeric::{Abs, BoundedMax, BoundedMin, Infinite, IsFinite, MinMax, Nan},
     tuple::{Tuple, TupleLike},
 };
 
@@ -192,8 +192,8 @@ fn numeric_predicates_surface() {
 
 #[test]
 fn bounded_and_min_max_surface() {
-    assert_eq!(<Tuple<i32, 3> as Bounded>::MIN.as_array(), &[i32::MIN; 3]);
-    assert_eq!(<Tuple<i32, 3> as Bounded>::MAX.as_array(), &[i32::MAX; 3]);
+    assert_eq!(<Tuple<i32, 3> as BoundedMin>::MIN.as_array(), &[i32::MIN; 3]);
+    assert_eq!(<Tuple<i32, 3> as BoundedMax>::MAX.as_array(), &[i32::MAX; 3]);
 
     let a = Tuple::from_array([1_i32, 5, 3]);
     let b = Tuple::from_array([2_i32, 4, 7]);

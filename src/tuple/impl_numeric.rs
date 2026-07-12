@@ -1,27 +1,39 @@
 use crate::{
-    numeric::{Abs, Bounded, Infinite, IsFinite, IsInfinite, IsNan, MinMax, Nan},
+    numeric::{Abs, BoundedMax, BoundedMin, Infinite, IsFinite, IsInfinite, IsNan, MinMax, Nan},
     tuple::Tuple,
 };
 
-// Bounded inherent
+// BoundedMin inherent
 impl<T, const N: usize> Tuple<T, N>
 where
-    T: Copy + Bounded,
+    T: Copy + BoundedMin,
 {
     /// Returns a new tuple with all elements set to the minimum value of type `T`.
     pub const MIN: Self = Self { inner: [T::MIN; N] };
+}
 
+// BoundedMin trait
+impl<T, const N: usize> BoundedMin for Tuple<T, N>
+where
+    T: Copy + BoundedMin,
+{
+    const MIN: Self = Tuple::MIN;
+}
+
+// BoundedMax inherent
+impl<T, const N: usize> Tuple<T, N>
+where
+    T: Copy + BoundedMax,
+{
     /// Returns a new tuple with all elements set to the maximum value of type `T`.
     pub const MAX: Self = Self { inner: [T::MAX; N] };
 }
 
-// Bounded trait
-impl<T, const N: usize> Bounded for Tuple<T, N>
+// BoundedMax trait
+impl<T, const N: usize> BoundedMax for Tuple<T, N>
 where
-    T: Copy + Bounded,
+    T: Copy + BoundedMax,
 {
-    const MIN: Self = Tuple::MIN;
-
     const MAX: Self = Tuple::MAX;
 }
 

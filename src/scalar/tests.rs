@@ -4,9 +4,9 @@ use crate::{
     algebra::{ApproxEqAbs, ApproxEqRel, Lerp},
     approx_eql_abs, approx_eql_abs_tol, approx_eql_rel, approx_eql_rel_tol,
     numeric::{
-        Abs, Bounded, Cbrt, Ceil, Exponential, Floor, Fract, Half, Hyperbolic, Hypot, Infinite,
-        IsFinite, IsInfinite, IsNan, IsZero, MinMax, Nan, NegOne, One, Power, Round, Rounding,
-        Sqrt, Trigonometry, Trunc, Two, Zero,
+        Abs, BoundedMax, BoundedMin, Cbrt, Ceil, Exponential, Floor, Fract, Half, Hyperbolic,
+        Hypot, Infinite, IsFinite, IsInfinite, IsNan, IsZero, MinMax, Nan, NegOne, One, Power,
+        Round, Rounding, Sqrt, Trigonometry, Trunc, Two, Zero,
     },
     scalar::{Float, Int, Scalar, Signed, SignedInt, Unsigned, UnsignedInt},
 };
@@ -58,14 +58,14 @@ fn constants_surface() {
 
 #[test]
 fn bounded_surface() {
-    assert_eq!(<i32 as Bounded>::MIN, i32::MIN);
-    assert_eq!(<i32 as Bounded>::MAX, i32::MAX);
+    assert_eq!(<i32 as BoundedMin>::MIN, i32::MIN);
+    assert_eq!(<i32 as BoundedMax>::MAX, i32::MAX);
 
-    assert_eq!(<u64 as Bounded>::MIN, u64::MIN);
-    assert_eq!(<u64 as Bounded>::MAX, u64::MAX);
+    assert_eq!(<u64 as BoundedMin>::MIN, u64::MIN);
+    assert_eq!(<u64 as BoundedMax>::MAX, u64::MAX);
 
-    assert_eq!(<f32 as Bounded>::MIN, f32::MIN);
-    assert_eq!(<f32 as Bounded>::MAX, f32::MAX);
+    assert_eq!(<f32 as BoundedMin>::MIN, f32::MIN);
+    assert_eq!(<f32 as BoundedMax>::MAX, f32::MAX);
 }
 
 #[test]

@@ -23,11 +23,14 @@ pub trait NegOne {
     const NEG_ONE: Self;
 }
 
-/// A trait for types that are bounded, meaning they have a minimum and maximum value.
-pub trait Bounded {
+/// A trait for types which have a bounded minimum value.
+pub trait BoundedMin {
     /// The minimum value of the type.
     const MIN: Self;
+}
 
+/// A trait for types which have a bounded maximum value.
+pub trait BoundedMax {
     /// The maximum value of the type.
     const MAX: Self;
 }

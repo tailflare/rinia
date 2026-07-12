@@ -3,9 +3,9 @@ use core::ops::{Add, Div, Mul, Neg, Sub};
 use crate::{
     algebra::{ApproxEqAbs, ApproxEqRel},
     numeric::{
-        Abs, Bounded, Cbrt, Clamp, Exponential, Half, Hyperbolic, Hypot, Infinite, IsFinite,
-        IsInfinite, IsNan, MinMax, Nan, NegOne, One, Power, Rounding, Sqrt, Trigonometry, Two,
-        Zero,
+        Abs, BoundedMax, BoundedMin, Cbrt, Clamp, Exponential, Half, Hyperbolic, Hypot, Infinite,
+        IsFinite, IsInfinite, IsNan, MinMax, Nan, NegOne, One, Power, Rounding, Sqrt, Trigonometry,
+        Two, Zero,
     },
 };
 
@@ -44,7 +44,8 @@ pub trait ScalarOps:
     + PartialOrd
     + MinMax
     + Clamp
-    + Bounded
+    + BoundedMin
+    + BoundedMax
     + Zero
     + One
     + Two

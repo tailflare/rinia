@@ -150,8 +150,11 @@ macro_rules! impl_scalar_predicates_int {
 macro_rules! impl_scalar_bounded {
 	($( [$ty:ty, $min:expr, $max:expr] ),+ $(,)?) => {
 		$(
-			impl $crate::numeric::Bounded for $ty {
+			impl $crate::numeric::BoundedMin for $ty {
 				const MIN: Self = $min;
+			}
+
+            impl $crate::numeric::BoundedMax for $ty {
 				const MAX: Self = $max;
 			}
 		)+

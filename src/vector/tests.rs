@@ -5,7 +5,7 @@ use alloc::vec::Vec;
 use crate::{
     algebra::{Dot, Length, LengthSquared, Lerp, Normalize},
     approx_eql_abs, approx_eql_abs_tol, approx_eql_rel, approx_eql_rel_tol,
-    numeric::{Infinite, IsFinite, IsZero, Nan, Negate, One, Zero},
+    numeric::{Abs, Infinite, IsFinite, IsZero, MinMax, Nan, Negate, One, Zero},
     tuple::{Tuple, TupleLike},
     vector::{Vec2, Vec3, Vec4, Vector},
 };
@@ -317,4 +317,143 @@ fn sakka_roundtrip() {
 
     assert_eq!(out, v);
     assert!(reader.is_eof());
+}
+
+#[test]
+fn minmax_surface() {
+    let a = Vector::<i32, 3>::from_array([5, 2, 8]);
+    let b = Vector::<i32, 3>::from_array([3, 7, 1]);
+
+    // Inherent method
+    let min_result = a.min(b);
+    let max_result = a.max(b);
+
+    assert_eq!(min_result.into_array(), [3, 2, 1]);
+    assert_eq!(max_result.into_array(), [5, 7, 8]);
+
+    // Trait method
+    let min_trait = <Vector<i32, 3> as MinMax>::minimum(a, b);
+    let max_trait = <Vector<i32, 3> as MinMax>::maximum(a, b);
+
+    assert_eq!(min_trait.into_array(), [3, 2, 1]);
+    assert_eq!(max_trait.into_array(), [5, 7, 8]);
+
+    // With floats
+    let af = Vector::<f32, 2>::from_array([5.5, 2.2]);
+    let bf = Vector::<f32, 2>::from_array([3.3, 7.7]);
+
+    let min_f = af.min(bf);
+    let max_f = af.max(bf);
+
+    assert!(approx_eql_abs_tol!(min_f, Vector::<f32, 2>::from_array([3.3, 2.2]), 1e-6));
+    assert!(approx_eql_abs_tol!(max_f, Vector::<f32, 2>::from_array([5.5, 7.7]), 1e-6));
+}
+
+#[test]
+fn bounded_surface() {
+    let min_int = Vector::<i32, 2>::MIN;
+    let max_int = Vector::<i32, 2>::MAX;
+
+    assert_eq!(min_int.into_array(), [i32::MIN, i32::MIN]);
+    assert_eq!(max_int.into_array(), [i32::MAX, i32::MAX]);
+
+    let min_float = Vector::<f32, 3>::MIN;
+    let max_float = Vector::<f32, 3>::MAX;
+
+    assert_eq!(min_float.into_array(), [f32::MIN, f32::MIN, f32::MIN]);
+    assert_eq!(max_float.into_array(), [f32::MAX, f32::MAX, f32::MAX]);
+
+    // Trait access
+    use crate::numeric::{BoundedMax, BoundedMin};
+    let min_trait = <Vector<i32, 2> as BoundedMin>::MIN;
+    let max_trait = <Vector<i32, 2> as BoundedMax>::MAX;
+
+    assert_eq!(min_trait.into_array(), [i32::MIN, i32::MIN]);
+    assert_eq!(max_trait.into_array(), [i32::MAX, i32::MAX]);
+}
+
+#[test]
+fn abs_surface() {
+    let v = Vector::<i32, 3>::from_array([-1, 2, -3]);
+    assert_eq!(v.abs().into_array(), [1, 2, 3]);
+    assert_eq!(<Vector<i32, 3> as Abs>::abs(v).into_array(), [1, 2, 3]);
+
+    let a = Vector::<i32, 3>::from_array([1, 2, 3]);
+    assert_eq!(a.negate().into_array(), [-1, -2, -3]);
+    assert_eq!(<Vector<i32, 3> as Negate>::negate(a).into_array(), [-1, -2, -3]);
+
+    let nf = Vector::<f32, 2>::from_array([-1.5, 2.5]);
+    let abs_f = nf.abs();
+    assert!(approx_eql_abs_tol!(abs_f, Vector::<f32, 2>::from_array([1.5, 2.5]), 1e-6));
+}
+
+#[test]
+fn unit_vector_constants_surface() {
+    // Vec2 unit vectors
+    assert_eq!(Vec2::<i32>::X.into_array(), [1, 0]);
+    assert_eq!(Vec2::<i32>::Y.into_array(), [0, 1]);
+    assert_eq!(Vec2::<i32>::NEG_X.into_array(), [-1, 0]);
+    assert_eq!(Vec2::<i32>::NEG_Y.into_array(), [0, -1]);
+
+    // Vec3 unit vectors
+    assert_eq!(Vec3::<i32>::X.into_array(), [1, 0, 0]);
+    assert_eq!(Vec3::<i32>::Y.into_array(), [0, 1, 0]);
+    assert_eq!(Vec3::<i32>::Z.into_array(), [0, 0, 1]);
+    assert_eq!(Vec3::<i32>::NEG_X.into_array(), [-1, 0, 0]);
+    assert_eq!(Vec3::<i32>::NEG_Y.into_array(), [0, -1, 0]);
+    assert_eq!(Vec3::<i32>::NEG_Z.into_array(), [0, 0, -1]);
+
+    // Floats
+    assert_eq!(Vec2::<f32>::X.into_array(), [1.0, 0.0]);
+    assert_eq!(Vec3::<f32>::Y.into_array(), [0.0, 1.0, 0.0]);
+    assert_eq!(Vec3::<f32>::Z.into_array(), [0.0, 0.0, 1.0]);
+
+    // AXES array
+    let v2_axes = Vec2::<i32>::AXES;
+    assert_eq!(v2_axes.len(), 2);
+    assert_eq!(v2_axes[0].into_array(), [1, 0]);
+    assert_eq!(v2_axes[1].into_array(), [0, 1]);
+
+    let v3_axes = Vec3::<i32>::AXES;
+    assert_eq!(v3_axes.len(), 3);
+    assert_eq!(v3_axes[0].into_array(), [1, 0, 0]);
+    assert_eq!(v3_axes[1].into_array(), [0, 1, 0]);
+    assert_eq!(v3_axes[2].into_array(), [0, 0, 1]);
+}
+
+#[test]
+fn cross_product_surface() {
+    // Vec2 cross product returns a scalar (determinant)
+    let a2 = Vec2::new(1_i32, 2);
+    let b2 = Vec2::new(3_i32, 4);
+    assert_eq!(a2.cross(b2), -2); // 1*4 - 2*3 = -2
+
+    let c2 = Vec2::new(2_i32, 0);
+    let d2 = Vec2::new(0_i32, 3);
+    assert_eq!(c2.cross(d2), 6); // 2*3 - 0*0 = 6
+
+    // Vec3 cross product returns a vector
+    let a3 = Vec3::new(1_i32, 0, 0);
+    let b3 = Vec3::new(0_i32, 1, 0);
+    let cross_result = a3.cross(b3);
+    assert_eq!(cross_result.into_array(), [0, 0, 1]);
+
+    let a = Vec3::new(1_f32, 2.0, 3.0);
+    let b = Vec3::new(4_f32, 5.0, 6.0);
+    let cross = a.cross(b);
+    assert!(approx_eql_abs_tol!(cross, Vec3::new(-3.0, 6.0, -3.0), 1e-6));
+
+    // Standard basis vectors cross products
+    let x = Vec3::new(1_f32, 0.0, 0.0);
+    let y = Vec3::new(0_f32, 1.0, 0.0);
+    let z = Vec3::new(0_f32, 0.0, 1.0);
+
+    assert!(approx_eql_abs_tol!(x.cross(y), z, 1e-6));
+    assert!(approx_eql_abs_tol!(y.cross(z), x, 1e-6));
+    assert!(approx_eql_abs_tol!(z.cross(x), y, 1e-6));
+
+    // Anti-commutativity: a × b = -(b × a)
+    let result1 = a.cross(b);
+    let result2 = b.cross(a);
+    assert!(approx_eql_abs_tol!(result1, -result2, 1e-6));
 }

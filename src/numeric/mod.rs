@@ -4,7 +4,7 @@ mod predicates;
 mod rounding;
 
 pub use self::{
-    constants::{Bounded, Half, Infinite, Nan, NegOne, One, Two, Zero},
+    constants::{BoundedMax, BoundedMin, Half, Infinite, Nan, NegOne, One, Two, Zero},
     elementary::{
         Abs, Cbrt, Clamp, Exponential, Hyperbolic, Hypot, MinMax, Negate, Power, Sqrt, Trigonometry,
     },

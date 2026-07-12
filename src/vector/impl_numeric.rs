@@ -2,7 +2,7 @@ use core::ops::Neg;
 
 use crate::{
     common,
-    numeric::{Abs, Bounded, IsZero, MinMax, Negate, One, Zero},
+    numeric::{Abs, BoundedMax, BoundedMin, IsZero, MinMax, Negate, One, Zero},
     tuple::Tuple,
     vector::Vector,
 };
@@ -62,24 +62,37 @@ where
     const ONE: Self = Vector::ONE;
 }
 
-// Bounded inherent
+// BoundedMin inherent
 impl<T, const N: usize> Vector<T, N>
 where
-    T: Copy + Bounded,
+    T: Copy + BoundedMin,
 {
     /// Returns a new vector with all elements set to the minimum value of type `T`.
     pub const MIN: Self = Self::from_tuple(Tuple::MIN);
+}
 
+// BoundedMin trait
+impl<T, const N: usize> BoundedMin for Vector<T, N>
+where
+    T: Copy + BoundedMin,
+{
+    const MIN: Self = Vector::MIN;
+}
+
+// BoundedMax inherent
+impl<T, const N: usize> Vector<T, N>
+where
+    T: Copy + BoundedMax,
+{
     /// Returns a new vector with all elements set to the maximum value of type `T`.
     pub const MAX: Self = Self::from_tuple(Tuple::MAX);
 }
 
-// Bounded trait
-impl<T, const N: usize> Bounded for Vector<T, N>
+// BoundedMax trait
+impl<T, const N: usize> BoundedMax for Vector<T, N>
 where
-    T: Copy + Bounded,
+    T: Copy + BoundedMax,
 {
-    const MIN: Self = Vector::MIN;
     const MAX: Self = Vector::MAX;
 }
 
