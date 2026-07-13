@@ -41,6 +41,18 @@ impl<T, const N: usize> Tuple<T, N> {
         Self::from_array(out)
     }
 
+    /// Returns the length of the [Tuple].
+    #[inline]
+    pub const fn len(&self) -> usize {
+        N
+    }
+
+    /// Returns true if the [Tuple] is empty (i.e., has length 0).
+    #[inline]
+    pub const fn is_empty(&self) -> bool {
+        N == 0
+    }
+
     /// Returns a reference to the inner array.
     #[inline]
     pub const fn as_array(&self) -> &[T; N] {

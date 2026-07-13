@@ -56,13 +56,13 @@ scalar::impl_scalar_clamp!(
 );
 
 // Implement Abs for signed scalar types.
-scalar::impl_scalar_trait!(Abs, [f32, f64, i8, i16, i32, i64, i128, isize], {unary, abs});
+scalar::impl_scalar_elementary_trait!(Abs, [f32, f64, i8, i16, i32, i64, i128, isize], {unary, abs});
 
 // Implement Sqrt for floating scalar types.
-scalar::impl_scalar_trait!(Sqrt, [f32, f64], {unary, sqrt});
+scalar::impl_scalar_elementary_trait!(Sqrt, [f32, f64], {unary, sqrt});
 
 // Implement Trigonometry for floating scalar types.
-scalar::impl_scalar_trait!(
+scalar::impl_scalar_elementary_trait!(
     Trigonometry,
     [f32, f64],
     {unary, sin, [f32: libm::sinf, f64: libm::sin]},
@@ -76,7 +76,7 @@ scalar::impl_scalar_trait!(
 );
 
 // Implement Exponential for floating scalar types.
-scalar::impl_scalar_trait!(
+scalar::impl_scalar_elementary_trait!(
     Exponential,
     [f32, f64],
     {unary, exp, [f32: libm::expf, f64: libm::exp]},
@@ -90,7 +90,7 @@ scalar::impl_scalar_trait!(
 );
 
 // Implement Power for floating scalar types.
-scalar::impl_scalar_trait!(
+scalar::impl_scalar_elementary_trait!(
     Power,
     [f32, f64],
     {binary, powf, Self, [f32: libm::powf, f64: libm::pow]},
@@ -98,13 +98,13 @@ scalar::impl_scalar_trait!(
 );
 
 // Implement Root for floating scalar types.
-scalar::impl_scalar_trait!(
+scalar::impl_scalar_elementary_trait!(
     Cbrt,
     [f32, f64],
     {unary, cbrt, [f32: libm::cbrtf, f64: libm::cbrt]});
 
 // Implement Hyperbolic for floating scalar types.
-scalar::impl_scalar_trait!(
+scalar::impl_scalar_elementary_trait!(
     Hyperbolic,
     [f32, f64],
     {unary, sinh, [f32: libm::sinhf, f64: libm::sinh]},
@@ -116,42 +116,42 @@ scalar::impl_scalar_trait!(
 );
 
 // Implement Euclidean for floating scalar types.
-scalar::impl_scalar_trait!(
+scalar::impl_scalar_elementary_trait!(
     Hypot,
     [f32, f64],
     {binary, hypot, Self, [f32: libm::hypotf, f64: libm::hypot]}
 );
 
 // Implement Floor for floating scalar types.
-scalar::impl_scalar_trait!(
+scalar::impl_scalar_elementary_trait!(
     Floor,
     [f32, f64],
     {unary, floor, [f32: libm::floorf, f64: libm::floor]}
 );
 
 // Implement Ceil for floating scalar types.
-scalar::impl_scalar_trait!(
+scalar::impl_scalar_elementary_trait!(
     Ceil,
     [f32, f64],
     {unary, ceil, [f32: libm::ceilf, f64: libm::ceil]}
 );
 
 // Implement Trunc for floating scalar types.
-scalar::impl_scalar_trait!(
+scalar::impl_scalar_elementary_trait!(
     Trunc,
     [f32, f64],
     {unary, trunc, [f32: libm::truncf, f64: libm::trunc]}
 );
 
 // Implement Round for floating scalar types.
-scalar::impl_scalar_trait!(
+scalar::impl_scalar_elementary_trait!(
     Round,
     [f32, f64],
     {unary, round, [f32: libm::roundf, f64: libm::round]}
 );
 
 // Implement Fract for floating scalar types.
-scalar::impl_scalar_trait!(
+scalar::impl_scalar_elementary_trait!(
     Fract,
     [f32, f64],
     {

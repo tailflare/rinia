@@ -5,6 +5,20 @@ use crate::{
     vector::Vector,
 };
 
+impl<T, const N: usize> Vector<T, N> {
+    /// Returns the length of the [Vector].
+    #[inline]
+    pub const fn len(&self) -> usize {
+        N
+    }
+
+    /// Returns true if the [Vector] is empty (i.e., has length 0).
+    #[inline]
+    pub const fn is_empty(&self) -> bool {
+        N == 0
+    }
+}
+
 // Default impl for Vector<T, N>, which is Zero
 impl<T, const N: usize> Default for Vector<T, N>
 where

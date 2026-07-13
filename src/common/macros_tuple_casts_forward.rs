@@ -1,17 +1,5 @@
 macro_rules! impl_tuple_wrapper_casts {
 	([$($impl_generics:tt)*], $outer:ty => $cast_outer:ty, item: $item:ty, len: $len:expr $(,)?) => {
-		// CastFrom inherent
-		impl<$($impl_generics)*> $outer {
-			/// Casts `value` into `Self`.
-			#[inline]
-			pub fn cast_from<U>(value: $cast_outer) -> Self
-			where
-				U: $crate::algebra::Cast<$item>,
-			{
-				Self::from_tuple($crate::tuple::Tuple::<$item, $len>::cast_from(value.into_tuple()))
-			}
-		}
-
 		// Cast inherent
 		impl<$($impl_generics)*> $outer {
 			/// Returns a new wrapper with all elements cast to type `U`.
@@ -35,15 +23,15 @@ macro_rules! impl_tuple_wrapper_casts {
 			}
 		}
 
-		// LossyCastFrom inherent
+        // CastFrom inherent
 		impl<$($impl_generics)*> $outer {
-			/// Lossy casts `value` into `Self`.
+			/// Casts `value` into `Self`.
 			#[inline]
-			pub fn lossy_cast_from<U>(value: $cast_outer) -> Self
+			pub fn cast_from<U>(value: $cast_outer) -> Self
 			where
-				U: $crate::algebra::LossyCast<$item>,
+				U: $crate::algebra::Cast<$item>,
 			{
-				Self::from_tuple($crate::tuple::Tuple::<$item, $len>::lossy_cast_from(value.into_tuple()))
+				Self::from_tuple($crate::tuple::Tuple::<$item, $len>::cast_from(value.into_tuple()))
 			}
 		}
 
@@ -70,16 +58,50 @@ macro_rules! impl_tuple_wrapper_casts {
 			}
 		}
 
-		// TryCastFrom inherent
+        // LossyCastFrom inherent
 		impl<$($impl_generics)*> $outer {
-			/// Try casts `value` into `Self`.
+			/// Lossy casts `value` into `Self`.
 			#[inline]
-			pub fn try_cast_from<U>(value: $cast_outer) -> Result<Self, $crate::algebra::CastError>
+			pub fn lossy_cast_from<U>(value: $cast_outer) -> Self
 			where
-				U: $crate::algebra::TryCast<$item>,
+				U: $crate::algebra::LossyCast<$item>,
 			{
-				$crate::tuple::Tuple::<$item, $len>::try_cast_from(value.into_tuple())
-					.map(Self::from_tuple)
+				Self::from_tuple($crate::tuple::Tuple::<$item, $len>::lossy_cast_from(value.into_tuple()))
+			}
+		}
+
+        // SaturatingCast inherent
+		impl<$($impl_generics)*> $outer {
+			/// Returns a new wrapper with all elements saturating cast to type `U`.
+			#[inline]
+			pub fn saturating_cast<U>(self) -> $cast_outer
+			where
+				$item: $crate::algebra::SaturatingCast<U>,
+			{
+				<$cast_outer>::from_tuple(self.into_tuple().saturating_cast::<U>())
+			}
+		}
+
+		// SaturatingCast trait
+		impl<$($impl_generics)*, U> $crate::algebra::SaturatingCast<$cast_outer> for $outer
+		where
+			$item: $crate::algebra::SaturatingCast<U>,
+		{
+			#[inline]
+			fn saturating_cast(self) -> $cast_outer {
+				<$outer>::saturating_cast::<U>(self)
+			}
+		}
+
+        // SaturatingCastFrom inherent
+		impl<$($impl_generics)*> $outer {
+			/// Saturating casts `value` into `Self`.
+			#[inline]
+			pub fn saturating_cast_from<U>(value: $cast_outer) -> Self
+			where
+				U: $crate::algebra::SaturatingCast<$item>,
+			{
+				Self::from_tuple($crate::tuple::Tuple::<$item, $len>::saturating_cast_from(value.into_tuple()))
 			}
 		}
 
@@ -106,17 +128,15 @@ macro_rules! impl_tuple_wrapper_casts {
 			}
 		}
 
-		// TryExactCastFrom inherent
+        // TryCastFrom inherent
 		impl<$($impl_generics)*> $outer {
-			/// Try exact casts `value` into `Self`.
+			/// Try casts `value` into `Self`.
 			#[inline]
-			pub fn try_exact_cast_from<U>(
-				value: $cast_outer,
-			) -> Result<Self, $crate::algebra::CastError>
+			pub fn try_cast_from<U>(value: $cast_outer) -> Result<Self, $crate::algebra::CastError>
 			where
-				U: $crate::algebra::TryExactCast<$item>,
+				U: $crate::algebra::TryCast<$item>,
 			{
-				$crate::tuple::Tuple::<$item, $len>::try_exact_cast_from(value.into_tuple())
+				$crate::tuple::Tuple::<$item, $len>::try_cast_from(value.into_tuple())
 					.map(Self::from_tuple)
 			}
 		}
@@ -141,6 +161,21 @@ macro_rules! impl_tuple_wrapper_casts {
 			#[inline]
 			fn try_exact_cast(self) -> Result<$cast_outer, $crate::algebra::CastError> {
 				<$outer>::try_exact_cast::<U>(self)
+			}
+		}
+
+        // TryExactCastFrom inherent
+		impl<$($impl_generics)*> $outer {
+			/// Try exact casts `value` into `Self`.
+			#[inline]
+			pub fn try_exact_cast_from<U>(
+				value: $cast_outer,
+			) -> Result<Self, $crate::algebra::CastError>
+			where
+				U: $crate::algebra::TryExactCast<$item>,
+			{
+				$crate::tuple::Tuple::<$item, $len>::try_exact_cast_from(value.into_tuple())
+					.map(Self::from_tuple)
 			}
 		}
 	};

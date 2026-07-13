@@ -33,6 +33,23 @@ pub trait LossyCastFrom<T> {
     fn lossy_cast_from(value: T) -> Self;
 }
 
+/// A trait which represents a saturating cast from one type to another.
+///
+/// A saturating cast always performs the conversion, but if the value is out of range for the
+/// target type, it will be clamped to the nearest representable value.
+pub trait SaturatingCast<T> {
+    /// Casts `self` to type `T`, saturating the value if it is out of range.
+    fn saturating_cast(self) -> T;
+}
+
+/// A trait which represents a saturating cast into `Self` from another type.
+///
+/// See [SaturatingCast] for more information.
+pub trait SaturatingCastFrom<T> {
+    /// Casts `value` to type `Self`, saturating the value if it is out of range.
+    fn saturating_cast_from(value: T) -> Self;
+}
+
 /// A trait which represents a fallible cast that preserves the value exactly.
 ///
 /// The conversion succeeds only when the value can be represented exactly
@@ -112,6 +129,16 @@ where
     #[inline]
     fn lossy_cast_from(value: T) -> Self {
         value.lossy_cast()
+    }
+}
+
+impl<T, U> SaturatingCastFrom<T> for U
+where
+    T: SaturatingCast<U>,
+{
+    #[inline]
+    fn saturating_cast_from(value: T) -> Self {
+        value.saturating_cast()
     }
 }
 

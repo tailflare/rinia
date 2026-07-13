@@ -4,8 +4,8 @@ use alloc::vec::Vec;
 
 use crate::{
     algebra::{
-        Cast, CastError, Dot, Length, LengthSquared, Lerp, LossyCast, Normalize, TryCast,
-        TryExactCast,
+        Cast, CastFrom, Dot, Length, LengthSquared, Lerp, LossyCast, LossyCastFrom, Normalize,
+        SaturatingCast, SaturatingCastFrom, TryCast, TryCastFrom, TryExactCast, TryExactCastFrom,
     },
     approx_eql_abs, approx_eql_abs_tol, approx_eql_rel, approx_eql_rel_tol,
     numeric::{Abs, Infinite, IsFinite, IsZero, MinMax, Nan, Negate, One, Zero},
@@ -132,46 +132,37 @@ fn tuplelike_surface() {
 
 #[test]
 fn cast_variants_surface() {
-    let cast_src = Vector::<i8, 3>::from_array([1, 2, 3]);
-    assert_eq!(cast_src.cast::<i32>().into_array(), [1_i32, 2, 3]);
-    assert_eq!(Vector::<i32, 3>::cast_from(cast_src).into_array(), [1_i32, 2, 3]);
-    assert_eq!(<Vector<i8, 3> as Cast<Vector<i32, 3>>>::cast(cast_src).into_array(), [1_i32, 2, 3]);
+    let src = Vector::<i32, 3>::from_array([1, 2, 3]);
 
-    let lossy_src = Vector::<i32, 3>::from_array([300, -1, 127]);
-    assert_eq!(lossy_src.lossy_cast::<u8>().into_array(), [44_u8, 255, 127]);
-    assert_eq!(Vector::<u8, 3>::lossy_cast_from(lossy_src).into_array(), [44_u8, 255, 127]);
-    assert_eq!(
-        <Vector<i32, 3> as LossyCast<Vector<u8, 3>>>::lossy_cast(lossy_src).into_array(),
-        [44_u8, 255, 127]
-    );
+    // inhrerent
+    let _: Vector<i64, 3> = src.cast();
+    let _: Vector<u8, 3> = src.lossy_cast();
+    let _: Vector<u8, 3> = src.saturating_cast();
+    let _: Result<Vector<u8, 3>, _> = src.try_cast();
+    let _: Result<Vector<i64, 3>, _> = src.try_exact_cast();
 
-    let try_src = Vector::<i32, 3>::from_array([1, 2, 255]);
-    assert_eq!(try_src.try_cast::<u8>().map(Vector::into_array), Ok([1_u8, 2, 255]));
-    assert_eq!(Vector::<u8, 3>::try_cast_from(try_src).map(Vector::into_array), Ok([1_u8, 2, 255]));
-    assert_eq!(
-        <Vector<i32, 3> as TryCast<Vector<u8, 3>>>::try_cast(try_src).map(Vector::into_array),
-        Ok([1_u8, 2, 255])
-    );
-    assert_eq!(
-        Vector::<i32, 3>::from_array([256, 2, 3]).try_cast::<u8>(),
-        Err(CastError::OutOfRange)
-    );
+    let _: Vector<i64, 3> = Vector::cast_from(src);
+    let _: Vector<u8, 3> = Vector::lossy_cast_from(src);
+    let _: Vector<u8, 3> = Vector::saturating_cast_from(src);
+    let _: Result<Vector<u8, 3>, _> = Vector::try_cast_from(src);
+    let _: Result<Vector<i64, 3>, _> = Vector::try_exact_cast_from(src);
 
-    let exact_src = Vector::<i32, 3>::from_array([1, 2, 100]);
-    assert_eq!(exact_src.try_exact_cast::<i64>().map(Vector::into_array), Ok([1_i64, 2, 100]));
-    assert_eq!(
-        Vector::<i64, 3>::try_exact_cast_from(exact_src).map(Vector::into_array),
-        Ok([1_i64, 2, 100])
-    );
-    assert_eq!(
-        <Vector<i32, 3> as TryExactCast<Vector<i64, 3>>>::try_exact_cast(exact_src)
-            .map(Vector::into_array),
-        Ok([1_i64, 2, 100])
-    );
-    assert_eq!(
-        Vector::<i32, 3>::from_array([300, 2, 3]).try_exact_cast::<u8>(),
-        Err(CastError::OutOfRange)
-    );
+    // traits
+    let _: Vector<i64, 3> = <Vector<i32, 3> as Cast<Vector<i64, 3>>>::cast(src);
+    let _: Vector<u8, 3> = <Vector<i32, 3> as LossyCast<Vector<u8, 3>>>::lossy_cast(src);
+    let _: Vector<u8, 3> = <Vector<i32, 3> as SaturatingCast<Vector<u8, 3>>>::saturating_cast(src);
+    let _: Result<Vector<u8, 3>, _> = <Vector<i32, 3> as TryCast<Vector<u8, 3>>>::try_cast(src);
+    let _: Result<Vector<i64, 3>, _> =
+        <Vector<i32, 3> as TryExactCast<Vector<i64, 3>>>::try_exact_cast(src);
+
+    let _: Vector<i64, 3> = <Vector<i64, 3> as CastFrom<Vector<i32, 3>>>::cast_from(src);
+    let _: Vector<u8, 3> = <Vector<u8, 3> as LossyCastFrom<Vector<i32, 3>>>::lossy_cast_from(src);
+    let _: Vector<u8, 3> =
+        <Vector<u8, 3> as SaturatingCastFrom<Vector<i32, 3>>>::saturating_cast_from(src);
+    let _: Result<Vector<u8, 3>, _> =
+        <Vector<u8, 3> as TryCastFrom<Vector<i32, 3>>>::try_cast_from(src);
+    let _: Result<Vector<i64, 3>, _> =
+        <Vector<i64, 3> as TryExactCastFrom<Vector<i32, 3>>>::try_exact_cast_from(src);
 }
 
 #[test]

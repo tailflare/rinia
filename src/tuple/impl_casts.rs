@@ -1,19 +1,7 @@
 use crate::{
-    algebra::{Cast, CastError, LossyCast, TryCast, TryExactCast},
+    algebra::{Cast, CastError, LossyCast, SaturatingCast, TryCast, TryExactCast},
     tuple::Tuple,
 };
-
-// CastFrom inherent
-impl<T, const N: usize> Tuple<T, N> {
-    /// Casts `value` into `Self`.
-    #[inline]
-    pub fn cast_from<U>(value: Tuple<U, N>) -> Self
-    where
-        U: Cast<T>,
-    {
-        value.cast::<T>()
-    }
-}
 
 // Cast inherent
 impl<T, const N: usize> Tuple<T, N> {
@@ -38,15 +26,15 @@ where
     }
 }
 
-// LossyCastFrom inherent
+// CastFrom inherent
 impl<T, const N: usize> Tuple<T, N> {
-    /// Lossy casts `value` into `Self`.
+    /// Casts `value` into `Self`.
     #[inline]
-    pub fn lossy_cast_from<U>(value: Tuple<U, N>) -> Self
+    pub fn cast_from<U>(value: Tuple<U, N>) -> Self
     where
-        U: LossyCast<T>,
+        U: Cast<T>,
     {
-        value.lossy_cast::<T>()
+        value.cast::<T>()
     }
 }
 
@@ -73,15 +61,50 @@ where
     }
 }
 
-// TryCastFrom inherent
+// LossyCastFrom inherent
 impl<T, const N: usize> Tuple<T, N> {
-    /// Try casts `value` into `Self`.
+    /// Lossy casts `value` into `Self`.
     #[inline]
-    pub fn try_cast_from<U>(value: Tuple<U, N>) -> Result<Self, CastError>
+    pub fn lossy_cast_from<U>(value: Tuple<U, N>) -> Self
     where
-        U: TryCast<T>,
+        U: LossyCast<T>,
     {
-        value.try_cast::<T>()
+        value.lossy_cast::<T>()
+    }
+}
+
+// SaturatingCast inherent
+impl<T, const N: usize> Tuple<T, N> {
+    /// Returns a new tuple with all elements saturating cast to type `U`.
+    #[inline]
+    pub fn saturating_cast<U>(self) -> Tuple<U, N>
+    where
+        T: SaturatingCast<U>,
+    {
+        self.map(|x| x.saturating_cast())
+    }
+}
+
+// SaturatingCast trait
+impl<T, U, const N: usize> SaturatingCast<Tuple<U, N>> for Tuple<T, N>
+where
+    T: SaturatingCast<U>,
+{
+    #[inline]
+    fn saturating_cast(self) -> Tuple<U, N> {
+        Tuple::saturating_cast(self)
+    }
+}
+
+// SaturatingCastFrom inherent
+impl<T, const N: usize> Tuple<T, N> {
+    /// Saturating casts `value` into `Self`.
+    #[inline]
+    pub fn saturating_cast_from<U>(value: Tuple<U, N>) -> Self
+    where
+        U: SaturatingCast<T>,
+    {
+        value.saturating_cast::<T>()
     }
 }
 
@@ -108,15 +131,15 @@ where
     }
 }
 
-// TryExactCastFrom inherent
+// TryCastFrom inherent
 impl<T, const N: usize> Tuple<T, N> {
-    /// Try exact casts `value` into `Self`.
+    /// Try casts `value` into `Self`.
     #[inline]
-    pub fn try_exact_cast_from<U>(value: Tuple<U, N>) -> Result<Self, CastError>
+    pub fn try_cast_from<U>(value: Tuple<U, N>) -> Result<Self, CastError>
     where
-        U: TryExactCast<T>,
+        U: TryCast<T>,
     {
-        value.try_exact_cast::<T>()
+        value.try_cast::<T>()
     }
 }
 
@@ -140,5 +163,17 @@ where
     #[inline]
     fn try_exact_cast(self) -> Result<Tuple<U, N>, CastError> {
         Tuple::try_exact_cast(self)
+    }
+}
+
+// TryExactCastFrom inherent
+impl<T, const N: usize> Tuple<T, N> {
+    /// Try exact casts `value` into `Self`.
+    #[inline]
+    pub fn try_exact_cast_from<U>(value: Tuple<U, N>) -> Result<Self, CastError>
+    where
+        U: TryExactCast<T>,
+    {
+        value.try_exact_cast::<T>()
     }
 }

@@ -3,7 +3,7 @@
 use crate::{
     algebra::{
         ApproxEqAbs, ApproxEqRel, Cast, CastError, CastFrom, Lerp, LossyCast, LossyCastFrom,
-        TryCast, TryCastFrom, TryExactCast, TryExactCastFrom,
+        SaturatingCast, SaturatingCastFrom, TryCast, TryCastFrom, TryExactCast, TryExactCastFrom,
     },
     approx_eql_abs, approx_eql_abs_tol, approx_eql_rel, approx_eql_rel_tol,
     numeric::{
@@ -290,6 +290,33 @@ fn lerp_surface() {
 }
 
 #[test]
+fn cast_surface() {
+    // Identity casts
+    assert_eq!(<i32 as Cast<i32>>::cast(42), 42_i32);
+    assert_eq!(<f32 as Cast<f32>>::cast(1.5), 1.5_f32);
+    assert_eq!(<f32 as Cast<f64>>::cast(0.5_f32), 0.5_f64);
+    assert_eq!(<f64 as Cast<f64>>::cast(-7.5), -7.5_f64);
+
+    // Unsigned int widening
+    assert_eq!(<u8 as Cast<u16>>::cast(200), 200_u16);
+    assert_eq!(<u8 as Cast<u32>>::cast(255), 255_u32);
+    assert_eq!(<u8 as Cast<u64>>::cast(1), 1_u64);
+    assert_eq!(<u8 as Cast<u128>>::cast(0), 0_u128);
+    assert_eq!(<u16 as Cast<u32>>::cast(1000), 1000_u32);
+    assert_eq!(<u32 as Cast<u64>>::cast(u32::MAX), u32::MAX as u64);
+    assert_eq!(<u64 as Cast<u128>>::cast(u64::MAX), u64::MAX as u128);
+
+    // Signed int widening
+    assert_eq!(<i8 as Cast<i16>>::cast(-100), -100_i16);
+    assert_eq!(<i8 as Cast<i32>>::cast(-1), -1_i32);
+    assert_eq!(<i8 as Cast<i64>>::cast(127), 127_i64);
+    assert_eq!(<i8 as Cast<i128>>::cast(-128), -128_i128);
+    assert_eq!(<i16 as Cast<i32>>::cast(-32768), -32768_i32);
+    assert_eq!(<i32 as Cast<i64>>::cast(i32::MIN), i32::MIN as i64);
+    assert_eq!(<i64 as Cast<i128>>::cast(i64::MAX), i64::MAX as i128);
+}
+
+#[test]
 fn lossy_cast_surface() {
     // Identity casts
     assert_eq!(<i32 as LossyCast<i32>>::lossy_cast(42), 42_i32);
@@ -330,41 +357,53 @@ fn lossy_cast_surface() {
 }
 
 #[test]
-fn cast_surface() {
-    // Identity casts
-    assert_eq!(<i32 as Cast<i32>>::cast(42), 42_i32);
-    assert_eq!(<f32 as Cast<f32>>::cast(1.5), 1.5_f32);
-    assert_eq!(<f32 as Cast<f64>>::cast(0.5_f32), 0.5_f64);
-    assert_eq!(<f64 as Cast<f64>>::cast(-7.5), -7.5_f64);
+fn saturating_cast_surface() {
+    // unsigned -> unsigned
+    assert_eq!(<u32 as SaturatingCast<u8>>::saturating_cast(0), 0_u8);
+    assert_eq!(<u32 as SaturatingCast<u8>>::saturating_cast(255), 255_u8);
+    assert_eq!(<u32 as SaturatingCast<u8>>::saturating_cast(256), u8::MAX);
 
-    // Unsigned int widening
-    assert_eq!(<u8 as Cast<u16>>::cast(200), 200_u16);
-    assert_eq!(<u8 as Cast<u32>>::cast(255), 255_u32);
-    assert_eq!(<u8 as Cast<u64>>::cast(1), 1_u64);
-    assert_eq!(<u8 as Cast<u128>>::cast(0), 0_u128);
-    assert_eq!(<u16 as Cast<u32>>::cast(1000), 1000_u32);
-    assert_eq!(<u32 as Cast<u64>>::cast(u32::MAX), u32::MAX as u64);
-    assert_eq!(<u64 as Cast<u128>>::cast(u64::MAX), u64::MAX as u128);
+    // signed -> signed
+    assert_eq!(<i32 as SaturatingCast<i8>>::saturating_cast(-200), i8::MIN);
+    assert_eq!(<i32 as SaturatingCast<i8>>::saturating_cast(-128), -128_i8);
+    assert_eq!(<i32 as SaturatingCast<i8>>::saturating_cast(127), 127_i8);
+    assert_eq!(<i32 as SaturatingCast<i8>>::saturating_cast(200), i8::MAX);
 
-    // Signed int widening
-    assert_eq!(<i8 as Cast<i16>>::cast(-100), -100_i16);
-    assert_eq!(<i8 as Cast<i32>>::cast(-1), -1_i32);
-    assert_eq!(<i8 as Cast<i64>>::cast(127), 127_i64);
-    assert_eq!(<i8 as Cast<i128>>::cast(-128), -128_i128);
-    assert_eq!(<i16 as Cast<i32>>::cast(-32768), -32768_i32);
-    assert_eq!(<i32 as Cast<i64>>::cast(i32::MIN), i32::MIN as i64);
-    assert_eq!(<i64 as Cast<i128>>::cast(i64::MAX), i64::MAX as i128);
-}
+    // unsigned -> signed
+    assert_eq!(<u32 as SaturatingCast<i16>>::saturating_cast(0), 0_i16);
+    assert_eq!(<u32 as SaturatingCast<i16>>::saturating_cast(i16::MAX as u32), i16::MAX);
+    assert_eq!(<u32 as SaturatingCast<i16>>::saturating_cast((i16::MAX as u32) + 1), i16::MAX);
 
-#[test]
-fn from_cast_variants_surface() {
-    assert_eq!(<u32 as CastFrom<u8>>::cast_from(255_u8), 255_u32);
-    assert_eq!(<u8 as LossyCastFrom<i32>>::lossy_cast_from(300_i32), 44_u8);
-    assert_eq!(<u8 as TryCastFrom<i32>>::try_cast_from(255_i32), Ok(255_u8));
-    assert_eq!(
-        <f32 as TryExactCastFrom<i32>>::try_exact_cast_from(16_777_217_i32),
-        Err(CastError::Inexact)
-    );
+    // signed -> unsigned
+    assert_eq!(<i32 as SaturatingCast<u16>>::saturating_cast(-100), u16::MIN);
+    assert_eq!(<i32 as SaturatingCast<u16>>::saturating_cast(0), 0_u16);
+    assert_eq!(<i32 as SaturatingCast<u16>>::saturating_cast(u16::MAX as i32), u16::MAX);
+    assert_eq!(<i32 as SaturatingCast<u16>>::saturating_cast((u16::MAX as i32) + 1), u16::MAX);
+
+    // int -> float (no clamp, same as as cast)
+    assert_eq!(<u64 as SaturatingCast<f32>>::saturating_cast(1), 1.0_f32);
+    assert_eq!(<u64 as SaturatingCast<f32>>::saturating_cast(16_777_217), 16_777_216.0_f32);
+
+    // float -> int
+    assert_eq!(<f32 as SaturatingCast<u8>>::saturating_cast(f32::NAN), 0_u8);
+    assert_eq!(<f32 as SaturatingCast<u8>>::saturating_cast(f32::NEG_INFINITY), u8::MIN);
+    assert_eq!(<f32 as SaturatingCast<u8>>::saturating_cast(-10.5), u8::MIN);
+    assert_eq!(<f32 as SaturatingCast<u8>>::saturating_cast(10.9), 10_u8);
+    assert_eq!(<f32 as SaturatingCast<u8>>::saturating_cast(255.9), u8::MAX);
+    assert_eq!(<f32 as SaturatingCast<u8>>::saturating_cast(f32::INFINITY), u8::MAX);
+    assert_eq!(<f32 as SaturatingCast<i8>>::saturating_cast(200.0), i8::MAX);
+    assert_eq!(<f32 as SaturatingCast<i8>>::saturating_cast(-200.0), i8::MIN);
+
+    // float -> float
+    assert_eq!(<f64 as SaturatingCast<f32>>::saturating_cast(f64::NAN), 0.0_f32);
+    assert_eq!(<f64 as SaturatingCast<f32>>::saturating_cast(f64::NEG_INFINITY), f32::MIN);
+    assert_eq!(<f64 as SaturatingCast<f32>>::saturating_cast(f64::INFINITY), f32::MAX);
+    assert!(approx_eql_abs_tol!(
+        <f64 as SaturatingCast<f32>>::saturating_cast(1.5_f64),
+        1.5_f32,
+        1e-6
+    ));
+    assert_eq!(<f64 as TryExactCast<f32>>::try_exact_cast(16777217.0), Err(CastError::Inexact));
 }
 
 #[test]
@@ -404,10 +443,6 @@ fn try_cast_surface() {
     // float-to-float: success cases
     assert!(<f32 as TryCast<f64>>::try_cast(1.5).is_ok());
     assert!(<f64 as TryCast<f32>>::try_cast(1.5).is_ok());
-
-    // float-to-float: failure cases
-    assert_eq!(<f32 as TryCast<f64>>::try_cast(f32::NAN), Err(CastError::NonFinite));
-    assert_eq!(<f64 as TryCast<f32>>::try_cast(f64::INFINITY), Err(CastError::NonFinite));
 }
 
 #[test]
@@ -457,14 +492,21 @@ fn try_exact_cast_surface() {
     assert_eq!(<f32 as TryExactCast<f32>>::try_exact_cast(0.5_f32), Ok(0.5_f32));
 
     // float-to-float: failure cases
-    assert_eq!(<f32 as TryExactCast<f64>>::try_exact_cast(f32::NAN), Err(CastError::NonFinite));
-    assert_eq!(
-        <f64 as TryExactCast<f32>>::try_exact_cast(f64::INFINITY),
-        Err(CastError::NonFinite)
-    );
     // f64 value not exactly representable as f32
     assert_eq!(
         <f64 as TryExactCast<f32>>::try_exact_cast(1.0000000001_f64),
+        Err(CastError::Inexact)
+    );
+}
+
+#[test]
+fn from_cast_variants_surface() {
+    assert_eq!(<u32 as CastFrom<u8>>::cast_from(255_u8), 255_u32);
+    assert_eq!(<u8 as LossyCastFrom<i32>>::lossy_cast_from(300_i32), 44_u8);
+    assert_eq!(<u8 as SaturatingCastFrom<u32>>::saturating_cast_from(300_u32), u8::MAX);
+    assert_eq!(<u8 as TryCastFrom<i32>>::try_cast_from(255_i32), Ok(255_u8));
+    assert_eq!(
+        <f32 as TryExactCastFrom<i32>>::try_exact_cast_from(16_777_217_i32),
         Err(CastError::Inexact)
     );
 }

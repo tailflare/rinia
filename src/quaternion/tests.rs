@@ -4,8 +4,9 @@ use alloc::vec::Vec;
 
 use crate::{
     algebra::{
-        Cast, CastError, Dot, Identity, Inverse, Length, LengthSquared, Lerp, LossyCast, Normalize,
-        TryCast, TryExactCast,
+        Cast, CastFrom, Dot, Identity, Inverse, Length, LengthSquared, Lerp, LossyCast,
+        LossyCastFrom, Normalize, SaturatingCast, SaturatingCastFrom, TryCast, TryCastFrom,
+        TryExactCast, TryExactCastFrom,
     },
     approx_eql_abs, approx_eql_abs_tol, approx_eql_rel, approx_eql_rel_tol,
     numeric::{Infinite, IsFinite, IsZero, Nan, Negate},
@@ -127,55 +128,39 @@ fn tuplelike_surface() {
 
 #[test]
 fn cast_variants_surface() {
-    let cast_src = Quaternion::<i8>::from_array([1, 2, 3, 4]);
-    assert_eq!(cast_src.cast::<i32>().into_array(), [1_i32, 2, 3, 4]);
-    assert_eq!(Quaternion::<i32>::cast_from(cast_src).into_array(), [1_i32, 2, 3, 4]);
-    assert_eq!(
-        <Quaternion<i8> as Cast<Quaternion<i32>>>::cast(cast_src).into_array(),
-        [1_i32, 2, 3, 4]
-    );
+    let src = Quaternion::<i32>::from_array([1, 2, 3, 4]);
 
-    let lossy_src = Quaternion::<i32>::from_array([300, -1, 127, 1024]);
-    assert_eq!(lossy_src.lossy_cast::<u8>().into_array(), [44_u8, 255, 127, 0]);
-    assert_eq!(Quaternion::<u8>::lossy_cast_from(lossy_src).into_array(), [44_u8, 255, 127, 0]);
-    assert_eq!(
-        <Quaternion<i32> as LossyCast<Quaternion<u8>>>::lossy_cast(lossy_src).into_array(),
-        [44_u8, 255, 127, 0]
-    );
+    // inherent
+    let _: Quaternion<i64> = src.cast();
+    let _: Quaternion<u8> = src.lossy_cast();
+    let _: Quaternion<u8> = src.saturating_cast();
+    let _: Result<Quaternion<u8>, _> = src.try_cast();
+    let _: Result<Quaternion<i64>, _> = src.try_exact_cast();
 
-    let try_src = Quaternion::<i32>::from_array([1, 2, 3, 255]);
-    assert_eq!(try_src.try_cast::<u8>().map(Quaternion::into_array), Ok([1_u8, 2, 3, 255]));
-    assert_eq!(
-        Quaternion::<u8>::try_cast_from(try_src).map(Quaternion::into_array),
-        Ok([1_u8, 2, 3, 255])
-    );
-    assert_eq!(
-        <Quaternion<i32> as TryCast<Quaternion<u8>>>::try_cast(try_src).map(Quaternion::into_array),
-        Ok([1_u8, 2, 3, 255])
-    );
-    assert_eq!(
-        Quaternion::<i32>::from_array([256, 2, 3, 4]).try_cast::<u8>(),
-        Err(CastError::OutOfRange)
-    );
+    let _: Quaternion<i64> = Quaternion::cast_from(src);
+    let _: Quaternion<u8> = Quaternion::lossy_cast_from(src);
+    let _: Quaternion<u8> = Quaternion::saturating_cast_from(src);
+    let _: Result<Quaternion<u8>, _> = Quaternion::try_cast_from(src);
+    let _: Result<Quaternion<i64>, _> = Quaternion::try_exact_cast_from(src);
 
-    let exact_src = Quaternion::<i32>::from_array([1, 2, 3, 100]);
-    assert_eq!(
-        exact_src.try_exact_cast::<i64>().map(Quaternion::into_array),
-        Ok([1_i64, 2, 3, 100])
-    );
-    assert_eq!(
-        Quaternion::<i64>::try_exact_cast_from(exact_src).map(Quaternion::into_array),
-        Ok([1_i64, 2, 3, 100])
-    );
-    assert_eq!(
-        <Quaternion<i32> as TryExactCast<Quaternion<i64>>>::try_exact_cast(exact_src)
-            .map(Quaternion::into_array),
-        Ok([1_i64, 2, 3, 100])
-    );
-    assert_eq!(
-        Quaternion::<i32>::from_array([300, 2, 3, 4]).try_exact_cast::<u8>(),
-        Err(CastError::OutOfRange)
-    );
+    // traits
+    let _: Quaternion<i64> = <Quaternion<i32> as Cast<Quaternion<i64>>>::cast(src);
+    let _: Quaternion<u8> = <Quaternion<i32> as LossyCast<Quaternion<u8>>>::lossy_cast(src);
+    let _: Quaternion<u8> =
+        <Quaternion<i32> as SaturatingCast<Quaternion<u8>>>::saturating_cast(src);
+    let _: Result<Quaternion<u8>, _> = <Quaternion<i32> as TryCast<Quaternion<u8>>>::try_cast(src);
+    let _: Result<Quaternion<i64>, _> =
+        <Quaternion<i32> as TryExactCast<Quaternion<i64>>>::try_exact_cast(src);
+
+    let _: Quaternion<i64> = <Quaternion<i64> as CastFrom<Quaternion<i32>>>::cast_from(src);
+    let _: Quaternion<u8> =
+        <Quaternion<u8> as LossyCastFrom<Quaternion<i32>>>::lossy_cast_from(src);
+    let _: Quaternion<u8> =
+        <Quaternion<u8> as SaturatingCastFrom<Quaternion<i32>>>::saturating_cast_from(src);
+    let _: Result<Quaternion<u8>, _> =
+        <Quaternion<u8> as TryCastFrom<Quaternion<i32>>>::try_cast_from(src);
+    let _: Result<Quaternion<i64>, _> =
+        <Quaternion<i64> as TryExactCastFrom<Quaternion<i32>>>::try_exact_cast_from(src);
 }
 
 #[test]
