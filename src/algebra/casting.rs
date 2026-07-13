@@ -35,8 +35,13 @@ pub trait LossyCastFrom<T> {
 
 /// A trait which represents a saturating cast from one type to another.
 ///
-/// A saturating cast always performs the conversion, but if the value is out of range for the
-/// target type, it will be clamped to the nearest representable value.
+/// A saturating cast always performs the conversion. If the value is outside
+/// the range representable by the target type, it is clamped to the nearest
+/// representable value.
+///
+/// Non-finite floating-point values are handled as out-of-range values:
+/// NaN converts to zero, positive infinity converts to the target maximum,
+/// and negative infinity converts to the target minimum.
 pub trait SaturatingCast<T> {
     /// Casts `self` to type `T`, saturating the value if it is out of range.
     fn saturating_cast(self) -> T;
