@@ -6,13 +6,17 @@
 [![Main CI Build Status](https://img.shields.io/github/actions/workflow/status/tailflare/rinia/ci.yml?label=main%20build)](https://github.com/tailflare/rinia/actions/workflows/ci.yml)
 [![License](https://img.shields.io/crates/l/rinia)](#license)
 
-Stable math primitives for graphics, animation, and simulation.
+Stable numeric foundations for graphics, animation, and simulation.
 
-Rinia provides a lightweight foundation of scalar, vector, and quaternion types for Rust applications. It defines consistent mathematical representations and operations that can be shared across engines, tools, runtimes, and data processing pipelines.
+Rinia provides a lightweight, portable foundation of numeric abstractions and mathematical primitives for Rust applications. It defines consistent scalar models, operations, conversions, and representations for building reliable graphics, animation, and simulation systems.
 
-Rinia is designed for projects that need stable math types across multiple systems without depending on a larger engine-specific math stack.
+Rinia separates mathematical structures from their underlying numeric representations, allowing mathematical primitives to be expressed generically across different numeric types. By providing shared scalar traits, numeric operations, and predictable conversion behavior, Rinia enables these primitives to be reused across engines, tools, runtimes, and processing pipelines without being tied to a single scalar type such as `f32`.
 
-Rinia is not intended to replace specialized math libraries where maximum performance or platform-specific optimizations are the primary goal. Instead, it provides a reliable mathematical foundation for systems that need to exchange data and behavior across project boundaries.
+Designed for portability, Rinia supports `no_std` and `no_alloc` environments while providing consistent numeric behavior and mathematical operations across platforms.
+
+Rinia is designed for projects that need stable mathematical types and predictable numeric behavior across system boundaries without depending on a larger engine-specific math stack.
+
+Rinia is not intended to replace specialized math libraries where maximum performance or platform-specific optimizations are the primary goal. Instead, it provides a reliable foundation layer for applications that prioritize portability, interoperability, and consistency.
 
 ## Status
 

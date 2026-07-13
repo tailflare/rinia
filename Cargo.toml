@@ -5,7 +5,7 @@ publish = true
 edition = "2024"
 license = "MIT OR Apache-2.0"
 repository = "https://github.com/tailflare/rinia"
-description = "Stable math primitives for graphics, animation, and simulation."
+description = "Stable numeric foundations for graphics, animation, and simulation."
 include = ["src/**", "README.md", "LICENSE*"]
 
 [features]
