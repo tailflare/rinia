@@ -129,6 +129,7 @@ fn tuplelike_surface() {
 fn cast_variants_surface() {
     let cast_src = Quaternion::<i8>::from_array([1, 2, 3, 4]);
     assert_eq!(cast_src.cast::<i32>().into_array(), [1_i32, 2, 3, 4]);
+    assert_eq!(Quaternion::<i32>::cast_from(cast_src).into_array(), [1_i32, 2, 3, 4]);
     assert_eq!(
         <Quaternion<i8> as Cast<Quaternion<i32>>>::cast(cast_src).into_array(),
         [1_i32, 2, 3, 4]
@@ -136,6 +137,7 @@ fn cast_variants_surface() {
 
     let lossy_src = Quaternion::<i32>::from_array([300, -1, 127, 1024]);
     assert_eq!(lossy_src.lossy_cast::<u8>().into_array(), [44_u8, 255, 127, 0]);
+    assert_eq!(Quaternion::<u8>::lossy_cast_from(lossy_src).into_array(), [44_u8, 255, 127, 0]);
     assert_eq!(
         <Quaternion<i32> as LossyCast<Quaternion<u8>>>::lossy_cast(lossy_src).into_array(),
         [44_u8, 255, 127, 0]
@@ -143,6 +145,10 @@ fn cast_variants_surface() {
 
     let try_src = Quaternion::<i32>::from_array([1, 2, 3, 255]);
     assert_eq!(try_src.try_cast::<u8>().map(Quaternion::into_array), Ok([1_u8, 2, 3, 255]));
+    assert_eq!(
+        Quaternion::<u8>::try_cast_from(try_src).map(Quaternion::into_array),
+        Ok([1_u8, 2, 3, 255])
+    );
     assert_eq!(
         <Quaternion<i32> as TryCast<Quaternion<u8>>>::try_cast(try_src).map(Quaternion::into_array),
         Ok([1_u8, 2, 3, 255])
@@ -155,6 +161,10 @@ fn cast_variants_surface() {
     let exact_src = Quaternion::<i32>::from_array([1, 2, 3, 100]);
     assert_eq!(
         exact_src.try_exact_cast::<i64>().map(Quaternion::into_array),
+        Ok([1_i64, 2, 3, 100])
+    );
+    assert_eq!(
+        Quaternion::<i64>::try_exact_cast_from(exact_src).map(Quaternion::into_array),
         Ok([1_i64, 2, 3, 100])
     );
     assert_eq!(

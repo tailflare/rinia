@@ -3,6 +3,18 @@ use crate::{
     tuple::Tuple,
 };
 
+// CastFrom inherent
+impl<T, const N: usize> Tuple<T, N> {
+    /// Casts `value` into `Self`.
+    #[inline]
+    pub fn cast_from<U>(value: Tuple<U, N>) -> Self
+    where
+        U: Cast<T>,
+    {
+        value.cast::<T>()
+    }
+}
+
 // Cast inherent
 impl<T, const N: usize> Tuple<T, N> {
     /// Returns a new tuple with all elements cast to type `U`.
@@ -23,6 +35,18 @@ where
     #[inline]
     fn cast(self) -> Tuple<U, N> {
         Tuple::cast(self)
+    }
+}
+
+// LossyCastFrom inherent
+impl<T, const N: usize> Tuple<T, N> {
+    /// Lossy casts `value` into `Self`.
+    #[inline]
+    pub fn lossy_cast_from<U>(value: Tuple<U, N>) -> Self
+    where
+        U: LossyCast<T>,
+    {
+        value.lossy_cast::<T>()
     }
 }
 
@@ -49,6 +73,18 @@ where
     }
 }
 
+// TryCastFrom inherent
+impl<T, const N: usize> Tuple<T, N> {
+    /// Try casts `value` into `Self`.
+    #[inline]
+    pub fn try_cast_from<U>(value: Tuple<U, N>) -> Result<Self, CastError>
+    where
+        U: TryCast<T>,
+    {
+        value.try_cast::<T>()
+    }
+}
+
 // TryCast inherent
 impl<T, const N: usize> Tuple<T, N> {
     /// Returns a new tuple with all elements try cast to type `U`.
@@ -69,6 +105,18 @@ where
     #[inline]
     fn try_cast(self) -> Result<Tuple<U, N>, CastError> {
         Tuple::try_cast(self)
+    }
+}
+
+// TryExactCastFrom inherent
+impl<T, const N: usize> Tuple<T, N> {
+    /// Try exact casts `value` into `Self`.
+    #[inline]
+    pub fn try_exact_cast_from<U>(value: Tuple<U, N>) -> Result<Self, CastError>
+    where
+        U: TryExactCast<T>,
+    {
+        value.try_exact_cast::<T>()
     }
 }
 

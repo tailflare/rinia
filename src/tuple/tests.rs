@@ -6,7 +6,10 @@ use alloc::{
 };
 
 use crate::{
-    algebra::{Cast, CastError, LossyCast, TryCast, TryExactCast},
+    algebra::{
+        Cast, CastError, CastFrom, LossyCast, LossyCastFrom, TryCast, TryCastFrom, TryExactCast,
+        TryExactCastFrom,
+    },
     numeric::{Abs, BoundedMax, BoundedMin, Infinite, IsFinite, MinMax, Nan},
     tuple::{Tuple, TupleLike},
 };
@@ -335,4 +338,38 @@ fn cast_variants_surface() {
     assert_eq!(exact_fail.try_exact_cast::<u8>(), Err(CastError::OutOfRange));
     let exact_trait = <Tuple<i32, 3> as TryExactCast<Tuple<i64, 3>>>::try_exact_cast(t_exact);
     assert_eq!(exact_trait, Ok(Tuple::from_array([1_i64, 2, 100])));
+}
+
+#[test]
+fn from_cast_variants_surface() {
+    let cast_src = Tuple::from_array([1_i8, 2, 3]);
+    assert_eq!(Tuple::<i32, 3>::cast_from(cast_src), Tuple::from_array([1_i32, 2, 3]));
+    assert_eq!(
+        <Tuple<i32, 3> as CastFrom<Tuple<i8, 3>>>::cast_from(cast_src),
+        Tuple::from_array([1_i32, 2, 3])
+    );
+
+    let lossy_src = Tuple::from_array([300_i32, -1, 127]);
+    assert_eq!(Tuple::<u8, 3>::lossy_cast_from(lossy_src), Tuple::from_array([44_u8, 255, 127]));
+    assert_eq!(
+        <Tuple<u8, 3> as LossyCastFrom<Tuple<i32, 3>>>::lossy_cast_from(lossy_src),
+        Tuple::from_array([44_u8, 255, 127])
+    );
+
+    let try_src = Tuple::from_array([1_i32, 2, 255]);
+    assert_eq!(Tuple::<u8, 3>::try_cast_from(try_src), Ok(Tuple::from_array([1_u8, 2, 255])));
+    assert_eq!(
+        <Tuple<u8, 3> as TryCastFrom<Tuple<i32, 3>>>::try_cast_from(try_src),
+        Ok(Tuple::from_array([1_u8, 2, 255]))
+    );
+
+    let exact_src = Tuple::from_array([1_i32, 2, 100]);
+    assert_eq!(
+        Tuple::<i64, 3>::try_exact_cast_from(exact_src),
+        Ok(Tuple::from_array([1_i64, 2, 100]))
+    );
+    assert_eq!(
+        <Tuple<i64, 3> as TryExactCastFrom<Tuple<i32, 3>>>::try_exact_cast_from(exact_src),
+        Ok(Tuple::from_array([1_i64, 2, 100]))
+    );
 }
