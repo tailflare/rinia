@@ -404,13 +404,199 @@ macro_rules! impl_scalar_trait {
 
 }
 
+macro_rules! impl_scalar_casts {
+    (
+        $(
+            $src:ty => [$($dst:ty),* $(,)?]
+        ),* $(,)?
+    ) => {
+        $(
+            $(
+                impl $crate::algebra::Cast<$dst> for $src {
+                    #[inline]
+                    fn cast(self) -> $dst {
+                        self as $dst
+                    }
+                }
+            )*
+        )*
+    };
+}
+
+macro_rules! impl_scalar_lossy_casts {
+    (
+        $(
+            $src:ty => [$($dst:ty),* $(,)?]
+        ),* $(,)?
+    ) => {
+        $(
+            $(
+                impl $crate::algebra::LossyCast<$dst> for $src {
+                    #[inline]
+                    fn lossy_cast(self) -> $dst {
+                        self as $dst
+                    }
+                }
+            )*
+        )*
+    };
+}
+
+macro_rules! impl_scalar_try_cast_int_to_int {
+    ($($src:ty => [$($dst:ty),* $(,)?]),* $(,)?) => {
+        $(
+            $(
+                impl $crate::algebra::TryExactCast<$dst> for $src {
+                    #[inline]
+                    fn try_exact_cast(self) -> Result<$dst, $crate::algebra::CastError> {
+                        let value = self as $dst;
+
+                        if value as $src == self {
+                            Ok(value)
+                        } else {
+                            Err($crate::algebra::CastError::OutOfRange)
+                        }
+                    }
+                }
+
+                impl $crate::algebra::TryCast<$dst> for $src {
+                    #[inline]
+                    fn try_cast(self) -> Result<$dst, $crate::algebra::CastError> {
+                        let value = self as $dst;
+
+                        if value as $src == self {
+                            Ok(value)
+                        } else {
+                            Err($crate::algebra::CastError::OutOfRange)
+                        }
+                    }
+                }
+            )*
+        )*
+    };
+}
+
+macro_rules! impl_scalar_try_cast_int_to_float {
+    ($($src:ty => [$($dst:ty),* $(,)?]),* $(,)?) => {
+        $(
+            $(
+                impl $crate::algebra::TryExactCast<$dst> for $src {
+                    #[inline]
+                    fn try_exact_cast(self) -> Result<$dst, $crate::algebra::CastError> {
+                        let value = self as $dst;
+
+                        if value as $src == self {
+                            Ok(value)
+                        } else {
+                            Err($crate::algebra::CastError::Inexact)
+                        }
+                    }
+                }
+
+                impl $crate::algebra::TryCast<$dst> for $src {
+                    #[inline]
+                    fn try_cast(self) -> Result<$dst, $crate::algebra::CastError> {
+                         Ok(self as $dst)
+                    }
+                }
+            )*
+        )*
+    };
+}
+
+macro_rules! impl_scalar_try_cast_float_to_int {
+    ($($src:ty => [$($dst:ty),* $(,)?]),* $(,)?) => {
+        $(
+            $(
+                impl $crate::algebra::TryExactCast<$dst> for $src where Self: $crate::numeric::Fract {
+                    #[inline]
+                    fn try_exact_cast(self) -> Result<$dst, $crate::algebra::CastError> {
+                        if !self.is_finite() {
+                            return Err($crate::algebra::CastError::NonFinite);
+                        }
+
+                        if <Self as $crate::numeric::Fract>::fract(self) != 0.0 {
+                            return Err($crate::algebra::CastError::Fractional);
+                        }
+
+                        let value = self as $dst;
+
+                        if value as $src == self {
+                            Ok(value)
+                        } else {
+                            Err($crate::algebra::CastError::OutOfRange)
+                        }
+                    }
+                }
+
+                impl $crate::algebra::TryCast<$dst> for $src {
+                    #[inline]
+                    fn try_cast(self) -> Result<$dst, $crate::algebra::CastError> {
+                        if !self.is_finite() {
+                            return Err($crate::algebra::CastError::NonFinite);
+                        }
+
+                        if self < <$dst>::MIN as $src || self > <$dst>::MAX as $src {
+                            return Err($crate::algebra::CastError::OutOfRange);
+                        }
+
+                        Ok(self as $dst)
+                    }
+                }
+            )*
+        )*
+    };
+}
+
+macro_rules! impl_scalar_try_cast_float_to_float {
+    ($($src:ty => [$($dst:ty),* $(,)?]),* $(,)?) => {
+        $(
+            $(
+                impl $crate::algebra::TryExactCast<$dst> for $src {
+                    #[inline]
+                    fn try_exact_cast(self) -> Result<$dst, $crate::algebra::CastError> {
+                        if !self.is_finite() {
+                            return Err($crate::algebra::CastError::NonFinite);
+                        }
+
+                        let value = self as $dst;
+
+                        if value as $src == self {
+                            Ok(value)
+                        } else {
+                            Err($crate::algebra::CastError::Inexact)
+                        }
+                    }
+                }
+
+                impl $crate::algebra::TryCast<$dst> for $src {
+                    #[inline]
+                    fn try_cast(self) -> Result<$dst, $crate::algebra::CastError> {
+                        if !self.is_finite() {
+                            return Err($crate::algebra::CastError::NonFinite);
+                        }
+
+                        Ok(self as $dst)
+                    }
+                }
+            )*
+        )*
+    };
+}
+
 pub(crate) use impl_scalar_approx_eq;
 pub(crate) use impl_scalar_bounded;
+pub(crate) use impl_scalar_casts;
 pub(crate) use impl_scalar_clamp;
 pub(crate) use impl_scalar_constants;
 pub(crate) use impl_scalar_constants_float;
 pub(crate) use impl_scalar_lerp;
+pub(crate) use impl_scalar_lossy_casts;
 pub(crate) use impl_scalar_min_max;
 pub(crate) use impl_scalar_predicates_float;
 pub(crate) use impl_scalar_predicates_int;
 pub(crate) use impl_scalar_trait;
+pub(crate) use impl_scalar_try_cast_float_to_float;
+pub(crate) use impl_scalar_try_cast_float_to_int;
+pub(crate) use impl_scalar_try_cast_int_to_float;
+pub(crate) use impl_scalar_try_cast_int_to_int;

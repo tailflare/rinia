@@ -1,8 +1,12 @@
 #![cfg(test)]
 
-use alloc::vec::Vec;
+use alloc::{
+    string::{String, ToString},
+    vec::Vec,
+};
 
 use crate::{
+    algebra::{Cast, CastError, LossyCast, TryCast, TryExactCast},
     numeric::{Abs, BoundedMax, BoundedMin, Infinite, IsFinite, MinMax, Nan},
     tuple::{Tuple, TupleLike},
 };
@@ -273,4 +277,62 @@ fn sakka_roundtrip() {
 
     assert_eq!(out, t);
     assert!(reader.is_eof());
+}
+
+#[test]
+fn try_map_surface() {
+    let t = Tuple::from_array([1_i32, 2, 3]);
+
+    // Successful mapping
+    let result = t.try_map(|x| -> Result<i32, String> { Ok(x * 2) });
+    assert_eq!(result, Ok(Tuple::from_array([2_i32, 4, 6])));
+
+    // Failed mapping
+    let result = t.try_map(|x| -> Result<i32, String> {
+        if x == 2 { Err("failed at 2".to_string()) } else { Ok(x * 10) }
+    });
+    assert_eq!(result, Err("failed at 2".to_string()));
+
+    // Using CastError as the error type
+    let result = t.try_map(|x| -> Result<u8, CastError> {
+        if x > 255 { Err(CastError::OutOfRange) } else { Ok(x as u8) }
+    });
+    assert_eq!(result, Ok(Tuple::from_array([1_u8, 2, 3])));
+}
+
+#[test]
+fn cast_variants_surface() {
+    // Cast: infallible, lossless cast (widening)
+    let t_i8 = Tuple::from_array([1_i8, 2, 3]);
+    let cast_result = t_i8.cast::<i32>();
+    assert_eq!(cast_result.as_array(), &[1_i32, 2, 3]);
+    let cast_trait = <Tuple<i8, 3> as Cast<Tuple<i32, 3>>>::cast(t_i8);
+    assert_eq!(cast_trait.as_array(), &[1_i32, 2, 3]);
+
+    // LossyCast: infallible, potentially lossy cast
+    let t_i32 = Tuple::from_array([300_i32, -1, 127]);
+    let lossy_result = t_i32.lossy_cast::<u8>();
+    assert_eq!(lossy_result.as_array(), &[44_u8, 255, 127]); // wraps
+    let lossy_trait = <Tuple<i32, 3> as LossyCast<Tuple<u8, 3>>>::lossy_cast(t_i32);
+    assert_eq!(lossy_trait.as_array(), &[44_u8, 255, 127]);
+
+    // TryCast: fallible, accepts loss of precision for int-to-float
+    let t_i32_narrow = Tuple::from_array([1_i32, 2, 255]);
+    let try_result = t_i32_narrow.try_cast::<u8>();
+    assert_eq!(try_result, Ok(Tuple::from_array([1_u8, 2, 255])));
+
+    let try_fail = Tuple::from_array([256_i32, 2, 3]);
+    assert!(try_fail.try_cast::<u8>().is_err());
+    let try_trait = <Tuple<i32, 3> as TryCast<Tuple<u8, 3>>>::try_cast(t_i32_narrow);
+    assert_eq!(try_trait, Ok(Tuple::from_array([1_u8, 2, 255])));
+
+    // TryExactCast: fallible, must preserve value exactly
+    let t_exact = Tuple::from_array([1_i32, 2, 100]);
+    let exact_result = t_exact.try_exact_cast::<i64>();
+    assert_eq!(exact_result, Ok(Tuple::from_array([1_i64, 2, 100])));
+
+    let exact_fail = Tuple::from_array([300_i32, 2, 3]);
+    assert_eq!(exact_fail.try_exact_cast::<u8>(), Err(CastError::OutOfRange));
+    let exact_trait = <Tuple<i32, 3> as TryExactCast<Tuple<i64, 3>>>::try_exact_cast(t_exact);
+    assert_eq!(exact_trait, Ok(Tuple::from_array([1_i64, 2, 100])));
 }

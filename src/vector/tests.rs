@@ -3,7 +3,10 @@
 use alloc::vec::Vec;
 
 use crate::{
-    algebra::{Dot, Length, LengthSquared, Lerp, Normalize},
+    algebra::{
+        Cast, CastError, Dot, Length, LengthSquared, Lerp, LossyCast, Normalize, TryCast,
+        TryExactCast,
+    },
     approx_eql_abs, approx_eql_abs_tol, approx_eql_rel, approx_eql_rel_tol,
     numeric::{Abs, Infinite, IsFinite, IsZero, MinMax, Nan, Negate, One, Zero},
     tuple::{Tuple, TupleLike},
@@ -125,6 +128,43 @@ fn tuplelike_surface() {
 
     TupleLike::as_mut_slice(&mut v)[1] = 40;
     assert_eq!(v.into_array(), [2, 40, 6]);
+}
+
+#[test]
+fn cast_variants_surface() {
+    let cast_src = Vector::<i8, 3>::from_array([1, 2, 3]);
+    assert_eq!(cast_src.cast::<i32>().into_array(), [1_i32, 2, 3]);
+    assert_eq!(<Vector<i8, 3> as Cast<Vector<i32, 3>>>::cast(cast_src).into_array(), [1_i32, 2, 3]);
+
+    let lossy_src = Vector::<i32, 3>::from_array([300, -1, 127]);
+    assert_eq!(lossy_src.lossy_cast::<u8>().into_array(), [44_u8, 255, 127]);
+    assert_eq!(
+        <Vector<i32, 3> as LossyCast<Vector<u8, 3>>>::lossy_cast(lossy_src).into_array(),
+        [44_u8, 255, 127]
+    );
+
+    let try_src = Vector::<i32, 3>::from_array([1, 2, 255]);
+    assert_eq!(try_src.try_cast::<u8>().map(Vector::into_array), Ok([1_u8, 2, 255]));
+    assert_eq!(
+        <Vector<i32, 3> as TryCast<Vector<u8, 3>>>::try_cast(try_src).map(Vector::into_array),
+        Ok([1_u8, 2, 255])
+    );
+    assert_eq!(
+        Vector::<i32, 3>::from_array([256, 2, 3]).try_cast::<u8>(),
+        Err(CastError::OutOfRange)
+    );
+
+    let exact_src = Vector::<i32, 3>::from_array([1, 2, 100]);
+    assert_eq!(exact_src.try_exact_cast::<i64>().map(Vector::into_array), Ok([1_i64, 2, 100]));
+    assert_eq!(
+        <Vector<i32, 3> as TryExactCast<Vector<i64, 3>>>::try_exact_cast(exact_src)
+            .map(Vector::into_array),
+        Ok([1_i64, 2, 100])
+    );
+    assert_eq!(
+        Vector::<i32, 3>::from_array([300, 2, 3]).try_exact_cast::<u8>(),
+        Err(CastError::OutOfRange)
+    );
 }
 
 #[test]

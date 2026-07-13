@@ -3,7 +3,10 @@
 use alloc::vec::Vec;
 
 use crate::{
-    algebra::{Dot, Identity, Inverse, Length, LengthSquared, Lerp, Normalize},
+    algebra::{
+        Cast, CastError, Dot, Identity, Inverse, Length, LengthSquared, Lerp, LossyCast, Normalize,
+        TryCast, TryExactCast,
+    },
     approx_eql_abs, approx_eql_abs_tol, approx_eql_rel, approx_eql_rel_tol,
     numeric::{Infinite, IsFinite, IsZero, Nan, Negate},
     quaternion::Quaternion,
@@ -120,6 +123,49 @@ fn tuplelike_surface() {
 
     TupleLike::as_mut_slice(&mut q)[1] = 40;
     assert_eq!(q.into_array(), [2, 40, 6, 8]);
+}
+
+#[test]
+fn cast_variants_surface() {
+    let cast_src = Quaternion::<i8>::from_array([1, 2, 3, 4]);
+    assert_eq!(cast_src.cast::<i32>().into_array(), [1_i32, 2, 3, 4]);
+    assert_eq!(
+        <Quaternion<i8> as Cast<Quaternion<i32>>>::cast(cast_src).into_array(),
+        [1_i32, 2, 3, 4]
+    );
+
+    let lossy_src = Quaternion::<i32>::from_array([300, -1, 127, 1024]);
+    assert_eq!(lossy_src.lossy_cast::<u8>().into_array(), [44_u8, 255, 127, 0]);
+    assert_eq!(
+        <Quaternion<i32> as LossyCast<Quaternion<u8>>>::lossy_cast(lossy_src).into_array(),
+        [44_u8, 255, 127, 0]
+    );
+
+    let try_src = Quaternion::<i32>::from_array([1, 2, 3, 255]);
+    assert_eq!(try_src.try_cast::<u8>().map(Quaternion::into_array), Ok([1_u8, 2, 3, 255]));
+    assert_eq!(
+        <Quaternion<i32> as TryCast<Quaternion<u8>>>::try_cast(try_src).map(Quaternion::into_array),
+        Ok([1_u8, 2, 3, 255])
+    );
+    assert_eq!(
+        Quaternion::<i32>::from_array([256, 2, 3, 4]).try_cast::<u8>(),
+        Err(CastError::OutOfRange)
+    );
+
+    let exact_src = Quaternion::<i32>::from_array([1, 2, 3, 100]);
+    assert_eq!(
+        exact_src.try_exact_cast::<i64>().map(Quaternion::into_array),
+        Ok([1_i64, 2, 3, 100])
+    );
+    assert_eq!(
+        <Quaternion<i32> as TryExactCast<Quaternion<i64>>>::try_exact_cast(exact_src)
+            .map(Quaternion::into_array),
+        Ok([1_i64, 2, 3, 100])
+    );
+    assert_eq!(
+        Quaternion::<i32>::from_array([300, 2, 3, 4]).try_exact_cast::<u8>(),
+        Err(CastError::OutOfRange)
+    );
 }
 
 #[test]

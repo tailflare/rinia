@@ -24,6 +24,9 @@ where
     }
 }
 
+// Implement casts
+common::impl_tuple_wrapper_casts!([T], Quaternion<T> => Quaternion<U>, item: T, len: 4);
+
 // Bytemuck trait implementations for Quaternion<T>
 common::impl_bytemuck_basic!([T], Quaternion<T>, item: T);
 

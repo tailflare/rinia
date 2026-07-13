@@ -1,4 +1,4 @@
-use core::ops::Add;
+use core::{mem::MaybeUninit, ops::Add};
 
 use crate::{
     common,
@@ -84,6 +84,26 @@ impl<T, const N: usize> Tuple<T, N> {
         F: FnMut(T) -> U,
     {
         Tuple::from_array(self.inner.map(f))
+    }
+
+    /// Maps each element of the [Tuple] to a new [Tuple] using the provided function.
+    ///
+    /// Returns an error if the function fails for any element.
+    #[inline]
+    pub fn try_map<U, E, F>(self, mut f: F) -> Result<Tuple<U, N>, E>
+    where
+        F: FnMut(T) -> Result<U, E>,
+    {
+        let mut output: [MaybeUninit<U>; N] = [const { MaybeUninit::uninit() }; N];
+
+        for (index, value) in self.inner.into_iter().enumerate() {
+            output[index].write(f(value)?);
+        }
+
+        // SAFETY: Every element was initialized before this point.
+        let output = unsafe { core::mem::transmute_copy::<[MaybeUninit<U>; N], [U; N]>(&output) };
+
+        Ok(Tuple::from_array(output))
     }
 
     /// Maps each element of the [Tuple] to a new [Tuple] using the provided function,

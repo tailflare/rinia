@@ -1,7 +1,7 @@
 #![cfg(test)]
 
 use crate::{
-    algebra::{ApproxEqAbs, ApproxEqRel, Lerp},
+    algebra::{ApproxEqAbs, ApproxEqRel, Cast, CastError, Lerp, LossyCast, TryCast, TryExactCast},
     approx_eql_abs, approx_eql_abs_tol, approx_eql_rel, approx_eql_rel_tol,
     numeric::{
         Abs, BoundedMax, BoundedMin, Cbrt, Ceil, Exponential, Floor, Fract, Half, Hyperbolic,
@@ -284,4 +284,173 @@ fn lerp_surface() {
     let b64 = 6.0_f64;
     assert!(approx_eql_abs_tol!(a64.lerp(b64, 0.5), 1.0_f64, 1e-12));
     assert!(approx_eql_abs_tol!(<f64 as Lerp>::lerp(a64, b64, 0.5), 1.0_f64, 1e-12));
+}
+
+#[test]
+fn lossy_cast_surface() {
+    // Identity casts
+    assert_eq!(<i32 as LossyCast<i32>>::lossy_cast(42), 42_i32);
+    assert_eq!(<f32 as LossyCast<f32>>::lossy_cast(1.5), 1.5_f32);
+
+    // Widening int casts
+    assert_eq!(<u8 as LossyCast<u32>>::lossy_cast(200), 200_u32);
+    assert_eq!(<i8 as LossyCast<i32>>::lossy_cast(-100), -100_i32);
+    assert_eq!(<i32 as LossyCast<i64>>::lossy_cast(-1_000_000), -1_000_000_i64);
+    assert_eq!(<u32 as LossyCast<u64>>::lossy_cast(4_000_000_000), 4_000_000_000_u64);
+
+    // Widening float cast
+    assert_eq!(<f32 as LossyCast<f64>>::lossy_cast(1.5_f32), 1.5_f64);
+
+    // Narrowing int casts
+    assert_eq!(<u32 as LossyCast<u8>>::lossy_cast(256), 0_u8);
+    assert_eq!(<u32 as LossyCast<u8>>::lossy_cast(257), 1_u8);
+    assert_eq!(<i32 as LossyCast<i8>>::lossy_cast(128), -128_i8);
+
+    // Signed/unsigned int casts
+    assert_eq!(<i32 as LossyCast<u32>>::lossy_cast(-1), u32::MAX);
+    assert_eq!(<u32 as LossyCast<i32>>::lossy_cast(u32::MAX), -1_i32);
+    assert_eq!(<i8 as LossyCast<u8>>::lossy_cast(-1_i8), 255_u8);
+
+    // Narrowing float cast
+    let v: f32 = <f64 as LossyCast<f32>>::lossy_cast(1.5_f64);
+    assert!(approx_eql_abs_tol!(v, 1.5_f32, 1e-6));
+
+    // Float-to-int casts
+    assert_eq!(<f32 as LossyCast<i32>>::lossy_cast(3.9_f32), 3_i32);
+    assert_eq!(<f32 as LossyCast<i32>>::lossy_cast(-3.9_f32), -3_i32);
+    assert_eq!(<f64 as LossyCast<u64>>::lossy_cast(255.99_f64), 255_u64);
+
+    // Int-to-float casts
+    assert_eq!(<i32 as LossyCast<f32>>::lossy_cast(100), 100.0_f32);
+    assert_eq!(<i32 as LossyCast<f64>>::lossy_cast(-1000), -1000.0_f64);
+    assert_eq!(<u64 as LossyCast<f64>>::lossy_cast(1024), 1024.0_f64);
+}
+
+#[test]
+fn cast_surface() {
+    // Identity casts
+    assert_eq!(<i32 as Cast<i32>>::cast(42), 42_i32);
+    assert_eq!(<f32 as Cast<f32>>::cast(1.5), 1.5_f32);
+    assert_eq!(<f32 as Cast<f64>>::cast(0.5_f32), 0.5_f64);
+    assert_eq!(<f64 as Cast<f64>>::cast(-7.5), -7.5_f64);
+
+    // Unsigned int widening
+    assert_eq!(<u8 as Cast<u16>>::cast(200), 200_u16);
+    assert_eq!(<u8 as Cast<u32>>::cast(255), 255_u32);
+    assert_eq!(<u8 as Cast<u64>>::cast(1), 1_u64);
+    assert_eq!(<u8 as Cast<u128>>::cast(0), 0_u128);
+    assert_eq!(<u16 as Cast<u32>>::cast(1000), 1000_u32);
+    assert_eq!(<u32 as Cast<u64>>::cast(u32::MAX), u32::MAX as u64);
+    assert_eq!(<u64 as Cast<u128>>::cast(u64::MAX), u64::MAX as u128);
+
+    // Signed int widening
+    assert_eq!(<i8 as Cast<i16>>::cast(-100), -100_i16);
+    assert_eq!(<i8 as Cast<i32>>::cast(-1), -1_i32);
+    assert_eq!(<i8 as Cast<i64>>::cast(127), 127_i64);
+    assert_eq!(<i8 as Cast<i128>>::cast(-128), -128_i128);
+    assert_eq!(<i16 as Cast<i32>>::cast(-32768), -32768_i32);
+    assert_eq!(<i32 as Cast<i64>>::cast(i32::MIN), i32::MIN as i64);
+    assert_eq!(<i64 as Cast<i128>>::cast(i64::MAX), i64::MAX as i128);
+}
+
+#[test]
+fn try_cast_surface() {
+    // int-to-int: success cases
+    assert_eq!(<i32 as TryCast<i32>>::try_cast(42), Ok(42_i32));
+    assert_eq!(<u8 as TryCast<u32>>::try_cast(200), Ok(200_u32));
+    assert_eq!(<i32 as TryCast<i64>>::try_cast(-1_000_000), Ok(-1_000_000_i64));
+    assert_eq!(<i32 as TryCast<u32>>::try_cast(0), Ok(0_u32));
+    assert_eq!(<i32 as TryCast<u32>>::try_cast(i32::MAX), Ok(i32::MAX as u32));
+
+    // int-to-int: failure cases
+    // Same-size casts (e.g. i32 <-> u32) always roundtrip at the bit level, so failures
+    // only occur when narrowing to a smaller type and the value is out of range.
+    assert_eq!(<i32 as TryCast<u8>>::try_cast(-1), Err(CastError::OutOfRange));
+    assert_eq!(<i32 as TryCast<u8>>::try_cast(256), Err(CastError::OutOfRange));
+    assert_eq!(<i32 as TryCast<i8>>::try_cast(128), Err(CastError::OutOfRange));
+    assert_eq!(<i64 as TryCast<u8>>::try_cast(-1), Err(CastError::OutOfRange));
+    assert_eq!(<u64 as TryCast<i32>>::try_cast(2_147_483_648_u64), Err(CastError::OutOfRange));
+
+    // int-to-float: always succeeds
+    assert!(<i32 as TryCast<f32>>::try_cast(100).is_ok());
+    assert!(<u64 as TryCast<f64>>::try_cast(1024).is_ok());
+    assert!(<i128 as TryCast<f32>>::try_cast(i128::MAX).is_ok()); // lossy but Ok
+
+    // float-to-int: success cases
+    assert_eq!(<f32 as TryCast<i32>>::try_cast(42.0), Ok(42_i32));
+    assert_eq!(<f64 as TryCast<u8>>::try_cast(255.0), Ok(255_u8));
+    assert_eq!(<f32 as TryCast<i32>>::try_cast(-10.9), Ok(-10_i32)); // truncates
+
+    // float-to-int: failure cases
+    assert_eq!(<f32 as TryCast<i32>>::try_cast(f32::INFINITY), Err(CastError::NonFinite));
+    assert_eq!(<f32 as TryCast<i32>>::try_cast(f32::NAN), Err(CastError::NonFinite));
+    assert_eq!(<f32 as TryCast<u8>>::try_cast(256.0), Err(CastError::OutOfRange));
+    assert_eq!(<f64 as TryCast<i8>>::try_cast(-200.0), Err(CastError::OutOfRange));
+
+    // float-to-float: success cases
+    assert!(<f32 as TryCast<f64>>::try_cast(1.5).is_ok());
+    assert!(<f64 as TryCast<f32>>::try_cast(1.5).is_ok());
+
+    // float-to-float: failure cases
+    assert_eq!(<f32 as TryCast<f64>>::try_cast(f32::NAN), Err(CastError::NonFinite));
+    assert_eq!(<f64 as TryCast<f32>>::try_cast(f64::INFINITY), Err(CastError::NonFinite));
+}
+
+#[test]
+fn try_exact_cast_surface() {
+    // int-to-int: success cases
+    assert_eq!(<i32 as TryExactCast<i32>>::try_exact_cast(42), Ok(42_i32));
+    assert_eq!(<u8 as TryExactCast<u32>>::try_exact_cast(200), Ok(200_u32));
+    assert_eq!(<i32 as TryExactCast<i64>>::try_exact_cast(-1_000_000), Ok(-1_000_000_i64));
+
+    // int-to-int: failure cases
+    assert_eq!(<i32 as TryExactCast<u8>>::try_exact_cast(-1), Err(CastError::OutOfRange));
+    assert_eq!(<i32 as TryExactCast<u8>>::try_exact_cast(256), Err(CastError::OutOfRange));
+    assert_eq!(
+        <u64 as TryExactCast<i32>>::try_exact_cast(2_147_483_648_u64),
+        Err(CastError::OutOfRange)
+    );
+
+    // int-to-float: success when exact
+    assert_eq!(<i32 as TryExactCast<f32>>::try_exact_cast(1), Ok(1.0_f32));
+    assert_eq!(<i32 as TryExactCast<f64>>::try_exact_cast(i32::MAX), Ok(i32::MAX as f64));
+    assert_eq!(<u8 as TryExactCast<f32>>::try_exact_cast(255), Ok(255.0_f32));
+
+    // int-to-float: failure when precision lost
+    // f32 has 24 bits of mantissa; 2^24+1 = 16_777_217 is the first integer not exactly representable.
+    assert_eq!(<i32 as TryExactCast<f32>>::try_exact_cast(16_777_217), Err(CastError::Inexact));
+    assert_eq!(<i64 as TryExactCast<f32>>::try_exact_cast(16_777_217_i64), Err(CastError::Inexact));
+
+    // float-to-int: success when whole number in range
+    assert_eq!(<f32 as TryExactCast<i32>>::try_exact_cast(42.0), Ok(42_i32));
+    assert_eq!(<f64 as TryExactCast<u8>>::try_exact_cast(255.0), Ok(255_u8));
+    assert_eq!(<f32 as TryExactCast<i32>>::try_exact_cast(-100.0), Ok(-100_i32));
+
+    // float-to-int: failure cases
+    assert_eq!(<f32 as TryExactCast<i32>>::try_exact_cast(f32::NAN), Err(CastError::NonFinite));
+    assert_eq!(
+        <f32 as TryExactCast<i32>>::try_exact_cast(f32::INFINITY),
+        Err(CastError::NonFinite)
+    );
+    assert_eq!(<f32 as TryExactCast<i32>>::try_exact_cast(1.5), Err(CastError::Fractional));
+    assert_eq!(<f64 as TryExactCast<u8>>::try_exact_cast(-0.5), Err(CastError::Fractional));
+    assert_eq!(<f32 as TryExactCast<u8>>::try_exact_cast(256.0), Err(CastError::OutOfRange));
+    assert_eq!(<f64 as TryExactCast<i8>>::try_exact_cast(-200.0), Err(CastError::OutOfRange));
+
+    // --- float-to-float: success cases ---
+    assert_eq!(<f32 as TryExactCast<f64>>::try_exact_cast(1.5_f32), Ok(1.5_f64));
+    assert_eq!(<f64 as TryExactCast<f64>>::try_exact_cast(1.5_f64), Ok(1.5_f64));
+    assert_eq!(<f32 as TryExactCast<f32>>::try_exact_cast(0.5_f32), Ok(0.5_f32));
+
+    // float-to-float: failure cases
+    assert_eq!(<f32 as TryExactCast<f64>>::try_exact_cast(f32::NAN), Err(CastError::NonFinite));
+    assert_eq!(
+        <f64 as TryExactCast<f32>>::try_exact_cast(f64::INFINITY),
+        Err(CastError::NonFinite)
+    );
+    // f64 value not exactly representable as f32
+    assert_eq!(
+        <f64 as TryExactCast<f32>>::try_exact_cast(1.0000000001_f64),
+        Err(CastError::Inexact)
+    );
 }
