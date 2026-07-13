@@ -1,7 +1,10 @@
 #![cfg(test)]
 
 use crate::{
-    algebra::{ApproxEqAbs, ApproxEqRel, Cast, CastError, Lerp, LossyCast, TryCast, TryExactCast},
+    algebra::{
+        ApproxEqAbs, ApproxEqRel, Cast, CastError, CastFrom, Lerp, LossyCast, LossyCastFrom,
+        TryCast, TryCastFrom, TryExactCast, TryExactCastFrom,
+    },
     approx_eql_abs, approx_eql_abs_tol, approx_eql_rel, approx_eql_rel_tol,
     numeric::{
         Abs, BoundedMax, BoundedMin, Cbrt, Ceil, Exponential, Floor, Fract, Half, Hyperbolic,
@@ -351,6 +354,17 @@ fn cast_surface() {
     assert_eq!(<i16 as Cast<i32>>::cast(-32768), -32768_i32);
     assert_eq!(<i32 as Cast<i64>>::cast(i32::MIN), i32::MIN as i64);
     assert_eq!(<i64 as Cast<i128>>::cast(i64::MAX), i64::MAX as i128);
+}
+
+#[test]
+fn from_cast_variants_surface() {
+    assert_eq!(<u32 as CastFrom<u8>>::cast_from(255_u8), 255_u32);
+    assert_eq!(<u8 as LossyCastFrom<i32>>::lossy_cast_from(300_i32), 44_u8);
+    assert_eq!(<u8 as TryCastFrom<i32>>::try_cast_from(255_i32), Ok(255_u8));
+    assert_eq!(
+        <f32 as TryExactCastFrom<i32>>::try_exact_cast_from(16_777_217_i32),
+        Err(CastError::Inexact)
+    );
 }
 
 #[test]

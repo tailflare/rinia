@@ -5,7 +5,10 @@ mod interpolation;
 mod operations;
 
 pub use self::{
-    casting::{Cast, CastError, LossyCast, TryCast, TryExactCast},
+    casting::{
+        Cast, CastError, CastFrom, LossyCast, LossyCastFrom, TryCast, TryCastFrom, TryExactCast,
+        TryExactCastFrom,
+    },
     equality::{ApproxEqAbs, ApproxEqRel},
     identities::Identity,
     interpolation::Lerp,
