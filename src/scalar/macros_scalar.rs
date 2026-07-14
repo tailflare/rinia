@@ -101,14 +101,14 @@ macro_rules! impl_scalar_elementary_trait {
 	};
 
 	(@call_unary $ty:ty, $method:ident, $value:expr) => {{
-		let call: fn($ty) -> $ty = |x: $ty| x.$method();
+		let call: fn($ty) -> $ty = |x: $ty| <$ty>::$method(x);
 		call($value)
 	}};
 
 	(@call_unary_with_fallback $ty:ty, $method:ident, $value:expr, $fallback:expr) => {{
 		#[cfg(feature = "std")]
 		{
-			let call: fn($ty) -> $ty = |x: $ty| x.$method();
+			let call: fn($ty) -> $ty = |x: $ty| <$ty>::$method(x);
 			call($value)
 		}
 
@@ -119,7 +119,7 @@ macro_rules! impl_scalar_elementary_trait {
 	}};
 
 	(@call_binary $ty:ty, $method:ident, $rhs:ty, $value:expr, $other:expr) => {{
-		let call: fn($ty, $rhs) -> $ty = |x: $ty, y: $rhs| x.$method(y);
+		let call: fn($ty, $rhs) -> $ty = |x: $ty, y: $rhs| <$ty>::$method(x, y);
 		call($value, $other)
 	}};
 
@@ -145,7 +145,7 @@ macro_rules! impl_scalar_elementary_trait {
 	(@call_binary_with_fallback $ty:ty, $method:ident, $rhs:ty, $value:expr, $other:expr, $fallback:expr) => {{
 		#[cfg(feature = "std")]
 		{
-			let call: fn($ty, $rhs) -> $ty = |x: $ty, y: $rhs| x.$method(y);
+			let call: fn($ty, $rhs) -> $ty = |x: $ty, y: $rhs| <$ty>::$method(x, y);
 			call($value, $other)
 		}
 
@@ -156,14 +156,14 @@ macro_rules! impl_scalar_elementary_trait {
 	}};
 
 	(@call_unary_pair $ty:ty, $method:ident, $value:expr) => {{
-		let call: fn($ty) -> ($ty, $ty) = |x: $ty| x.$method();
+		let call: fn($ty) -> ($ty, $ty) = |x: $ty| <$ty>::$method(x);
 		call($value)
 	}};
 
 	(@call_unary_pair_with_fallback $ty:ty, $method:ident, $value:expr, $fallback:expr) => {{
 		#[cfg(feature = "std")]
 		{
-			let call: fn($ty) -> ($ty, $ty) = |x: $ty| x.$method();
+			let call: fn($ty) -> ($ty, $ty) = |x: $ty| <$ty>::$method(x);
 			call($value)
 		}
 
