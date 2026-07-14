@@ -55,6 +55,37 @@ scalar::impl_scalar_clamp!(
     usize, isize, u8, u16, u32, u64, u128, i8, i16, i32, i64, i128, f32, f64
 );
 
+// Implement signed/unsigned equivalent scalar mappings.
+scalar::impl_scalar_signed_equivalent!(
+    usize => isize,
+    isize => isize,
+    u8 => i8,
+    i8 => i8,
+    u16 => i16,
+    i16 => i16,
+    u32 => i32,
+    i32 => i32,
+    u64 => i64,
+    i64 => i64,
+    u128 => i128,
+    i128 => i128
+);
+
+scalar::impl_scalar_unsigned_equivalent!(
+    usize => usize,
+    isize => usize,
+    u8 => u8,
+    i8 => u8,
+    u16 => u16,
+    i16 => u16,
+    u32 => u32,
+    i32 => u32,
+    u64 => u64,
+    i64 => u64,
+    u128 => u128,
+    i128 => u128
+);
+
 // Implement saturating arithmetic for integer scalar types.
 scalar::impl_scalar_arithmetic_trait!(SaturatingAdd, [usize, isize, u8, u16, u32, u64, u128, i8, i16, i32, i64, i128], {binary, saturating_add, output: Self});
 scalar::impl_scalar_arithmetic_trait!(SaturatingSub, [usize, isize, u8, u16, u32, u64, u128, i8, i16, i32, i64, i128], {binary, saturating_sub, output: Self});

@@ -6,8 +6,9 @@ use crate::{
         Abs, BoundedMax, BoundedMin, Cbrt, CheckedAdd, CheckedDiv, CheckedMul, CheckedNeg,
         CheckedRem, CheckedSub, Clamp, Exponential, Half, Hyperbolic, Hypot, Infinite, IsFinite,
         IsInfinite, IsNan, MinMax, MulAdd, Nan, NegOne, One, Power, Rounding, SaturatingAdd,
-        SaturatingDiv, SaturatingMul, SaturatingNeg, SaturatingSub, Sqrt, Trigonometry, Two,
-        WrappingAdd, WrappingDiv, WrappingMul, WrappingNeg, WrappingRem, WrappingSub, Zero,
+        SaturatingDiv, SaturatingMul, SaturatingNeg, SaturatingSub, SignedEquivalent, Sqrt,
+        Trigonometry, Two, UnsignedEquivalent, WrappingAdd, WrappingDiv, WrappingMul, WrappingNeg,
+        WrappingRem, WrappingSub, Zero,
     },
 };
 
@@ -24,7 +25,7 @@ pub trait Unsigned: Scalar {}
 pub trait Float: Signed {}
 
 /// Marker trait for integer scalar types.
-pub trait Int: Scalar {}
+pub trait Int: Scalar + SignedEquivalent + UnsignedEquivalent {}
 
 /// Marker trait for signed integer scalar types.
 pub trait SignedInt: Signed + Int {}

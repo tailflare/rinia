@@ -198,6 +198,26 @@ macro_rules! impl_scalar_clamp {
 	};
 }
 
+macro_rules! impl_scalar_signed_equivalent {
+	($($src:ty => $dst:ty),+ $(,)?) => {
+		$(
+			impl $crate::numeric::SignedEquivalent for $src {
+				type Signed = $dst;
+			}
+		)+
+	};
+}
+
+macro_rules! impl_scalar_unsigned_equivalent {
+	($($src:ty => $dst:ty),+ $(,)?) => {
+		$(
+			impl $crate::numeric::UnsignedEquivalent for $src {
+				type Unsigned = $dst;
+			}
+		)+
+	};
+}
+
 macro_rules! impl_scalar_arithmetic_trait {
 	($trait:ident, [$head:tt $(, $tail:tt)* $(,)?], {unary, $method:ident, output: $output:ty}) => {
 		impl $crate::numeric::$trait for $head {
@@ -253,3 +273,5 @@ pub(crate) use impl_scalar_constants_float;
 pub(crate) use impl_scalar_min_max;
 pub(crate) use impl_scalar_predicates_float;
 pub(crate) use impl_scalar_predicates_int;
+pub(crate) use impl_scalar_signed_equivalent;
+pub(crate) use impl_scalar_unsigned_equivalent;
