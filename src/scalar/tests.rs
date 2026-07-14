@@ -2,8 +2,9 @@
 
 use crate::{
     algebra::{ApproxEqAbs, ApproxEqRel, Lerp},
-    approx_eql_abs, approx_eql_abs_tol, approx_eql_rel, approx_eql_rel_tol, assert_approx_eql_abs,
-    assert_approx_eql_abs_tol, assert_approx_eql_rel, assert_approx_eql_rel_tol,
+    approx_ne_abs, approx_ne_abs_tol, approx_ne_rel, approx_ne_rel_tol, assert_approx_eq_abs,
+    assert_approx_eq_abs_tol, assert_approx_eq_rel, assert_approx_eq_rel_tol, assert_approx_ne_abs,
+    assert_approx_ne_abs_tol, assert_approx_ne_rel, assert_approx_ne_rel_tol,
     numeric::{
         Abs, BoundedMax, BoundedMin, Cast, CastError, CastFrom, Cbrt, Ceil, CheckedAdd, CheckedDiv,
         CheckedMul, CheckedNeg, CheckedRem, CheckedSub, Exponential, Floor, Fract, Half,
@@ -76,8 +77,8 @@ fn bounded_surface() {
 
 #[test]
 fn elementary_surface() {
-    assert_approx_eql_abs_tol!(<f32 as MulAdd>::mul_add(2.0, 3.0, 4.0), 10.0, 1e-6);
-    assert_approx_eql_abs_tol!(<f64 as MulAdd>::mul_add(1.5, 2.0, 0.5), 3.5, 1e-12);
+    assert_approx_eq_abs_tol!(<f32 as MulAdd>::mul_add(2.0, 3.0, 4.0), 10.0, 1e-6);
+    assert_approx_eq_abs_tol!(<f64 as MulAdd>::mul_add(1.5, 2.0, 0.5), 3.5, 1e-12);
 
     assert_eq!(<i32 as MinMax>::minimum(3, 9), 3);
     assert_eq!(<i32 as MinMax>::maximum(3, 9), 9);
@@ -103,52 +104,52 @@ fn elementary_surface() {
 
     let x = 0.5_f32;
     let (s, c) = <f32 as Trigonometry>::sin_cos(x);
-    assert_approx_eql_abs_tol!(<f32 as Trigonometry>::sin(x), s, 1e-6);
-    assert_approx_eql_abs_tol!(<f32 as Trigonometry>::cos(x), c, 1e-6);
-    assert_approx_eql_abs_tol!(<f32 as Trigonometry>::tan(x), s / c, 1e-5);
-    assert_approx_eql_abs_tol!(<f32 as Trigonometry>::sin(<f32 as Trigonometry>::asin(x)), x, 1e-6);
-    assert_approx_eql_abs_tol!(<f32 as Trigonometry>::cos(<f32 as Trigonometry>::acos(x)), x, 1e-6);
-    assert_approx_eql_abs_tol!(<f32 as Trigonometry>::tan(<f32 as Trigonometry>::atan(x)), x, 1e-6);
-    assert_approx_eql_abs_tol!(
+    assert_approx_eq_abs_tol!(<f32 as Trigonometry>::sin(x), s, 1e-6);
+    assert_approx_eq_abs_tol!(<f32 as Trigonometry>::cos(x), c, 1e-6);
+    assert_approx_eq_abs_tol!(<f32 as Trigonometry>::tan(x), s / c, 1e-5);
+    assert_approx_eq_abs_tol!(<f32 as Trigonometry>::sin(<f32 as Trigonometry>::asin(x)), x, 1e-6);
+    assert_approx_eq_abs_tol!(<f32 as Trigonometry>::cos(<f32 as Trigonometry>::acos(x)), x, 1e-6);
+    assert_approx_eq_abs_tol!(<f32 as Trigonometry>::tan(<f32 as Trigonometry>::atan(x)), x, 1e-6);
+    assert_approx_eq_abs_tol!(
         <f32 as Trigonometry>::atan2(1.0, 1.0),
         core::f32::consts::FRAC_PI_4,
         1e-6
     );
 
     let e = <f32 as Exponential>::exp(1.0);
-    assert_approx_eql_abs_tol!(e, core::f32::consts::E, 1e-6);
-    assert_approx_eql_abs_tol!(<f32 as Exponential>::exp2(4.0), 16.0, 1e-6);
-    assert_approx_eql_abs_tol!(
+    assert_approx_eq_abs_tol!(e, core::f32::consts::E, 1e-6);
+    assert_approx_eq_abs_tol!(<f32 as Exponential>::exp2(4.0), 16.0, 1e-6);
+    assert_approx_eq_abs_tol!(
         <f32 as Exponential>::exp_m1(1e-4),
         <f32 as Exponential>::exp(1e-4) - 1.0,
         1e-6
     );
-    assert_approx_eql_abs_tol!(<f32 as Exponential>::ln(core::f32::consts::E), 1.0, 1e-6);
-    assert_approx_eql_abs_tol!(
+    assert_approx_eq_abs_tol!(<f32 as Exponential>::ln(core::f32::consts::E), 1.0, 1e-6);
+    assert_approx_eq_abs_tol!(
         <f32 as Exponential>::ln_1p(1e-4),
         <f32 as Exponential>::ln(1.0001),
         1e-6
     );
-    assert_approx_eql_abs_tol!(<f32 as Exponential>::log(8.0, 2.0), 3.0, 1e-6);
-    assert_approx_eql_abs_tol!(<f32 as Exponential>::log2(8.0), 3.0, 1e-6);
-    assert_approx_eql_abs_tol!(<f32 as Exponential>::log10(1000.0), 3.0, 1e-6);
+    assert_approx_eq_abs_tol!(<f32 as Exponential>::log(8.0, 2.0), 3.0, 1e-6);
+    assert_approx_eq_abs_tol!(<f32 as Exponential>::log2(8.0), 3.0, 1e-6);
+    assert_approx_eq_abs_tol!(<f32 as Exponential>::log10(1000.0), 3.0, 1e-6);
 
-    assert_approx_eql_abs_tol!(<f32 as Power>::powf(9.0, 0.5), 3.0, 1e-6);
-    assert_approx_eql_abs_tol!(<f32 as Power>::powi(3.0, 4), 81.0, 1e-6);
+    assert_approx_eq_abs_tol!(<f32 as Power>::powf(9.0, 0.5), 3.0, 1e-6);
+    assert_approx_eq_abs_tol!(<f32 as Power>::powi(3.0, 4), 81.0, 1e-6);
 
-    assert_approx_eql_abs_tol!(<f32 as Cbrt>::cbrt(27.0), 3.0, 1e-6);
-    assert_approx_eql_abs_tol!(<f32 as Hypot>::hypot(3.0, 4.0), 5.0, 1e-6);
+    assert_approx_eq_abs_tol!(<f32 as Cbrt>::cbrt(27.0), 3.0, 1e-6);
+    assert_approx_eq_abs_tol!(<f32 as Hypot>::hypot(3.0, 4.0), 5.0, 1e-6);
 
     let hs = <f32 as Hyperbolic>::sinh(x);
     let hc = <f32 as Hyperbolic>::cosh(x);
-    assert_approx_eql_abs_tol!(<f32 as Hyperbolic>::tanh(x), hs / hc, 1e-6);
-    assert_approx_eql_abs_tol!(<f32 as Hyperbolic>::asinh(hs), x, 1e-5);
-    assert_approx_eql_abs_tol!(
+    assert_approx_eq_abs_tol!(<f32 as Hyperbolic>::tanh(x), hs / hc, 1e-6);
+    assert_approx_eq_abs_tol!(<f32 as Hyperbolic>::asinh(hs), x, 1e-5);
+    assert_approx_eq_abs_tol!(
         <f32 as Hyperbolic>::acosh(<f32 as Hyperbolic>::cosh(2.0)),
         2.0,
         1e-5
     );
-    assert_approx_eql_abs_tol!(
+    assert_approx_eq_abs_tol!(
         <f32 as Hyperbolic>::atanh(<f32 as Hyperbolic>::tanh(0.25)),
         0.25,
         1e-5
@@ -157,63 +158,99 @@ fn elementary_surface() {
 
 #[test]
 fn approx_eq_surface() {
-    assert_approx_eql_abs_tol!(1.0_f32, 1.000001_f32, 0.00001_f32);
-    assert!(!approx_eql_abs_tol!(1.0_f32, 1.1_f32, 0.00001_f32));
+    assert!(approx_ne_abs_tol!(1.0_f32, 1.1_f32, 0.00001_f32));
+    assert!(!approx_ne_abs_tol!(1.0_f32, 1.000001_f32, 0.00001_f32));
 
-    assert_approx_eql_rel_tol!(1000.0_f32, 1000.001_f32, 0.00001_f32);
-    assert!(!approx_eql_rel_tol!(1.0_f32, 2.0_f32, 0.00001_f32));
+    assert!(approx_ne_rel_tol!(1.0_f32, 2.0_f32, 0.00001_f32));
+    assert!(!approx_ne_rel_tol!(1000.0_f32, 1000.001_f32, 0.00001_f32));
+
+    assert!(approx_ne_abs!(1.0_f32, 1.0_f32 + 2e-6));
+    assert!(!approx_ne_abs!(1.0_f32, 1.0_f32 + 5e-7));
+
+    assert!(approx_ne_rel!(100_000.0_f32, 100_002.0_f32));
+    assert!(!approx_ne_rel!(100_000.0_f32, 100_000.5_f32));
+
+    assert_approx_eq_abs_tol!(1.0_f32, 1.000001_f32, 0.00001_f32);
+    assert_approx_ne_abs_tol!(1.0_f32, 1.1_f32, 0.00001_f32);
+
+    assert_approx_eq_rel_tol!(1000.0_f32, 1000.001_f32, 0.00001_f32);
+    assert_approx_ne_rel_tol!(1.0_f32, 2.0_f32, 0.00001_f32);
 
     // Default abs tolerance (f32: 1e-6)
-    assert_approx_eql_abs!(1.0_f32, 1.0_f32 + 5e-7);
-    assert!(!approx_eql_abs!(1.0_f32, 1.0_f32 + 2e-6));
+    assert_approx_eq_abs!(1.0_f32, 1.0_f32 + 5e-7);
+    assert_approx_ne_abs!(1.0_f32, 1.0_f32 + 2e-6);
 
     // Default rel tolerance (f32: 1e-5)
-    assert_approx_eql_rel!(100_000.0_f32, 100_000.5_f32);
-    assert!(!approx_eql_rel!(100_000.0_f32, 100_002.0_f32));
+    assert_approx_eq_rel!(100_000.0_f32, 100_000.5_f32);
+    assert_approx_ne_rel!(100_000.0_f32, 100_002.0_f32);
 
     assert_eq!(<f32 as ApproxEqAbs>::DEFAULT_TOLERANCE_ABS, 1e-6);
     assert_eq!(<f64 as ApproxEqAbs>::DEFAULT_TOLERANCE_ABS, 1e-12);
     assert_eq!(<f32 as ApproxEqRel>::DEFAULT_TOLERANCE_REL, 1e-5);
     assert_eq!(<f64 as ApproxEqRel>::DEFAULT_TOLERANCE_REL, 1e-10);
 
-    assert_approx_eql_abs!(1.0_f32, 1.0_f32 + 5e-7);
-    assert!(!approx_eql_abs!(1.0_f32, 1.0_f32 + 2e-6));
-    assert_approx_eql_abs_tol!(1.0_f32, 1.0_f32 + 5e-7, 1e-6);
-    assert!(!approx_eql_abs_tol!(1.0_f32, 1.0_f32 + 2e-4, 1e-6));
+    assert_approx_eq_abs!(1.0_f32, 1.0_f32 + 5e-7);
+    assert_approx_ne_abs!(1.0_f32, 1.0_f32 + 2e-6);
+    assert_approx_eq_abs_tol!(1.0_f32, 1.0_f32 + 5e-7, 1e-6);
+    assert_approx_ne_abs_tol!(1.0_f32, 1.0_f32 + 2e-4, 1e-6);
 
-    assert_approx_eql_rel!(100_000.0_f32, 100_000.5_f32);
-    assert!(!approx_eql_rel!(100_000.0_f32, 100_002.0_f32));
-    assert_approx_eql_rel_tol!(1000.0_f32, 1000.001_f32, 1e-5);
-    assert!(!approx_eql_rel_tol!(1.0_f32, 2.0_f32, 1e-5));
+    assert_approx_eq_rel!(100_000.0_f32, 100_000.5_f32);
+    assert_approx_ne_rel!(100_000.0_f32, 100_002.0_f32);
+    assert_approx_eq_rel_tol!(1000.0_f32, 1000.001_f32, 1e-5);
+    assert_approx_ne_rel_tol!(1.0_f32, 2.0_f32, 1e-5);
 
-    assert_approx_eql_abs!(1.0_f32, 1.0_f32 + 5e-7);
-    assert_approx_eql_abs_tol!(1.0_f32, 1.0_f32 + 5e-7, 1e-6_f32);
-    assert_approx_eql_rel!(100_000.0_f32, 100_000.5_f32);
-    assert_approx_eql_rel_tol!(1000.0_f32, 1000.001_f32, 1e-5_f32);
+    assert_approx_eq_abs!(1.0_f32, 1.0_f32 + 5e-7);
+    assert_approx_eq_abs_tol!(1.0_f32, 1.0_f32 + 5e-7, 1e-6_f32);
+    assert_approx_eq_rel!(100_000.0_f32, 100_000.5_f32);
+    assert_approx_eq_rel_tol!(1000.0_f32, 1000.001_f32, 1e-5_f32);
 }
 
 #[test]
 #[should_panic]
 fn approx_eq_assert_abs_panics() {
-    assert_approx_eql_abs!(1.0_f32, 2.0_f32);
+    assert_approx_eq_abs!(1.0_f32, 2.0_f32);
 }
 
 #[test]
 #[should_panic]
 fn approx_eq_assert_abs_tol_panics() {
-    assert_approx_eql_abs_tol!(1.0_f32, 2.0_f32, 1e-6_f32);
+    assert_approx_eq_abs_tol!(1.0_f32, 2.0_f32, 1e-6_f32);
 }
 
 #[test]
 #[should_panic]
 fn approx_eq_assert_rel_panics() {
-    assert_approx_eql_rel!(1.0_f32, 2.0_f32);
+    assert_approx_eq_rel!(1.0_f32, 2.0_f32);
 }
 
 #[test]
 #[should_panic]
 fn approx_eq_assert_rel_tol_panics() {
-    assert_approx_eql_rel_tol!(1.0_f32, 2.0_f32, 1e-5_f32);
+    assert_approx_eq_rel_tol!(1.0_f32, 2.0_f32, 1e-5_f32);
+}
+
+#[test]
+#[should_panic]
+fn approx_ne_assert_abs_panics() {
+    assert_approx_ne_abs!(1.0_f32, 1.0_f32 + 5e-7);
+}
+
+#[test]
+#[should_panic]
+fn approx_ne_assert_abs_tol_panics() {
+    assert_approx_ne_abs_tol!(1.0_f32, 1.0_f32 + 5e-7, 1e-6_f32);
+}
+
+#[test]
+#[should_panic]
+fn approx_ne_assert_rel_panics() {
+    assert_approx_ne_rel!(100_000.0_f32, 100_000.5_f32);
+}
+
+#[test]
+#[should_panic]
+fn approx_ne_assert_rel_tol_panics() {
+    assert_approx_ne_rel_tol!(1000.0_f32, 1000.001_f32, 1e-5_f32);
 }
 
 #[test]
@@ -303,13 +340,13 @@ fn rounding_surface() {
 fn lerp_surface() {
     let a32 = 10.0_f32;
     let b32 = 20.0_f32;
-    assert_approx_eql_abs_tol!(a32.lerp(b32, 0.25), 12.5_f32, 1e-6);
-    assert_approx_eql_abs_tol!(<f32 as Lerp>::lerp(a32, b32, 0.25), 12.5_f32, 1e-6);
+    assert_approx_eq_abs_tol!(a32.lerp(b32, 0.25), 12.5_f32, 1e-6);
+    assert_approx_eq_abs_tol!(<f32 as Lerp>::lerp(a32, b32, 0.25), 12.5_f32, 1e-6);
 
     let a64 = -4.0_f64;
     let b64 = 6.0_f64;
-    assert_approx_eql_abs_tol!(a64.lerp(b64, 0.5), 1.0_f64, 1e-12);
-    assert_approx_eql_abs_tol!(<f64 as Lerp>::lerp(a64, b64, 0.5), 1.0_f64, 1e-12);
+    assert_approx_eq_abs_tol!(a64.lerp(b64, 0.5), 1.0_f64, 1e-12);
+    assert_approx_eq_abs_tol!(<f64 as Lerp>::lerp(a64, b64, 0.5), 1.0_f64, 1e-12);
 }
 
 #[test]
@@ -398,7 +435,7 @@ fn lossy_cast_surface() {
 
     // Narrowing float cast
     let v: f32 = <f64 as LossyCast<f32>>::lossy_cast(1.5_f64);
-    assert_approx_eql_abs_tol!(v, 1.5_f32, 1e-6);
+    assert_approx_eq_abs_tol!(v, 1.5_f32, 1e-6);
 
     // Float-to-int casts
     assert_eq!(<f32 as LossyCast<i32>>::lossy_cast(3.9_f32), 3_i32);
@@ -466,7 +503,7 @@ fn saturating_cast_surface() {
     assert_eq!(<f64 as SaturatingCast<f32>>::saturating_cast(f64::NAN), 0.0_f32);
     assert_eq!(<f64 as SaturatingCast<f32>>::saturating_cast(f64::NEG_INFINITY), f32::MIN);
     assert_eq!(<f64 as SaturatingCast<f32>>::saturating_cast(f64::INFINITY), f32::MAX);
-    assert_approx_eql_abs_tol!(
+    assert_approx_eq_abs_tol!(
         <f64 as SaturatingCast<f32>>::saturating_cast(1.5_f64),
         1.5_f32,
         1e-6

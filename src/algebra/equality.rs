@@ -20,7 +20,7 @@ pub trait ApproxEqAbs<Rhs = Self> {
 /// Returns whether two values are approximately equal using [`ApproxEqAbs`] and the
 /// type's default absolute tolerance.
 #[macro_export]
-macro_rules! approx_eql_abs {
+macro_rules! approx_eq_abs {
     ($lhs:expr, $rhs:expr $(,)?) => {{
         let lhs = $lhs;
         let rhs = $rhs;
@@ -28,16 +28,27 @@ macro_rules! approx_eql_abs {
     }};
 }
 
+/// Returns whether two values are not approximately equal using [`ApproxEqAbs`] and the
+/// type's default absolute tolerance.
+#[macro_export]
+macro_rules! approx_ne_abs {
+    ($lhs:expr, $rhs:expr $(,)?) => {{
+        let lhs = $lhs;
+        let rhs = $rhs;
+        !$crate::algebra::ApproxEqAbs::approx_eq_abs(lhs, rhs)
+    }};
+}
+
 /// Asserts that two values are approximately equal using [`ApproxEqAbs`] and the
 /// type's default absolute tolerance.
 #[macro_export]
-macro_rules! assert_approx_eql_abs {
+macro_rules! assert_approx_eq_abs {
     ($lhs:expr, $rhs:expr $(,)?) => {{
         let lhs = $lhs;
         let rhs = $rhs;
         assert!(
             $crate::algebra::ApproxEqAbs::approx_eq_abs(lhs, rhs),
-            "assertion failed: approx_eql_abs!({}, {})",
+            "assertion failed: approx_eq_abs!({}, {})",
             stringify!($lhs),
             stringify!($rhs)
         );
@@ -49,10 +60,31 @@ macro_rules! assert_approx_eql_abs {
     }};
 }
 
+/// Asserts that two values are not approximately equal using [`ApproxEqAbs`] and the
+/// type's default absolute tolerance.
+#[macro_export]
+macro_rules! assert_approx_ne_abs {
+    ($lhs:expr, $rhs:expr $(,)?) => {{
+        let lhs = $lhs;
+        let rhs = $rhs;
+        assert!(
+            !$crate::algebra::ApproxEqAbs::approx_eq_abs(lhs, rhs),
+            "assertion failed: approx_ne_abs!({}, {})",
+            stringify!($lhs),
+            stringify!($rhs)
+        );
+    }};
+    ($lhs:expr, $rhs:expr, $($arg:tt)+) => {{
+        let lhs = $lhs;
+        let rhs = $rhs;
+        assert!(!$crate::algebra::ApproxEqAbs::approx_eq_abs(lhs, rhs), $($arg)+);
+    }};
+}
+
 /// Returns whether two values are approximately equal using [`ApproxEqAbs`] and
 /// an explicit absolute tolerance.
 #[macro_export]
-macro_rules! approx_eql_abs_tol {
+macro_rules! approx_eq_abs_tol {
     ($lhs:expr, $rhs:expr, $tol:expr $(,)?) => {{
         let lhs = $lhs;
         let rhs = $rhs;
@@ -61,17 +93,29 @@ macro_rules! approx_eql_abs_tol {
     }};
 }
 
+/// Returns whether two values are not approximately equal using [`ApproxEqAbs`] and
+/// an explicit absolute tolerance.
+#[macro_export]
+macro_rules! approx_ne_abs_tol {
+    ($lhs:expr, $rhs:expr, $tol:expr $(,)?) => {{
+        let lhs = $lhs;
+        let rhs = $rhs;
+        let tol = $tol;
+        !$crate::algebra::ApproxEqAbs::approx_eq_abs_tol(lhs, rhs, tol)
+    }};
+}
+
 /// Asserts that two values are approximately equal using [`ApproxEqAbs`] and
 /// an explicit absolute tolerance.
 #[macro_export]
-macro_rules! assert_approx_eql_abs_tol {
+macro_rules! assert_approx_eq_abs_tol {
     ($lhs:expr, $rhs:expr, $tol:expr $(,)?) => {{
         let lhs = $lhs;
         let rhs = $rhs;
         let tol = $tol;
         assert!(
             $crate::algebra::ApproxEqAbs::approx_eq_abs_tol(lhs, rhs, tol),
-            "assertion failed: approx_eql_abs_tol!({}, {}, {})",
+            "assertion failed: approx_eq_abs_tol!({}, {}, {})",
             stringify!($lhs),
             stringify!($rhs),
             stringify!($tol)
@@ -82,6 +126,33 @@ macro_rules! assert_approx_eql_abs_tol {
         let rhs = $rhs;
         let tol = $tol;
         assert!($crate::algebra::ApproxEqAbs::approx_eq_abs_tol(lhs, rhs, tol), $($arg)+);
+    }};
+}
+
+/// Asserts that two values are not approximately equal using [`ApproxEqAbs`] and
+/// an explicit absolute tolerance.
+#[macro_export]
+macro_rules! assert_approx_ne_abs_tol {
+    ($lhs:expr, $rhs:expr, $tol:expr $(,)?) => {{
+        let lhs = $lhs;
+        let rhs = $rhs;
+        let tol = $tol;
+        assert!(
+            !$crate::algebra::ApproxEqAbs::approx_eq_abs_tol(lhs, rhs, tol),
+            "assertion failed: approx_ne_abs_tol!({}, {}, {})",
+            stringify!($lhs),
+            stringify!($rhs),
+            stringify!($tol)
+        );
+    }};
+    ($lhs:expr, $rhs:expr, $tol:expr, $($arg:tt)+) => {{
+        let lhs = $lhs;
+        let rhs = $rhs;
+        let tol = $tol;
+        assert!(
+            !$crate::algebra::ApproxEqAbs::approx_eq_abs_tol(lhs, rhs, tol),
+            $($arg)+
+        );
     }};
 }
 
@@ -107,7 +178,7 @@ pub trait ApproxEqRel<Rhs = Self> {
 /// Returns whether two values are approximately equal using [`ApproxEqRel`] and the
 /// type's default relative tolerance.
 #[macro_export]
-macro_rules! approx_eql_rel {
+macro_rules! approx_eq_rel {
     ($lhs:expr, $rhs:expr $(,)?) => {{
         let lhs = $lhs;
         let rhs = $rhs;
@@ -115,16 +186,27 @@ macro_rules! approx_eql_rel {
     }};
 }
 
+/// Returns whether two values are not approximately equal using [`ApproxEqRel`] and the
+/// type's default relative tolerance.
+#[macro_export]
+macro_rules! approx_ne_rel {
+    ($lhs:expr, $rhs:expr $(,)?) => {{
+        let lhs = $lhs;
+        let rhs = $rhs;
+        !$crate::algebra::ApproxEqRel::approx_eq_rel(lhs, rhs)
+    }};
+}
+
 /// Asserts that two values are approximately equal using [`ApproxEqRel`] and the
 /// type's default relative tolerance.
 #[macro_export]
-macro_rules! assert_approx_eql_rel {
+macro_rules! assert_approx_eq_rel {
     ($lhs:expr, $rhs:expr $(,)?) => {{
         let lhs = $lhs;
         let rhs = $rhs;
         assert!(
             $crate::algebra::ApproxEqRel::approx_eq_rel(lhs, rhs),
-            "assertion failed: approx_eql_rel!({}, {})",
+            "assertion failed: approx_eq_rel!({}, {})",
             stringify!($lhs),
             stringify!($rhs)
         );
@@ -136,10 +218,31 @@ macro_rules! assert_approx_eql_rel {
     }};
 }
 
+/// Asserts that two values are not approximately equal using [`ApproxEqRel`] and the
+/// type's default relative tolerance.
+#[macro_export]
+macro_rules! assert_approx_ne_rel {
+    ($lhs:expr, $rhs:expr $(,)?) => {{
+        let lhs = $lhs;
+        let rhs = $rhs;
+        assert!(
+            !$crate::algebra::ApproxEqRel::approx_eq_rel(lhs, rhs),
+            "assertion failed: approx_ne_rel!({}, {})",
+            stringify!($lhs),
+            stringify!($rhs)
+        );
+    }};
+    ($lhs:expr, $rhs:expr, $($arg:tt)+) => {{
+        let lhs = $lhs;
+        let rhs = $rhs;
+        assert!(!$crate::algebra::ApproxEqRel::approx_eq_rel(lhs, rhs), $($arg)+);
+    }};
+}
+
 /// Returns whether two values are approximately equal using [`ApproxEqRel`] and
 /// an explicit relative tolerance.
 #[macro_export]
-macro_rules! approx_eql_rel_tol {
+macro_rules! approx_eq_rel_tol {
     ($lhs:expr, $rhs:expr, $tol:expr $(,)?) => {{
         let lhs = $lhs;
         let rhs = $rhs;
@@ -148,17 +251,29 @@ macro_rules! approx_eql_rel_tol {
     }};
 }
 
+/// Returns whether two values are not approximately equal using [`ApproxEqRel`] and
+/// an explicit relative tolerance.
+#[macro_export]
+macro_rules! approx_ne_rel_tol {
+    ($lhs:expr, $rhs:expr, $tol:expr $(,)?) => {{
+        let lhs = $lhs;
+        let rhs = $rhs;
+        let tol = $tol;
+        !$crate::algebra::ApproxEqRel::approx_eq_rel_tol(lhs, rhs, tol)
+    }};
+}
+
 /// Asserts that two values are approximately equal using [`ApproxEqRel`] and
 /// an explicit relative tolerance.
 #[macro_export]
-macro_rules! assert_approx_eql_rel_tol {
+macro_rules! assert_approx_eq_rel_tol {
     ($lhs:expr, $rhs:expr, $tol:expr $(,)?) => {{
         let lhs = $lhs;
         let rhs = $rhs;
         let tol = $tol;
         assert!(
             $crate::algebra::ApproxEqRel::approx_eq_rel_tol(lhs, rhs, tol),
-            "assertion failed: approx_eql_rel_tol!({}, {}, {})",
+            "assertion failed: approx_eq_rel_tol!({}, {}, {})",
             stringify!($lhs),
             stringify!($rhs),
             stringify!($tol)
@@ -169,5 +284,32 @@ macro_rules! assert_approx_eql_rel_tol {
         let rhs = $rhs;
         let tol = $tol;
         assert!($crate::algebra::ApproxEqRel::approx_eq_rel_tol(lhs, rhs, tol), $($arg)+);
+    }};
+}
+
+/// Asserts that two values are not approximately equal using [`ApproxEqRel`] and
+/// an explicit relative tolerance.
+#[macro_export]
+macro_rules! assert_approx_ne_rel_tol {
+    ($lhs:expr, $rhs:expr, $tol:expr $(,)?) => {{
+        let lhs = $lhs;
+        let rhs = $rhs;
+        let tol = $tol;
+        assert!(
+            !$crate::algebra::ApproxEqRel::approx_eq_rel_tol(lhs, rhs, tol),
+            "assertion failed: approx_ne_rel_tol!({}, {}, {})",
+            stringify!($lhs),
+            stringify!($rhs),
+            stringify!($tol)
+        );
+    }};
+    ($lhs:expr, $rhs:expr, $tol:expr, $($arg:tt)+) => {{
+        let lhs = $lhs;
+        let rhs = $rhs;
+        let tol = $tol;
+        assert!(
+            !$crate::algebra::ApproxEqRel::approx_eq_rel_tol(lhs, rhs, tol),
+            $($arg)+
+        );
     }};
 }
