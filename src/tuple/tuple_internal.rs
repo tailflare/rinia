@@ -22,6 +22,7 @@ impl<T, const N: usize> Tuple<T, N> {
         self.into_iter().zip(rhs).all(|(a, b)| a.approx_eq_rel_tol(b, tolerance))
     }
 
+    // Length squared inherent
     pub(crate) fn length_squared(self) -> T
     where
         T: Copy + Mul<Output = T> + Add<Output = T>,

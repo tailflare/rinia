@@ -12,6 +12,7 @@ impl<T, const N: usize> Vector<T, N>
 where
     T: Zero,
 {
+    /// The zero vector (0, 0, ..., 0).
     pub const ZERO: Self = Self::from_array([T::ZERO; N]);
 }
 
@@ -51,6 +52,7 @@ impl<T, const N: usize> Vector<T, N>
 where
     T: One,
 {
+    /// The one vector (1, 1, ..., 1).
     pub const ONE: Self = Self::from_array([T::ONE; N]);
 }
 

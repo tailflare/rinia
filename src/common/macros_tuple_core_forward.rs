@@ -1,6 +1,7 @@
 macro_rules! impl_tuple_wrapper_from_array {
 	([$($impl_generics:tt)*], $outer:ty, item: $item:ty, len: $len:expr, field: $field:ident $(,)?) => {
-		impl<$($impl_generics)*> $outer {
+		// FromArray inherent
+        impl<$($impl_generics)*> $outer {
 			/// Creates a new wrapper from an array.
 			#[inline]
 			pub const fn from_array(inner: [$item; $len]) -> Self {
@@ -12,7 +13,8 @@ macro_rules! impl_tuple_wrapper_from_array {
 
 macro_rules! impl_tuple_wrapper_from_tuple {
 	([$($impl_generics:tt)*], $outer:ty, item: $item:ty, len: $len:expr, field: $field:ident $(,)?) => {
-		impl<$($impl_generics)*> $outer {
+		// FromTuple inherent
+        impl<$($impl_generics)*> $outer {
 			/// Creates a new wrapper from a [Tuple].
 			#[inline]
 			pub const fn from_tuple(inner: $crate::tuple::Tuple<$item, $len>) -> Self {
@@ -24,7 +26,8 @@ macro_rules! impl_tuple_wrapper_from_tuple {
 
 macro_rules! impl_tuple_wrapper_array_accessors {
 	([$($impl_generics:tt)*], $outer:ty, item: $item:ty, len: $len:expr, field: $field:ident $(,)?) => {
-		impl<$($impl_generics)*> $outer {
+		// Array access inherent
+        impl<$($impl_generics)*> $outer {
 			/// Returns a reference to the inner array.
 			#[inline]
 			pub const fn as_array(&self) -> &[$item; $len] {
@@ -66,7 +69,8 @@ macro_rules! impl_tuple_wrapper_tuple_accessors {
 
 macro_rules! impl_tuple_wrapper_slice_accessors {
 	([$($impl_generics:tt)*], $outer:ty, item: $item:ty, field: $field:ident $(,)?) => {
-		impl<$($impl_generics)*> $outer {
+		// Slice access inherent
+        impl<$($impl_generics)*> $outer {
 			/// Returns a slice of the elements.
 			#[inline]
 			pub fn as_slice(&self) -> &[$item] {
@@ -84,7 +88,8 @@ macro_rules! impl_tuple_wrapper_slice_accessors {
 
 macro_rules! impl_tuple_wrapper_iter_accessors {
 	([$($impl_generics:tt)*], $outer:ty, item: $item:ty, field: $field:ident $(,)?) => {
-		impl<$($impl_generics)*> $outer {
+		// Iter access inherent
+        impl<$($impl_generics)*> $outer {
 			/// Returns an iterator over the elements.
 			#[inline]
 			pub fn iter(&self) -> core::slice::Iter<'_, $item> {
@@ -102,7 +107,8 @@ macro_rules! impl_tuple_wrapper_iter_accessors {
 
 macro_rules! impl_tuple_wrapper_index_traits {
 	([$($impl_generics:tt)*], $outer:ty, item: $item:ty $(,)?) => {
-		impl<$($impl_generics)*> core::ops::Index<usize> for $outer {
+		// Index trait
+        impl<$($impl_generics)*> core::ops::Index<usize> for $outer {
 			type Output = $item;
 
 			#[inline]
@@ -111,6 +117,7 @@ macro_rules! impl_tuple_wrapper_index_traits {
 			}
 		}
 
+        // IndexMut trait
 		impl<$($impl_generics)*> core::ops::IndexMut<usize> for $outer {
 			#[inline]
 			fn index_mut(&mut self, index: usize) -> &mut Self::Output {
@@ -122,7 +129,8 @@ macro_rules! impl_tuple_wrapper_index_traits {
 
 macro_rules! impl_tuple_wrapper_into_iter_traits {
 	([$($impl_generics:tt)*], $outer:ty, item: $item:ty, len: $len:expr $(,)?) => {
-		impl<'a, $($impl_generics)*> core::iter::IntoIterator for &'a $outer {
+		// IntoIterator ref trait
+        impl<'a, $($impl_generics)*> core::iter::IntoIterator for &'a $outer {
 			type Item = &'a $item;
 			type IntoIter = core::slice::Iter<'a, $item>;
 
@@ -132,6 +140,7 @@ macro_rules! impl_tuple_wrapper_into_iter_traits {
 			}
 		}
 
+        // IntoIterator mut ref trait
 		impl<'a, $($impl_generics)*> core::iter::IntoIterator for &'a mut $outer {
 			type Item = &'a mut $item;
 			type IntoIter = core::slice::IterMut<'a, $item>;
@@ -142,6 +151,7 @@ macro_rules! impl_tuple_wrapper_into_iter_traits {
 			}
 		}
 
+        // IntoIterator by value trait
 		impl<$($impl_generics)*> core::iter::IntoIterator for $outer {
 			type Item = $item;
 			type IntoIter = core::array::IntoIter<$item, $len>;
@@ -156,6 +166,7 @@ macro_rules! impl_tuple_wrapper_into_iter_traits {
 
 macro_rules! impl_tuple_wrapper_from_array_trait {
 	([$($impl_generics:tt)*], $outer:ty, item: $item:ty, len: $len:expr $(,)?) => {
+        // From<[$item; $len]> trait
 		impl<$($impl_generics)*> core::convert::From<[$item; $len]> for $outer {
 			#[inline]
 			fn from(inner: [$item; $len]) -> Self {
@@ -163,6 +174,7 @@ macro_rules! impl_tuple_wrapper_from_array_trait {
 			}
 		}
 
+        // From<$outer> for [$item; $len] trait
 		impl<$($impl_generics)*> core::convert::From<$outer> for [$item; $len] {
 			#[inline]
 			fn from(value: $outer) -> Self {
@@ -174,6 +186,7 @@ macro_rules! impl_tuple_wrapper_from_array_trait {
 
 macro_rules! impl_tuplelike_for_wrapper {
 	([$($impl_generics:tt)*], $outer:ty, item: $item:ty, len: $len:expr $(,)?) => {
+        // TupleLike trait
 		impl<$($impl_generics)*> $crate::tuple::TupleLike for $outer {
 			type Item = $item;
 			const LEN: usize = $len;

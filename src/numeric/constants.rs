@@ -1,25 +1,30 @@
 /// The zero constant for a type (often used as the additive identity).
 pub trait Zero {
+    /// The zero constant for the type.
     const ZERO: Self;
 }
 
 /// The one constant for a type (often used as the multiplicative identity).
 pub trait One {
+    /// The one constant for the type.
     const ONE: Self;
 }
 
 /// The two constant for a type.
 pub trait Two {
+    /// The two constant for the type.
     const TWO: Self;
 }
 
 /// The half constant for a type.
 pub trait Half {
+    /// The half constant for the type.
     const HALF: Self;
 }
 
 /// The negative one constant for a type.
 pub trait NegOne {
+    /// The negative one constant for the type.
     const NEG_ONE: Self;
 }
 

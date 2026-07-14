@@ -42,6 +42,7 @@ pub struct Vector<T, const N: usize> {
     pub(crate) data: Tuple<T, N>,
 }
 
+/// A 2-dimensional vector with named fields `x` and `y`.
 #[doc(hidden)]
 #[repr(C)]
 pub struct Vector2Fields<T> {
@@ -52,6 +53,7 @@ pub struct Vector2Fields<T> {
     pub y: T,
 }
 
+/// A 3-dimensional vector with named fields `x`, `y`, and `z`.
 #[doc(hidden)]
 #[repr(C)]
 pub struct Vector3Fields<T> {
@@ -65,6 +67,7 @@ pub struct Vector3Fields<T> {
     pub z: T,
 }
 
+/// A 4-dimensional vector with named fields `x`, `y`, `z`, and `w`.
 #[doc(hidden)]
 #[repr(C)]
 pub struct Vector4Fields<T> {

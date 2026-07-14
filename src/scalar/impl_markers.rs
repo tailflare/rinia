@@ -1,5 +1,6 @@
 use crate::{
     common,
+    numeric::Rounding,
     scalar::{
         CheckedIntNegOps, CheckedIntOps, Float, FloatOps, Int, IntOps, SaturatingIntNegOps,
         SaturatingIntOps, Scalar, ScalarOps, Signed, SignedInt, SignedIntOps, SignedOps, Unsigned,
@@ -78,3 +79,6 @@ common::impl_marker_trait!(WrappingIntNegOps, [isize, i8, i16, i32, i64, i128]);
 
 // Implement marker trait for checked negation for all signed integer scalar types.
 common::impl_marker_trait!(CheckedIntNegOps, [isize, i8, i16, i32, i64, i128]);
+
+// Implement Rounding marker for floating scalar types.
+common::impl_marker_trait!(Rounding, [f32, f64]);

@@ -1,6 +1,7 @@
 macro_rules! impl_scalar_approx_eq {
 	($([$ty:ty, abs: $default_abs_tol:expr, rel: $default_rel_tol:expr]),+ $(,)?) => {
 		$(
+            // ApproxEqAbs trait
 			impl $crate::algebra::ApproxEqAbs for $ty {
 				type Tolerance = $ty;
 				const DEFAULT_TOLERANCE_ABS: Self::Tolerance = $default_abs_tol;
@@ -11,6 +12,7 @@ macro_rules! impl_scalar_approx_eq {
 				}
 			}
 
+            // ApproxEqRel trait
 			impl $crate::algebra::ApproxEqRel for $ty {
 				type Tolerance = $ty;
 				const DEFAULT_TOLERANCE_REL: Self::Tolerance = $default_rel_tol;
@@ -31,6 +33,7 @@ macro_rules! impl_scalar_approx_eq {
 macro_rules! impl_scalar_lerp {
 	($($ty:ty),+ $(,)?) => {
 		$(
+            // Lerp trait
 			impl $crate::algebra::Lerp for $ty {
 				type Scalar = $ty;
 

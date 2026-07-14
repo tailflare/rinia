@@ -24,6 +24,7 @@ pub struct Quaternion<T> {
     pub(crate) data: Tuple<T, 4>,
 }
 
+/// A struct representing the fields of a quaternion.
 #[doc(hidden)]
 #[repr(C)]
 pub struct QuaternionFields<T> {

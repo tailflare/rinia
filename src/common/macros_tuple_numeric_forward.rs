@@ -5,6 +5,7 @@ macro_rules! impl_tuple_wrapper_finite {
 		where
 			$item: $crate::numeric::IsFinite + Copy,
 		{
+            /// Returns `true` if all elements are finite, `false` otherwise.
 			#[inline]
 			pub fn is_finite(self) -> bool {
 				self.into_tuple().is_finite()
@@ -31,9 +32,11 @@ macro_rules! impl_tuple_wrapper_infinite {
 		where
 			$item: $crate::numeric::Infinite + Copy,
 		{
+            /// Returns a new wrapper with all elements set to positive infinity.
 			pub const INFINITY: Self =
 				Self::from_tuple($crate::tuple::Tuple::<$item, $len>::INFINITY);
 
+            /// Returns a new wrapper with all elements set to negative infinity.
 			pub const NEG_INFINITY: Self =
 				Self::from_tuple($crate::tuple::Tuple::<$item, $len>::NEG_INFINITY);
 		}
@@ -52,6 +55,7 @@ macro_rules! impl_tuple_wrapper_infinite {
 		where
 			$item: $crate::numeric::IsInfinite + Copy,
 		{
+            /// Returns `true` if any element is infinite, `false` otherwise.
 			#[inline]
 			pub fn is_infinite(self) -> bool {
 				self.into_tuple().is_infinite()
@@ -78,6 +82,7 @@ macro_rules! impl_tuple_wrapper_nan {
 		where
 			$item: $crate::numeric::Nan + Copy,
 		{
+            /// Returns a new wrapper with all elements set to NaN.
 			pub const NAN: Self = Self::from_tuple($crate::tuple::Tuple::<$item, $len>::NAN);
 
 		}
@@ -95,6 +100,7 @@ macro_rules! impl_tuple_wrapper_nan {
 		where
 			$item: $crate::numeric::IsNan + Copy,
 		{
+            /// Returns `true` if any element is NaN, `false` otherwise.
 			#[inline]
 			pub fn is_nan(self) -> bool {
 				self.into_tuple().is_nan()

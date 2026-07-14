@@ -1,4 +1,6 @@
-use core::ops::{Add, Div, Mul, Neg, Sub};
+use core::ops::{
+    Add, AddAssign, Div, DivAssign, Mul, MulAssign, Neg, Rem, RemAssign, Sub, SubAssign,
+};
 
 use crate::{
     algebra::{ApproxEqAbs, ApproxEqRel},
@@ -35,6 +37,7 @@ pub trait UnsignedInt: Unsigned + Int {}
 
 /// Marker trait for types that have an associated scalar type.
 pub trait HasScalar {
+    /// The associated scalar type.
     type Scalar: Scalar;
 }
 
@@ -53,9 +56,15 @@ pub trait ScalarOps:
     + One
     + Two
     + Add<Output = Self>
+    + AddAssign
     + Sub<Output = Self>
+    + SubAssign
     + Mul<Output = Self>
+    + MulAssign
     + Div<Output = Self>
+    + DivAssign
+    + Rem<Output = Self>
+    + RemAssign
 {
 }
 

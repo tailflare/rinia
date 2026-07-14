@@ -11,6 +11,7 @@ impl<T> Quaternion<T>
 where
     T: Zero,
 {
+    /// The zero quaternion (0, 0, 0, 0).
     pub const ZERO: Self = Self::new(T::ZERO, T::ZERO, T::ZERO, T::ZERO);
 }
 

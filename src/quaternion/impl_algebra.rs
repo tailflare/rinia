@@ -14,6 +14,7 @@ impl<T> Quaternion<T>
 where
     T: Zero + One,
 {
+    /// The identity quaternion (0, 0, 0, 1).
     pub const IDENTITY: Self = Self::new(T::ZERO, T::ZERO, T::ZERO, T::ONE);
 }
 

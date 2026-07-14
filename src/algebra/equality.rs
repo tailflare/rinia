@@ -1,3 +1,4 @@
+/// A trait for types that support approximate equality checks with absolute tolerance.
 pub trait ApproxEqAbs<Rhs = Self> {
     /// The type of the tolerance used for absolute approximate equality checks.
     type Tolerance;
@@ -156,6 +157,7 @@ macro_rules! assert_approx_ne_abs_tol {
     }};
 }
 
+/// A trait for types that support approximate equality checks with relative tolerance.
 pub trait ApproxEqRel<Rhs = Self> {
     /// The type of the tolerance used for relative approximate equality checks.
     type Tolerance;

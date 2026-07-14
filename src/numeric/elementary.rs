@@ -2,32 +2,34 @@ use core::ops::Neg;
 
 /// Trait for fused multiply-add.
 pub trait MulAdd<Rhs = Self> {
+    /// Performs a fused multiply-add operation: (self * a) + b.
     fn mul_add(self, a: Rhs, b: Rhs) -> Self;
 }
 
-/// Trait for computing the minimum or maximum of two numbers.
+/// Trait for computing the minimum or maximum of two values.
 pub trait MinMax {
-    /// Computes the minimum of two numbers.
+    /// Computes the minimum of two values.
     fn minimum(self, other: Self) -> Self;
 
-    /// Computes the maximum of two numbers.
+    /// Computes the maximum of two values.
     fn maximum(self, other: Self) -> Self;
 }
 
-/// Trait for clamping a number between a minimum and maximum value.
+/// Trait for clamping a value between a minimum and maximum value.
 pub trait Clamp {
-    /// Clamps the number between a minimum and maximum value.
+    /// Clamps the value between a minimum and maximum value.
     fn clamp_value(self, min: Self, max: Self) -> Self;
 }
 
 /// A trait that represents a type which can be negated.
 pub trait Negate: Neg {
+    /// Negates the value of the type.
     fn negate(self) -> Self::Output;
 }
 
-/// Trait for computing the absolute value of a number.
+/// Trait for computing the absolute value of a value.
 pub trait Abs {
-    /// Computes the absolute value of the number.
+    /// Computes the absolute value of the value.
     fn abs(self) -> Self;
 }
 

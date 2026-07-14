@@ -1,5 +1,6 @@
 macro_rules! impl_layout_field_access {
 	([$($impl_generics:tt)*], $outer:ty => $fields:ty $(,)?) => {
+        // Field access deref impl
 		impl<$($impl_generics)*> core::ops::Deref for $outer {
 			type Target = $fields;
 
@@ -13,6 +14,7 @@ macro_rules! impl_layout_field_access {
 			}
 		}
 
+        // Field access deref_mut impl
 		impl<$($impl_generics)*> core::ops::DerefMut for $outer {
 			#[inline]
 			fn deref_mut(&mut self) -> &mut Self::Target {

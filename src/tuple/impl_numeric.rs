@@ -129,6 +129,16 @@ where
     pub const NEG_INFINITY: Self = Self { inner: [T::NEG_INFINITY; N] };
 }
 
+// Infinite trait
+impl<T, const N: usize> Infinite for Tuple<T, N>
+where
+    T: Copy + Infinite,
+{
+    const INFINITY: Self = Tuple::INFINITY;
+
+    const NEG_INFINITY: Self = Tuple::NEG_INFINITY;
+}
+
 // IsInfinite inherent
 impl<T, const N: usize> Tuple<T, N>
 where
@@ -139,16 +149,6 @@ where
     pub fn is_infinite(self) -> bool {
         self.inner.iter().any(|&x| x.is_infinite())
     }
-}
-
-// Infinite trait
-impl<T, const N: usize> Infinite for Tuple<T, N>
-where
-    T: Copy + Infinite,
-{
-    const INFINITY: Self = Tuple::INFINITY;
-
-    const NEG_INFINITY: Self = Tuple::NEG_INFINITY;
 }
 
 // IsInfinite trait

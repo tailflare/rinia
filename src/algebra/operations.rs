@@ -1,5 +1,6 @@
 /// A trait that represents a type with a squared magnitude.
 pub trait LengthSquared {
+    /// The output type for the squared length.
     type Output;
 
     /// Returns the squared length (magnitude) of the type.
@@ -20,6 +21,7 @@ pub trait Normalize {
 
 /// A trait that represents a type which can be dotted with another type.
 pub trait Dot<Rhs = Self> {
+    /// The output type for the dot product.
     type Output;
 
     /// Computes the dot product of two vectors.
@@ -28,6 +30,7 @@ pub trait Dot<Rhs = Self> {
 
 /// A trait that represents a type which can be crossed with another type.
 pub trait Cross<Rhs = Self> {
+    /// The output type for the cross product.
     type Output;
 
     /// Computes the cross product of two vectors.

@@ -5,7 +5,15 @@ use core::{
 
 use crate::tuple::Tuple;
 
-// Basic access impls for Tuple<T, N>
+// Implement Default for Tuple<T, N> where T: Default
+impl<T: Default, const N: usize> Default for Tuple<T, N> {
+    #[inline]
+    fn default() -> Self {
+        Self { inner: core::array::from_fn(|_| T::default()) }
+    }
+}
+
+// Index trait
 impl<T, const N: usize> Index<usize> for Tuple<T, N> {
     type Output = T;
 
@@ -15,6 +23,7 @@ impl<T, const N: usize> Index<usize> for Tuple<T, N> {
     }
 }
 
+// IndexMut trait
 impl<T, const N: usize> IndexMut<usize> for Tuple<T, N> {
     #[inline]
     fn index_mut(&mut self, index: usize) -> &mut Self::Output {
@@ -22,6 +31,7 @@ impl<T, const N: usize> IndexMut<usize> for Tuple<T, N> {
     }
 }
 
+// AsRef array trait
 impl<T, const N: usize> AsRef<[T; N]> for Tuple<T, N> {
     #[inline]
     fn as_ref(&self) -> &[T; N] {
@@ -29,6 +39,7 @@ impl<T, const N: usize> AsRef<[T; N]> for Tuple<T, N> {
     }
 }
 
+// AsMut array trait
 impl<T, const N: usize> AsMut<[T; N]> for Tuple<T, N> {
     #[inline]
     fn as_mut(&mut self) -> &mut [T; N] {
@@ -36,6 +47,7 @@ impl<T, const N: usize> AsMut<[T; N]> for Tuple<T, N> {
     }
 }
 
+// AsRef slice trait
 impl<T, const N: usize> AsRef<[T]> for Tuple<T, N> {
     #[inline]
     fn as_ref(&self) -> &[T] {
@@ -43,6 +55,7 @@ impl<T, const N: usize> AsRef<[T]> for Tuple<T, N> {
     }
 }
 
+// AsMut slice trait
 impl<T, const N: usize> AsMut<[T]> for Tuple<T, N> {
     #[inline]
     fn as_mut(&mut self) -> &mut [T] {
@@ -50,6 +63,7 @@ impl<T, const N: usize> AsMut<[T]> for Tuple<T, N> {
     }
 }
 
+// Borrow slice trait
 impl<T, const N: usize> Borrow<[T]> for Tuple<T, N> {
     #[inline]
     fn borrow(&self) -> &[T] {
@@ -57,6 +71,7 @@ impl<T, const N: usize> Borrow<[T]> for Tuple<T, N> {
     }
 }
 
+// BorrowMut slice trait
 impl<T, const N: usize> BorrowMut<[T]> for Tuple<T, N> {
     #[inline]
     fn borrow_mut(&mut self) -> &mut [T] {
@@ -64,6 +79,7 @@ impl<T, const N: usize> BorrowMut<[T]> for Tuple<T, N> {
     }
 }
 
+// IntoIterator trait for ref
 impl<'a, T, const N: usize> IntoIterator for &'a Tuple<T, N> {
     type Item = &'a T;
     type IntoIter = core::slice::Iter<'a, T>;
@@ -74,6 +90,7 @@ impl<'a, T, const N: usize> IntoIterator for &'a Tuple<T, N> {
     }
 }
 
+// IntoIterator trait for mutable ref
 impl<'a, T, const N: usize> IntoIterator for &'a mut Tuple<T, N> {
     type Item = &'a mut T;
     type IntoIter = core::slice::IterMut<'a, T>;
@@ -84,6 +101,7 @@ impl<'a, T, const N: usize> IntoIterator for &'a mut Tuple<T, N> {
     }
 }
 
+// IntoIterator trait for owned Tuple
 impl<T, const N: usize> IntoIterator for Tuple<T, N> {
     type Item = T;
     type IntoIter = core::array::IntoIter<T, N>;
@@ -94,6 +112,7 @@ impl<T, const N: usize> IntoIterator for Tuple<T, N> {
     }
 }
 
+// From array to tuple trait
 impl<T, const N: usize> From<[T; N]> for Tuple<T, N> {
     #[inline]
     fn from(inner: [T; N]) -> Self {
@@ -101,16 +120,10 @@ impl<T, const N: usize> From<[T; N]> for Tuple<T, N> {
     }
 }
 
+// From tuple to array trait
 impl<T, const N: usize> From<Tuple<T, N>> for [T; N] {
     #[inline]
     fn from(tuple: Tuple<T, N>) -> Self {
         tuple.inner
-    }
-}
-
-impl<T: Default, const N: usize> Default for Tuple<T, N> {
-    #[inline]
-    fn default() -> Self {
-        Self { inner: core::array::from_fn(|_| T::default()) }
     }
 }

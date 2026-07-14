@@ -46,7 +46,7 @@ where
 // Field accessors via Deref for Vector<T, 2>
 common::impl_layout_field_access!([T], Vector<T, 2> => Vector2Fields<T>);
 
-// Cross
+// Cross inherent
 impl<T> Vector<T, 2>
 where
     T: Copy + Mul<Output = T> + Sub<Output = T>,
@@ -58,6 +58,7 @@ where
     }
 }
 
+// Cross trait
 impl<T> Cross for Vector<T, 2>
 where
     T: Copy + Mul<Output = T> + Sub<Output = T>,

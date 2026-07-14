@@ -1,4 +1,4 @@
-use crate::{common, numeric::Rounding, scalar};
+use crate::scalar;
 
 // Implement scalar constants for all scalars (ZERO, ONE, TWO, NEG_ONE, HALF)
 scalar::impl_scalar_constants!(
@@ -158,7 +158,7 @@ scalar::impl_scalar_elementary_trait!(
     {binary, powi, i32, [f32: |x: f32, n: i32| libm::powf(x, n as f32), f64: |x: f64, n: i32| libm::pow(x, n as f64)]}
 );
 
-// Implement Root for floating scalar types.
+// Implement Cbrt (cube root) for floating scalar types.
 scalar::impl_scalar_elementary_trait!(
     Cbrt,
     [f32, f64],
@@ -221,7 +221,3 @@ scalar::impl_scalar_elementary_trait!(
         [f32: |x| libm::modff(x).0, f64: |x| libm::modf(x).0]
     }
 );
-
-// Implement Rounding marker for floating scalar types as all of the rounding traits are
-// implemented above for them.
-common::impl_marker_trait!(Rounding, [f32, f64]);
