@@ -1,9 +1,10 @@
-mod impl_basic;
-mod impl_equality;
-mod interop;
-#[cfg(test)]
+mod impl_access;
+mod impl_algebra;
+mod impl_compat_mint;
+mod impl_core;
+mod impl_numeric;
+mod impl_ops;
 mod tests;
-mod traits;
 mod types;
 
-pub use self::{traits::*, types::*};
+pub use self::types::{Quat, Quatd, Quaternion, QuaternionFields, Quatf};

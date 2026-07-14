@@ -1,12 +1,22 @@
-mod float_compat;
-mod impl_common;
-mod impl_float;
-mod impl_int;
-mod macros_float;
-mod macros_int;
-#[cfg(test)]
+mod impl_algebra;
+mod impl_casts;
+mod impl_core;
+mod impl_markers;
+mod impl_numeric;
+mod macros_algebra;
+mod macros_casting;
+mod macros_numeric;
+mod macros_scalar;
 mod tests;
 mod traits;
-pub(crate) mod type_lists;
+mod types;
 
-pub use self::{float_compat::Float, traits::*};
+pub(crate) use self::{macros_algebra::*, macros_casting::*, macros_numeric::*, macros_scalar::*};
+pub use self::{
+    traits::{
+        CheckedIntNegOps, CheckedIntOps, Float, FloatOps, HasScalar, Int, IntOps,
+        SaturatingIntNegOps, SaturatingIntOps, Scalar, ScalarOps, Signed, SignedInt, SignedIntOps,
+        SignedOps, Unsigned, UnsignedInt, WrappingIntNegOps, WrappingIntOps,
+    },
+    types::{Scalard, Scalarf},
+};

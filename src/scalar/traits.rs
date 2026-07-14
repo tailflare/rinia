@@ -1,89 +1,120 @@
-use core::{
-    fmt::Debug,
-    ops::{Add, AddAssign, Div, DivAssign, Mul, MulAssign, Sub, SubAssign},
-};
+use core::ops::{Add, Div, Mul, Neg, Sub};
 
-use approx::{AbsDiffEq, RelativeEq, UlpsEq};
-
-use super::type_lists::with_all_scalar_types;
 use crate::{
-    ops::{Abs, HasScalar, Negate, One, Select, Zero},
-    scalar::Float,
+    algebra::{ApproxEqAbs, ApproxEqRel},
+    numeric::{
+        Abs, BoundedMax, BoundedMin, Cbrt, CheckedAdd, CheckedDiv, CheckedMul, CheckedNeg,
+        CheckedRem, CheckedSub, Clamp, Exponential, Half, Hyperbolic, Hypot, Infinite, IsFinite,
+        IsInfinite, IsNan, MinMax, MulAdd, Nan, NegOne, One, Power, Rounding, SaturatingAdd,
+        SaturatingDiv, SaturatingMul, SaturatingNeg, SaturatingSub, SignedEquivalent, Sqrt,
+        Trigonometry, Two, UnsignedEquivalent, WrappingAdd, WrappingDiv, WrappingMul, WrappingNeg,
+        WrappingRem, WrappingSub, Zero,
+    },
 };
 
-/// A trait representing a scalar type with the minimal set of operations and constants required
-/// for mathematical computations.
-pub trait Scalar:
-    Copy
-    + Debug
-    + HasScalar
-    + Zero
-    + One
-    + Select
+/// Marker trait for scalar types.
+pub trait Scalar {}
+
+/// Marker trait for signed scalar types.
+pub trait Signed: Scalar {}
+
+/// Marker trait for unsigned scalar types.
+pub trait Unsigned: Scalar {}
+
+/// Marker trait for floating-point scalar types.
+pub trait Float: Signed {}
+
+/// Marker trait for integer scalar types.
+pub trait Int: Scalar + SignedEquivalent + UnsignedEquivalent {}
+
+/// Marker trait for signed integer scalar types.
+pub trait SignedInt: Signed + Int {}
+
+/// Marker trait for unsigned integer scalar types.
+pub trait UnsignedInt: Unsigned + Int {}
+
+/// Marker trait for types that have an associated scalar type.
+pub trait HasScalar {
+    type Scalar: Scalar;
+}
+
+/// Marker trait for scalar types that implement the basic set of scalar math ops.
+pub trait ScalarOps:
+    Scalar
+    + Copy
+    + core::fmt::Debug
     + PartialEq
     + PartialOrd
-    + ScalarCasts
+    + MinMax
+    + Clamp
+    + BoundedMin
+    + BoundedMax
+    + Zero
+    + One
+    + Two
     + Add<Output = Self>
-    + AddAssign
     + Sub<Output = Self>
-    + SubAssign
     + Mul<Output = Self>
-    + MulAssign
     + Div<Output = Self>
-    + DivAssign
-{
-    /// The maximum finite value for the scalar type.
-    const MAX: Self;
-
-    /// The minimum finite value for the scalar type.
-    const MIN: Self;
-
-    /// Converts a value of type `T` into the implementing scalar type.
-    #[inline]
-    fn from_scalar<T: Scalar>(value: T) -> Self
-    where
-        Self: ScalarCast<T>,
-    {
-        <Self as ScalarCast<T>>::from_scalar_impl(value)
-    }
-
-    /// Converts the implementing scalar type into a value of type `T`.
-    #[inline]
-    fn as_scalar<T: Scalar>(&self) -> T
-    where
-        Self: ScalarCast<T>,
-    {
-        <Self as ScalarCast<T>>::as_scalar_impl(self)
-    }
-}
-
-/// A trait representing a floating-point scalar type with additional constants and operations.
-pub trait FloatScalar:
-    Scalar + Float + AbsDiffEq<Epsilon = Self> + RelativeEq<Epsilon = Self> + UlpsEq<Epsilon = Self>
 {
 }
 
-/// A trait representing an integer scalar type.
-pub trait IntScalar: Scalar + Ord + Eq {}
+/// Marker trait for signed scalar types that implement the basic set of signed scalar math ops.
+pub trait SignedOps: ScalarOps + Signed + Abs + Neg<Output = Self> + NegOne {}
 
-/// A trait representing an unsigned integer scalar type.
-pub trait UIntScalar: IntScalar {}
+// Marker trait for integer scalar types that implement the basic set of integer scalar math ops.
+pub trait IntOps: Int + ScalarOps {}
 
-/// A trait representing a signed integer scalar type.
-pub trait SIntScalar: IntScalar + Negate + Abs {}
+// Marker trait for signed integer scalar types that implement the basic set of signed integer scalar math ops.
+pub trait SignedIntOps: SignedInt + IntOps + SignedOps {}
 
-/// A trait for converting between different scalar types.
-pub trait ScalarCast<T>: Sized {
-    fn from_scalar_impl(value: T) -> Self;
-    fn as_scalar_impl(&self) -> T;
+// Marker trait for checked integer scalar types that implement the basic set of checked integer scalar math ops.
+pub trait CheckedIntOps:
+    IntOps + CheckedAdd + CheckedSub + CheckedMul + CheckedDiv + CheckedRem
+{
 }
 
-macro_rules! define_scalar_casts_trait {
-    ($($ty:ty),+ $(,)?) => {
-        pub trait ScalarCasts: $(ScalarCast<$ty> +)+ {}
-
-        impl<T> ScalarCasts for T where T: $(ScalarCast<$ty> +)+ {}
-    };
+// Marker trait for saturating integer scalar types that implement the basic set of saturating integer scalar math ops.
+pub trait SaturatingIntOps:
+    IntOps + SaturatingAdd + SaturatingSub + SaturatingMul + SaturatingDiv
+{
 }
 
-with_all_scalar_types!(define_scalar_casts_trait);
+// Marker trait for wrapping integer scalar types that implement the basic set of wrapping integer scalar math ops.
+pub trait WrappingIntOps:
+    IntOps + WrappingAdd + WrappingSub + WrappingMul + WrappingDiv + WrappingRem
+{
+}
+
+// Marker trait for checked signed scalar types that can be negated.
+pub trait CheckedIntNegOps: CheckedNeg {}
+
+// Marker trait for saturating signed scalar types that can be negated.
+pub trait SaturatingIntNegOps: SaturatingNeg {}
+
+// Marker trait for wrapping signed scalar types that can be negated.
+pub trait WrappingIntNegOps: WrappingNeg {}
+
+/// Marker trait for floating-point scalar types that implement the basic set of floating-point math ops.
+pub trait FloatOps:
+    Float
+    + SignedOps
+    + Rounding
+    + IsFinite
+    + Infinite
+    + IsInfinite
+    + Nan
+    + IsNan
+    + MulAdd
+    + Sqrt
+    + Trigonometry
+    + Exponential
+    + Power
+    + Cbrt
+    + Hyperbolic
+    + Hypot
+    + ApproxEqAbs<Tolerance = Self>
+    + ApproxEqRel<Tolerance = Self>
+    + Half
+{
+}
