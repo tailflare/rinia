@@ -3,9 +3,11 @@ use core::ops::{Add, Div, Mul, Neg, Sub};
 use crate::{
     algebra::{ApproxEqAbs, ApproxEqRel},
     numeric::{
-        Abs, BoundedMax, BoundedMin, Cbrt, Clamp, Exponential, Half, Hyperbolic, Hypot, Infinite,
-        IsFinite, IsInfinite, IsNan, MinMax, Nan, NegOne, One, Power, Rounding, Sqrt, Trigonometry,
-        Two, Zero,
+        Abs, BoundedMax, BoundedMin, Cbrt, CheckedAdd, CheckedDiv, CheckedMul, CheckedNeg,
+        CheckedRem, CheckedSub, Clamp, Exponential, Half, Hyperbolic, Hypot, Infinite, IsFinite,
+        IsInfinite, IsNan, MinMax, MulAdd, Nan, NegOne, One, Power, Rounding, SaturatingAdd,
+        SaturatingDiv, SaturatingMul, SaturatingNeg, SaturatingSub, Sqrt, Trigonometry, Two,
+        WrappingAdd, WrappingDiv, WrappingMul, WrappingNeg, WrappingRem, WrappingSub, Zero,
     },
 };
 
@@ -59,6 +61,39 @@ pub trait ScalarOps:
 /// Marker trait for signed scalar types that implement the basic set of signed scalar math ops.
 pub trait SignedOps: ScalarOps + Signed + Abs + Neg<Output = Self> + NegOne {}
 
+// Marker trait for integer scalar types that implement the basic set of integer scalar math ops.
+pub trait IntOps: Int + ScalarOps {}
+
+// Marker trait for signed integer scalar types that implement the basic set of signed integer scalar math ops.
+pub trait SignedIntOps: SignedInt + IntOps + SignedOps {}
+
+// Marker trait for checked integer scalar types that implement the basic set of checked integer scalar math ops.
+pub trait CheckedIntOps:
+    IntOps + CheckedAdd + CheckedSub + CheckedMul + CheckedDiv + CheckedRem
+{
+}
+
+// Marker trait for saturating integer scalar types that implement the basic set of saturating integer scalar math ops.
+pub trait SaturatingIntOps:
+    IntOps + SaturatingAdd + SaturatingSub + SaturatingMul + SaturatingDiv
+{
+}
+
+// Marker trait for wrapping integer scalar types that implement the basic set of wrapping integer scalar math ops.
+pub trait WrappingIntOps:
+    IntOps + WrappingAdd + WrappingSub + WrappingMul + WrappingDiv + WrappingRem
+{
+}
+
+// Marker trait for checked signed scalar types that can be negated.
+pub trait CheckedIntNegOps: CheckedNeg {}
+
+// Marker trait for saturating signed scalar types that can be negated.
+pub trait SaturatingIntNegOps: SaturatingNeg {}
+
+// Marker trait for wrapping signed scalar types that can be negated.
+pub trait WrappingIntNegOps: WrappingNeg {}
+
 /// Marker trait for floating-point scalar types that implement the basic set of floating-point math ops.
 pub trait FloatOps:
     Float
@@ -69,6 +104,7 @@ pub trait FloatOps:
     + IsInfinite
     + Nan
     + IsNan
+    + MulAdd
     + Sqrt
     + Trigonometry
     + Exponential

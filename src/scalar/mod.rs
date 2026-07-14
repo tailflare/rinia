@@ -14,8 +14,9 @@ mod types;
 pub(crate) use self::{macros_algebra::*, macros_casting::*, macros_numeric::*, macros_scalar::*};
 pub use self::{
     traits::{
-        Float, FloatOps, HasScalar, Int, Scalar, ScalarOps, Signed, SignedInt, SignedOps, Unsigned,
-        UnsignedInt,
+        CheckedIntNegOps, CheckedIntOps, Float, FloatOps, HasScalar, Int, IntOps,
+        SaturatingIntNegOps, SaturatingIntOps, Scalar, ScalarOps, Signed, SignedInt, SignedIntOps,
+        SignedOps, Unsigned, UnsignedInt, WrappingIntNegOps, WrappingIntOps,
     },
     types::{Scalard, Scalarf},
 };
