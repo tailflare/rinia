@@ -39,6 +39,10 @@ macro_rules! impl_scalar_elementary_trait {
 		$crate::scalar::impl_scalar_elementary_trait!(@method $ty, binary, $method, $rhs, $crate::scalar::impl_scalar_elementary_trait!(@float_fallback_for_type $ty, [f32: $f32_fallback, f64: $f64_fallback]));
 	};
 
+	(@entry_for_type $ty:tt, {ternary, $method:ident, $rhs1:ty, $rhs2:ty, [f32: $f32_fallback:expr, f64: $f64_fallback:expr]}) => {
+		$crate::scalar::impl_scalar_elementary_trait!(@method $ty, ternary, $method, $rhs1, $rhs2, $crate::scalar::impl_scalar_elementary_trait!(@float_fallback_for_type $ty, [f32: $f32_fallback, f64: $f64_fallback]));
+	};
+
 
 	(@method $ty:ty, unary, $method:ident, $fallback:expr) => {
 		#[inline]
@@ -89,6 +93,13 @@ macro_rules! impl_scalar_elementary_trait {
 		}
 	};
 
+	(@method $ty:ty, ternary, $method:ident, $rhs1:ty, $rhs2:ty, $fallback:expr) => {
+		#[inline]
+		fn $method(self, arg1: $rhs1, arg2: $rhs2) -> Self {
+			$crate::scalar::impl_scalar_elementary_trait!(@call_ternary_with_fallback $ty, $method, $rhs1, $rhs2, self, arg1, arg2, $fallback)
+		}
+	};
+
 	(@call_unary $ty:ty, $method:ident, $value:expr) => {{
 		let call: fn($ty) -> $ty = |x: $ty| x.$method();
 		call($value)
@@ -115,6 +126,19 @@ macro_rules! impl_scalar_elementary_trait {
 	(@call_ternary_inherent $ty:ty, $method:ident, $rhs1:ty, $rhs2:ty, $value:expr, $arg1:expr, $arg2:expr) => {{
 		let call: fn($ty, $rhs1, $rhs2) -> $ty = |x: $ty, y: $rhs1, z: $rhs2| <$ty>::$method(x, y, z);
 		call($value, $arg1, $arg2)
+	}};
+
+	(@call_ternary_with_fallback $ty:ty, $method:ident, $rhs1:ty, $rhs2:ty, $value:expr, $arg1:expr, $arg2:expr, $fallback:expr) => {{
+		#[cfg(feature = "std")]
+		{
+			let call: fn($ty, $rhs1, $rhs2) -> $ty = |x: $ty, y: $rhs1, z: $rhs2| <$ty>::$method(x, y, z);
+			call($value, $arg1, $arg2)
+		}
+
+		#[cfg(not(feature = "std"))]
+		{
+			($fallback)($value, $arg1, $arg2)
+		}
 	}};
 
 

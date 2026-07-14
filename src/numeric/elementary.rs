@@ -1,5 +1,10 @@
 use core::ops::Neg;
 
+/// Trait for fused multiply-add.
+pub trait MulAdd<Rhs = Self> {
+    fn mul_add(self, a: Rhs, b: Rhs) -> Self;
+}
+
 /// Trait for computing the minimum or maximum of two numbers.
 pub trait MinMax {
     /// Computes the minimum of two numbers.

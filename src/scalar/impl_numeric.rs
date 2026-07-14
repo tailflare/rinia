@@ -55,6 +55,36 @@ scalar::impl_scalar_clamp!(
     usize, isize, u8, u16, u32, u64, u128, i8, i16, i32, i64, i128, f32, f64
 );
 
+// Implement saturating arithmetic for integer scalar types.
+scalar::impl_scalar_arithmetic_trait!(SaturatingAdd, [usize, isize, u8, u16, u32, u64, u128, i8, i16, i32, i64, i128], {binary, saturating_add, output: Self});
+scalar::impl_scalar_arithmetic_trait!(SaturatingSub, [usize, isize, u8, u16, u32, u64, u128, i8, i16, i32, i64, i128], {binary, saturating_sub, output: Self});
+scalar::impl_scalar_arithmetic_trait!(SaturatingMul, [usize, isize, u8, u16, u32, u64, u128, i8, i16, i32, i64, i128], {binary, saturating_mul, output: Self});
+scalar::impl_scalar_arithmetic_trait!(SaturatingDiv, [usize, isize, u8, u16, u32, u64, u128, i8, i16, i32, i64, i128], {binary, saturating_div, output: Self});
+scalar::impl_scalar_arithmetic_trait!(SaturatingNeg, [isize, i8, i16, i32, i64, i128], {unary, saturating_neg, output: Self});
+
+// Implement wrapping arithmetic for integer scalar types.
+scalar::impl_scalar_arithmetic_trait!(WrappingAdd, [usize, isize, u8, u16, u32, u64, u128, i8, i16, i32, i64, i128], {binary, wrapping_add, output: Self});
+scalar::impl_scalar_arithmetic_trait!(WrappingSub, [usize, isize, u8, u16, u32, u64, u128, i8, i16, i32, i64, i128], {binary, wrapping_sub, output: Self});
+scalar::impl_scalar_arithmetic_trait!(WrappingMul, [usize, isize, u8, u16, u32, u64, u128, i8, i16, i32, i64, i128], {binary, wrapping_mul, output: Self});
+scalar::impl_scalar_arithmetic_trait!(WrappingDiv, [usize, isize, u8, u16, u32, u64, u128, i8, i16, i32, i64, i128], {binary, wrapping_div, output: Self});
+scalar::impl_scalar_arithmetic_trait!(WrappingRem, [usize, isize, u8, u16, u32, u64, u128, i8, i16, i32, i64, i128], {binary, wrapping_rem, output: Self});
+scalar::impl_scalar_arithmetic_trait!(WrappingNeg, [isize, i8, i16, i32, i64, i128], {unary, wrapping_neg, output: Self});
+
+// Implement checked arithmetic for integer scalar types.
+scalar::impl_scalar_arithmetic_trait!(CheckedAdd, [usize, isize, u8, u16, u32, u64, u128, i8, i16, i32, i64, i128], {binary, checked_add, output: Option<Self>});
+scalar::impl_scalar_arithmetic_trait!(CheckedSub, [usize, isize, u8, u16, u32, u64, u128, i8, i16, i32, i64, i128], {binary, checked_sub, output: Option<Self>});
+scalar::impl_scalar_arithmetic_trait!(CheckedMul, [usize, isize, u8, u16, u32, u64, u128, i8, i16, i32, i64, i128], {binary, checked_mul, output: Option<Self>});
+scalar::impl_scalar_arithmetic_trait!(CheckedDiv, [usize, isize, u8, u16, u32, u64, u128, i8, i16, i32, i64, i128], {binary, checked_div, output: Option<Self>});
+scalar::impl_scalar_arithmetic_trait!(CheckedRem, [usize, isize, u8, u16, u32, u64, u128, i8, i16, i32, i64, i128], {binary, checked_rem, output: Option<Self>});
+scalar::impl_scalar_arithmetic_trait!(CheckedNeg, [isize, i8, i16, i32, i64, i128], {unary, checked_neg, output: Option<Self>});
+
+// Implement fused multiply-add for floating scalar types.
+scalar::impl_scalar_elementary_trait!(
+    MulAdd,
+    [f32, f64],
+    {ternary, mul_add, Self, Self, [f32: libm::fmaf, f64: libm::fma]}
+);
+
 // Implement Abs for signed scalar types.
 scalar::impl_scalar_elementary_trait!(Abs, [f32, f64, i8, i16, i32, i64, i128, isize], {unary, abs});
 

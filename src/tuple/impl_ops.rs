@@ -1,3 +1,5 @@
+use core::ops::{Add, AddAssign, Div, DivAssign, Mul, MulAssign, Rem, RemAssign, Sub, SubAssign};
+
 use crate::tuple::{impl_tuple_assign_op, impl_tuple_binary_op, impl_tuple_unary_op};
 
 // -Tuple<T> = Tuple<T>

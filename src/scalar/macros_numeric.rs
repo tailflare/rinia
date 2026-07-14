@@ -198,6 +198,54 @@ macro_rules! impl_scalar_clamp {
 	};
 }
 
+macro_rules! impl_scalar_arithmetic_trait {
+	($trait:ident, [$head:tt $(, $tail:tt)* $(,)?], {unary, $method:ident, output: $output:ty}) => {
+		impl $crate::numeric::$trait for $head {
+			type Output = $output;
+
+			#[inline]
+			fn $method(self) -> Self::Output {
+				self.$method()
+			}
+		}
+
+		$crate::scalar::impl_scalar_arithmetic_trait!($trait, [$($tail),*], {unary, $method, output: $output});
+	};
+
+	($trait:ident, [], {unary, $method:ident, output: $output:ty}) => {};
+
+	($trait:ident, [$head:ty $(, $tail:ty)* $(,)?], {binary, $method:ident, output: $output:ty}) => {
+		impl $crate::numeric::$trait for $head {
+			type Output = $output;
+
+			#[inline]
+			fn $method(self, rhs: Self) -> Self::Output {
+				self.$method(rhs)
+			}
+		}
+
+		$crate::scalar::impl_scalar_arithmetic_trait!($trait, [$($tail),*], {binary, $method, output: $output});
+	};
+
+	($trait:ident, [], {binary, $method:ident, output: $output:ty}) => {};
+
+	($trait:ident, [$head:ty $(, $tail:ty)* $(,)?], {ternary, $method:ident, $rhs1:ty, $rhs2:ty, output: $output:ty}) => {
+		impl $crate::numeric::$trait for $head {
+			type Output = $output;
+
+			#[inline]
+			fn $method(self, arg1: $rhs1, arg2: $rhs2) -> Self::Output {
+				<$head>::$method(self, arg1, arg2)
+			}
+		}
+
+		$crate::scalar::impl_scalar_arithmetic_trait!($trait, [$($tail),*], {ternary, $method, $rhs1, $rhs2, output: $output});
+	};
+
+	($trait:ident, [], {ternary, $method:ident, $rhs1:ty, $rhs2:ty, output: $output:ty}) => {};
+}
+
+pub(crate) use impl_scalar_arithmetic_trait;
 pub(crate) use impl_scalar_bounded;
 pub(crate) use impl_scalar_clamp;
 pub(crate) use impl_scalar_constants;

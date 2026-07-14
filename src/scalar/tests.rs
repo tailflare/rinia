@@ -7,9 +7,12 @@ use crate::{
     },
     approx_eql_abs, approx_eql_abs_tol, approx_eql_rel, approx_eql_rel_tol,
     numeric::{
-        Abs, BoundedMax, BoundedMin, Cbrt, Ceil, Exponential, Floor, Fract, Half, Hyperbolic,
-        Hypot, Infinite, IsFinite, IsInfinite, IsNan, IsZero, MinMax, Nan, NegOne, One, Power,
-        Round, Rounding, Sqrt, Trigonometry, Trunc, Two, Zero,
+        Abs, BoundedMax, BoundedMin, Cbrt, Ceil, CheckedAdd, CheckedDiv, CheckedMul, CheckedNeg,
+        CheckedRem, CheckedSub, Exponential, Floor, Fract, Half, Hyperbolic, Hypot, Infinite,
+        IsFinite, IsInfinite, IsNan, IsZero, MinMax, MulAdd, Nan, NegOne, One, Power, Round,
+        Rounding, SaturatingAdd, SaturatingDiv, SaturatingMul, SaturatingNeg, SaturatingSub, Sqrt,
+        Trigonometry, Trunc, Two, WrappingAdd, WrappingDiv, WrappingMul, WrappingNeg, WrappingRem,
+        WrappingSub, Zero,
     },
     scalar::{Float, Int, Scalar, Signed, SignedInt, Unsigned, UnsignedInt},
 };
@@ -73,6 +76,9 @@ fn bounded_surface() {
 
 #[test]
 fn elementary_surface() {
+    assert!(approx_eql_abs_tol!(<f32 as MulAdd>::mul_add(2.0, 3.0, 4.0), 10.0, 1e-6));
+    assert!(approx_eql_abs_tol!(<f64 as MulAdd>::mul_add(1.5, 2.0, 0.5), 3.5, 1e-12));
+
     assert_eq!(<i32 as MinMax>::minimum(3, 9), 3);
     assert_eq!(<i32 as MinMax>::maximum(3, 9), 9);
 
@@ -404,6 +410,38 @@ fn saturating_cast_surface() {
         1e-6
     ));
     assert_eq!(<f64 as TryExactCast<f32>>::try_exact_cast(16777217.0), Err(CastError::Inexact));
+}
+
+#[test]
+fn arithmetic_traits_surface() {
+    assert_eq!(<u8 as SaturatingAdd>::saturating_add(250, 10), u8::MAX);
+    assert_eq!(<i8 as SaturatingSub>::saturating_sub(-120, 20), i8::MIN);
+    assert_eq!(<u8 as SaturatingMul>::saturating_mul(40, 10), u8::MAX);
+    assert_eq!(<u8 as SaturatingDiv>::saturating_div(10, 2), 5);
+    assert_eq!(<i8 as SaturatingNeg>::saturating_neg(1), -1);
+    assert_eq!(<i8 as SaturatingNeg>::saturating_neg(i8::MIN), i8::MAX);
+
+    assert_eq!(<u8 as WrappingAdd>::wrapping_add(255, 1), 0);
+    assert_eq!(<u8 as WrappingSub>::wrapping_sub(0, 1), u8::MAX);
+    assert_eq!(<u8 as WrappingMul>::wrapping_mul(200, 2), 144);
+    assert_eq!(<u8 as WrappingDiv>::wrapping_div(10, 2), 5);
+    assert_eq!(<u8 as WrappingRem>::wrapping_rem(10, 3), 1);
+    assert_eq!(<i8 as WrappingNeg>::wrapping_neg(1), -1);
+    assert_eq!(<i8 as WrappingNeg>::wrapping_neg(i8::MIN), i8::MIN);
+
+    assert_eq!(<u8 as CheckedAdd>::checked_add(250, 10), None);
+    assert_eq!(<u8 as CheckedAdd>::checked_add(10, 20), Some(30));
+    assert_eq!(<u8 as CheckedSub>::checked_sub(0, 1), None);
+    assert_eq!(<u8 as CheckedSub>::checked_sub(10, 3), Some(7));
+    assert_eq!(<u8 as CheckedMul>::checked_mul(20, 20), None);
+    assert_eq!(<u8 as CheckedMul>::checked_mul(10, 20), Some(200));
+    assert_eq!(<u8 as CheckedDiv>::checked_div(10, 0), None);
+    assert_eq!(<u8 as CheckedDiv>::checked_div(10, 2), Some(5));
+    assert_eq!(<u8 as CheckedRem>::checked_rem(10, 0), None);
+    assert_eq!(<u8 as CheckedRem>::checked_rem(10, 3), Some(1));
+    assert_eq!(<i8 as CheckedNeg>::checked_neg(0), Some(0));
+    assert_eq!(<i8 as CheckedNeg>::checked_neg(5), Some(-5));
+    assert_eq!(<i8 as CheckedNeg>::checked_neg(i8::MIN), None);
 }
 
 #[test]

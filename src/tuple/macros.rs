@@ -16,9 +16,9 @@ macro_rules! impl_tuple_unary_op {
 
 macro_rules! impl_tuple_binary_op {
 	($trait:ident, $method:ident, $op:tt) => {
-		impl<T, const N: usize> core::ops::$trait for $crate::tuple::Tuple<T, N>
+		impl<T, const N: usize> $trait for $crate::tuple::Tuple<T, N>
 		where
-			T: core::ops::$trait<Output = T> + Copy,
+			T: $trait<Output = T> + Copy,
 		{
 			type Output = Self;
 
@@ -30,9 +30,9 @@ macro_rules! impl_tuple_binary_op {
 	};
 
 	($trait:ident<$rhs:ty>, $method:ident, $op:tt) => {
-		impl<T, const N: usize> core::ops::$trait<$rhs> for $crate::tuple::Tuple<T, N>
+		impl<T, const N: usize> $trait<$rhs> for $crate::tuple::Tuple<T, N>
 		where
-			T: core::ops::$trait<$rhs, Output = T> + Copy,
+			T: $trait<$rhs, Output = T> + Copy,
 			$rhs: Copy,
 		{
 			type Output = Self;
@@ -47,9 +47,9 @@ macro_rules! impl_tuple_binary_op {
 
 macro_rules! impl_tuple_assign_op {
 	($trait:ident, $method:ident, $op:tt) => {
-		impl<T, const N: usize> core::ops::$trait for $crate::tuple::Tuple<T, N>
+		impl<T, const N: usize> $trait for $crate::tuple::Tuple<T, N>
 		where
-			T: core::ops::$trait + Copy,
+			T: $trait + Copy,
 		{
 			#[inline]
 			fn $method(&mut self, rhs: Self) {
@@ -61,9 +61,9 @@ macro_rules! impl_tuple_assign_op {
 	};
 
 	($trait:ident<$rhs:ty>, $method:ident, $op:tt) => {
-		impl<T, const N: usize> core::ops::$trait<$rhs> for $crate::tuple::Tuple<T, N>
+		impl<T, const N: usize> $trait<$rhs> for $crate::tuple::Tuple<T, N>
 		where
-			T: core::ops::$trait<$rhs> + Copy,
+			T: $trait<$rhs> + Copy,
 			$rhs: Copy,
 		{
 			#[inline]
