@@ -6,11 +6,11 @@ use alloc::{
 };
 
 use crate::{
-    algebra::{
-        Cast, CastError, CastFrom, LossyCast, LossyCastFrom, SaturatingCast, SaturatingCastFrom,
-        TryCast, TryCastFrom, TryExactCast, TryExactCastFrom,
+    numeric::{
+        Abs, BoundedMax, BoundedMin, Cast, CastError, CastFrom, Infinite, IsFinite, LossyCast,
+        LossyCastFrom, MinMax, Nan, SaturatingCast, SaturatingCastFrom, TryCast, TryCastFrom,
+        TryExactCast, TryExactCastFrom,
     },
-    numeric::{Abs, BoundedMax, BoundedMin, Infinite, IsFinite, MinMax, Nan},
     tuple::{Tuple, TupleLike},
 };
 

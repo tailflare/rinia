@@ -3,12 +3,13 @@
 use alloc::vec::Vec;
 
 use crate::{
-    algebra::{
-        Cast, CastFrom, Dot, Length, LengthSquared, Lerp, LossyCast, LossyCastFrom, Normalize,
-        SaturatingCast, SaturatingCastFrom, TryCast, TryCastFrom, TryExactCast, TryExactCastFrom,
-    },
+    algebra::{Dot, Length, LengthSquared, Lerp, Normalize},
     approx_eql_abs, approx_eql_abs_tol, approx_eql_rel, approx_eql_rel_tol,
-    numeric::{Abs, Infinite, IsFinite, IsZero, MinMax, Nan, Negate, One, Zero},
+    numeric::{
+        Abs, Cast, CastFrom, Infinite, IsFinite, IsZero, LossyCast, LossyCastFrom, MinMax, Nan,
+        Negate, One, SaturatingCast, SaturatingCastFrom, TryCast, TryCastFrom, TryExactCast,
+        TryExactCastFrom, Zero,
+    },
     tuple::{Tuple, TupleLike},
     vector::{Vec2, Vec3, Vec4, Vector},
 };

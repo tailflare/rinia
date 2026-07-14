@@ -55,6 +55,29 @@ pub trait SaturatingCastFrom<T> {
     fn saturating_cast_from(value: T) -> Self;
 }
 
+/// A trait which represents a cast from one type to the corresponding signed type.
+pub trait SignedCast<T> {
+    /// Casts `self` to type `T`, which is the signed equivalent of the original type.
+    fn signed_cast(self) -> T;
+}
+
+/// A trait which represents a cast into `Self` from another type that is the corresponding signed type.
+pub trait SignedCastFrom<T> {
+    /// Casts `value` to type `Self`, which is the signed equivalent of the original type.
+    fn signed_cast_from(value: T) -> Self;
+}
+
+/// A trait which represents a cast from one type to the corresponding unsigned type.
+pub trait UnsignedCast<T> {
+    /// Casts `self` to type `T`, which is the unsigned equivalent of the original type.
+    fn unsigned_cast(self) -> T;
+}
+
+pub trait UnsignedCastFrom<T> {
+    /// Casts `value` to type `Self`, which is the unsigned equivalent of the original type.
+    fn unsigned_cast_from(value: T) -> Self;
+}
+
 /// A trait which represents a fallible cast that preserves the value exactly.
 ///
 /// The conversion succeeds only when the value can be represented exactly
@@ -144,6 +167,26 @@ where
     #[inline]
     fn saturating_cast_from(value: T) -> Self {
         value.saturating_cast()
+    }
+}
+
+impl<T, U> SignedCastFrom<T> for U
+where
+    T: SignedCast<U>,
+{
+    #[inline]
+    fn signed_cast_from(value: T) -> Self {
+        value.signed_cast()
+    }
+}
+
+impl<T, U> UnsignedCastFrom<T> for U
+where
+    T: UnsignedCast<U>,
+{
+    #[inline]
+    fn unsigned_cast_from(value: T) -> Self {
+        value.unsigned_cast()
     }
 }
 

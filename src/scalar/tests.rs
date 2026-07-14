@@ -1,18 +1,17 @@
 #![cfg(test)]
 
 use crate::{
-    algebra::{
-        ApproxEqAbs, ApproxEqRel, Cast, CastError, CastFrom, Lerp, LossyCast, LossyCastFrom,
-        SaturatingCast, SaturatingCastFrom, TryCast, TryCastFrom, TryExactCast, TryExactCastFrom,
-    },
+    algebra::{ApproxEqAbs, ApproxEqRel, Lerp},
     approx_eql_abs, approx_eql_abs_tol, approx_eql_rel, approx_eql_rel_tol,
     numeric::{
-        Abs, BoundedMax, BoundedMin, Cbrt, Ceil, CheckedAdd, CheckedDiv, CheckedMul, CheckedNeg,
-        CheckedRem, CheckedSub, Exponential, Floor, Fract, Half, Hyperbolic, Hypot, Infinite,
-        IsFinite, IsInfinite, IsNan, IsZero, MinMax, MulAdd, Nan, NegOne, One, Power, Round,
-        Rounding, SaturatingAdd, SaturatingDiv, SaturatingMul, SaturatingNeg, SaturatingSub, Sqrt,
-        Trigonometry, Trunc, Two, WrappingAdd, WrappingDiv, WrappingMul, WrappingNeg, WrappingRem,
-        WrappingSub, Zero,
+        Abs, BoundedMax, BoundedMin, Cast, CastError, CastFrom, Cbrt, Ceil, CheckedAdd, CheckedDiv,
+        CheckedMul, CheckedNeg, CheckedRem, CheckedSub, Exponential, Floor, Fract, Half,
+        Hyperbolic, Hypot, Infinite, IsFinite, IsInfinite, IsNan, IsZero, LossyCast, LossyCastFrom,
+        MinMax, MulAdd, Nan, NegOne, One, Power, Round, Rounding, SaturatingAdd, SaturatingCast,
+        SaturatingCastFrom, SaturatingDiv, SaturatingMul, SaturatingNeg, SaturatingSub, SignedCast,
+        SignedCastFrom, Sqrt, Trigonometry, Trunc, TryCast, TryCastFrom, TryExactCast,
+        TryExactCastFrom, Two, UnsignedCast, UnsignedCastFrom, WrappingAdd, WrappingDiv,
+        WrappingMul, WrappingNeg, WrappingRem, WrappingSub, Zero,
     },
     scalar::{Float, Int, Scalar, Signed, SignedInt, Unsigned, UnsignedInt},
 };
@@ -296,6 +295,38 @@ fn lerp_surface() {
 }
 
 #[test]
+fn arithmetic_traits_surface() {
+    assert_eq!(<u8 as SaturatingAdd>::saturating_add(250, 10), u8::MAX);
+    assert_eq!(<i8 as SaturatingSub>::saturating_sub(-120, 20), i8::MIN);
+    assert_eq!(<u8 as SaturatingMul>::saturating_mul(40, 10), u8::MAX);
+    assert_eq!(<u8 as SaturatingDiv>::saturating_div(10, 2), 5);
+    assert_eq!(<i8 as SaturatingNeg>::saturating_neg(1), -1);
+    assert_eq!(<i8 as SaturatingNeg>::saturating_neg(i8::MIN), i8::MAX);
+
+    assert_eq!(<u8 as WrappingAdd>::wrapping_add(255, 1), 0);
+    assert_eq!(<u8 as WrappingSub>::wrapping_sub(0, 1), u8::MAX);
+    assert_eq!(<u8 as WrappingMul>::wrapping_mul(200, 2), 144);
+    assert_eq!(<u8 as WrappingDiv>::wrapping_div(10, 2), 5);
+    assert_eq!(<u8 as WrappingRem>::wrapping_rem(10, 3), 1);
+    assert_eq!(<i8 as WrappingNeg>::wrapping_neg(1), -1);
+    assert_eq!(<i8 as WrappingNeg>::wrapping_neg(i8::MIN), i8::MIN);
+
+    assert_eq!(<u8 as CheckedAdd>::checked_add(250, 10), None);
+    assert_eq!(<u8 as CheckedAdd>::checked_add(10, 20), Some(30));
+    assert_eq!(<u8 as CheckedSub>::checked_sub(0, 1), None);
+    assert_eq!(<u8 as CheckedSub>::checked_sub(10, 3), Some(7));
+    assert_eq!(<u8 as CheckedMul>::checked_mul(20, 20), None);
+    assert_eq!(<u8 as CheckedMul>::checked_mul(10, 20), Some(200));
+    assert_eq!(<u8 as CheckedDiv>::checked_div(10, 0), None);
+    assert_eq!(<u8 as CheckedDiv>::checked_div(10, 2), Some(5));
+    assert_eq!(<u8 as CheckedRem>::checked_rem(10, 0), None);
+    assert_eq!(<u8 as CheckedRem>::checked_rem(10, 3), Some(1));
+    assert_eq!(<i8 as CheckedNeg>::checked_neg(0), Some(0));
+    assert_eq!(<i8 as CheckedNeg>::checked_neg(5), Some(-5));
+    assert_eq!(<i8 as CheckedNeg>::checked_neg(i8::MIN), None);
+}
+
+#[test]
 fn cast_surface() {
     // Identity casts
     assert_eq!(<i32 as Cast<i32>>::cast(42), 42_i32);
@@ -413,35 +444,11 @@ fn saturating_cast_surface() {
 }
 
 #[test]
-fn arithmetic_traits_surface() {
-    assert_eq!(<u8 as SaturatingAdd>::saturating_add(250, 10), u8::MAX);
-    assert_eq!(<i8 as SaturatingSub>::saturating_sub(-120, 20), i8::MIN);
-    assert_eq!(<u8 as SaturatingMul>::saturating_mul(40, 10), u8::MAX);
-    assert_eq!(<u8 as SaturatingDiv>::saturating_div(10, 2), 5);
-    assert_eq!(<i8 as SaturatingNeg>::saturating_neg(1), -1);
-    assert_eq!(<i8 as SaturatingNeg>::saturating_neg(i8::MIN), i8::MAX);
-
-    assert_eq!(<u8 as WrappingAdd>::wrapping_add(255, 1), 0);
-    assert_eq!(<u8 as WrappingSub>::wrapping_sub(0, 1), u8::MAX);
-    assert_eq!(<u8 as WrappingMul>::wrapping_mul(200, 2), 144);
-    assert_eq!(<u8 as WrappingDiv>::wrapping_div(10, 2), 5);
-    assert_eq!(<u8 as WrappingRem>::wrapping_rem(10, 3), 1);
-    assert_eq!(<i8 as WrappingNeg>::wrapping_neg(1), -1);
-    assert_eq!(<i8 as WrappingNeg>::wrapping_neg(i8::MIN), i8::MIN);
-
-    assert_eq!(<u8 as CheckedAdd>::checked_add(250, 10), None);
-    assert_eq!(<u8 as CheckedAdd>::checked_add(10, 20), Some(30));
-    assert_eq!(<u8 as CheckedSub>::checked_sub(0, 1), None);
-    assert_eq!(<u8 as CheckedSub>::checked_sub(10, 3), Some(7));
-    assert_eq!(<u8 as CheckedMul>::checked_mul(20, 20), None);
-    assert_eq!(<u8 as CheckedMul>::checked_mul(10, 20), Some(200));
-    assert_eq!(<u8 as CheckedDiv>::checked_div(10, 0), None);
-    assert_eq!(<u8 as CheckedDiv>::checked_div(10, 2), Some(5));
-    assert_eq!(<u8 as CheckedRem>::checked_rem(10, 0), None);
-    assert_eq!(<u8 as CheckedRem>::checked_rem(10, 3), Some(1));
-    assert_eq!(<i8 as CheckedNeg>::checked_neg(0), Some(0));
-    assert_eq!(<i8 as CheckedNeg>::checked_neg(5), Some(-5));
-    assert_eq!(<i8 as CheckedNeg>::checked_neg(i8::MIN), None);
+fn signed_unsigned_cast_surface() {
+    assert_eq!(<u8 as SignedCast<i8>>::signed_cast(255_u8), -1_i8);
+    assert_eq!(<usize as SignedCast<isize>>::signed_cast(42_usize), 42_isize);
+    assert_eq!(<i8 as UnsignedCast<u8>>::unsigned_cast(-1_i8), 255_u8);
+    assert_eq!(<isize as UnsignedCast<usize>>::unsigned_cast(42_isize), 42_usize);
 }
 
 #[test]
@@ -542,6 +549,8 @@ fn from_cast_variants_surface() {
     assert_eq!(<u32 as CastFrom<u8>>::cast_from(255_u8), 255_u32);
     assert_eq!(<u8 as LossyCastFrom<i32>>::lossy_cast_from(300_i32), 44_u8);
     assert_eq!(<u8 as SaturatingCastFrom<u32>>::saturating_cast_from(300_u32), u8::MAX);
+    assert_eq!(<i8 as SignedCastFrom<u8>>::signed_cast_from(255_u8), -1_i8);
+    assert_eq!(<u8 as UnsignedCastFrom<i8>>::unsigned_cast_from(-1_i8), 255_u8);
     assert_eq!(<u8 as TryCastFrom<i32>>::try_cast_from(255_i32), Ok(255_u8));
     assert_eq!(
         <f32 as TryExactCastFrom<i32>>::try_exact_cast_from(16_777_217_i32),

@@ -1,5 +1,5 @@
 use crate::{
-    algebra::{Cast, CastError, LossyCast, SaturatingCast, TryCast, TryExactCast},
+    numeric::{Cast, CastError, LossyCast, SaturatingCast, TryCast, TryExactCast},
     tuple::Tuple,
 };
 

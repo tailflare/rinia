@@ -174,6 +174,38 @@ scalar::impl_scalar_saturating_cast_float_to_float!(
     f64 => [f32, f64]
 );
 
+// Impl unsigned cast for all integer types to their corresponding unsigned equivalent types.
+scalar::impl_scalar_unsigned_cast!(
+    usize => usize,
+    isize => usize,
+    u8 => u8,
+    u16 => u16,
+    u32 => u32,
+    u64 => u64,
+    u128 => u128,
+    i8 => u8,
+    i16 => u16,
+    i32 => u32,
+    i64 => u64,
+    i128 => u128
+);
+
+// Impl signed cast for all integer types to their corresponding signed equivalent types.
+scalar::impl_scalar_signed_cast!(
+    usize => isize,
+    isize => isize,
+    u8 => i8,
+    u16 => i16,
+    u32 => i32,
+    u64 => i64,
+    u128 => i128,
+    i8 => i8,
+    i16 => i16,
+    i32 => i32,
+    i64 => i64,
+    i128 => i128
+);
+
 // Impl TryCast for int to int
 scalar::impl_scalar_try_cast_int_to_int!(
     usize => [usize, isize, u8, u16, u32, u64, u128, i8, i16, i32, i64, i128],
