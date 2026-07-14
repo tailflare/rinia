@@ -4,7 +4,8 @@ use alloc::vec::Vec;
 
 use crate::{
     algebra::{Dot, Length, LengthSquared, Lerp, Normalize},
-    approx_eql_abs, approx_eql_abs_tol, approx_eql_rel, approx_eql_rel_tol,
+    approx_eql_abs, approx_eql_abs_tol, approx_eql_rel, approx_eql_rel_tol, assert_approx_eql_abs,
+    assert_approx_eql_abs_tol, assert_approx_eql_rel, assert_approx_eql_rel_tol,
     numeric::{
         Abs, Cast, CastFrom, Infinite, IsFinite, IsZero, LossyCast, LossyCastFrom, MinMax, Nan,
         Negate, One, SaturatingCast, SaturatingCastFrom, TryCast, TryCastFrom, TryExactCast,
@@ -251,13 +252,13 @@ fn approx_eq_abs_surface() {
     let b = Vector::<f32, 3>::from_array([1.0 + 5e-7, 2.0 - 5e-7, 3.0 + 5e-7]);
     let c = Vector::<f32, 3>::from_array([1.0 + 2e-4, 2.0, 3.0]);
 
-    assert!(approx_eql_abs!(a, b));
+    assert_approx_eql_abs!(a, b);
     assert!(!approx_eql_abs!(a, c));
 
-    assert!(approx_eql_abs_tol!(a, b, 1e-6));
+    assert_approx_eql_abs_tol!(a, b, 1e-6);
     assert!(!approx_eql_abs_tol!(a, c, 1e-6));
 
-    assert!(approx_eql_abs!(a, b));
+    assert_approx_eql_abs!(a, b);
     assert!(!approx_eql_abs!(a, c));
 }
 
@@ -267,13 +268,13 @@ fn approx_eq_rel_surface() {
     let b = Vector::<f32, 3>::from_array([10.0 + 5e-5, 20.0 - 5e-5, 30.0 + 5e-5]);
     let c = Vector::<f32, 3>::from_array([10.0 + 5e-2, 20.0, 30.0]);
 
-    assert!(approx_eql_rel!(a, b));
+    assert_approx_eql_rel!(a, b);
     assert!(!approx_eql_rel!(a, c));
 
-    assert!(approx_eql_rel_tol!(a, b, 1e-4));
+    assert_approx_eql_rel_tol!(a, b, 1e-4);
     assert!(!approx_eql_rel_tol!(a, c, 1e-4));
 
-    assert!(approx_eql_rel!(a, b));
+    assert_approx_eql_rel!(a, b);
     assert!(!approx_eql_rel!(a, c));
 }
 
@@ -290,19 +291,19 @@ fn dot_surface() {
 fn length_and_normalize_surface() {
     let v = Vector::<f32, 2>::from_array([3.0, 4.0]);
 
-    assert!(approx_eql_abs_tol!(v.length_squared(), 25.0, 1e-6));
-    assert!(approx_eql_abs_tol!(<Vector<f32, 2> as LengthSquared>::length_squared(v), 25.0, 1e-6));
+    assert_approx_eql_abs_tol!(v.length_squared(), 25.0, 1e-6);
+    assert_approx_eql_abs_tol!(<Vector<f32, 2> as LengthSquared>::length_squared(v), 25.0, 1e-6);
 
-    assert!(approx_eql_abs_tol!(v.length(), 5.0, 1e-6));
-    assert!(approx_eql_abs_tol!(<Vector<f32, 2> as Length>::length(v), 5.0, 1e-6));
+    assert_approx_eql_abs_tol!(v.length(), 5.0, 1e-6);
+    assert_approx_eql_abs_tol!(<Vector<f32, 2> as Length>::length(v), 5.0, 1e-6);
 
     let n = v.normalize();
     let nt = <Vector<f32, 2> as Normalize>::normalize(v);
 
-    assert!(approx_eql_abs_tol!(n.length(), 1.0, 1e-6));
-    assert!(approx_eql_abs_tol!(nt.length(), 1.0, 1e-6));
-    assert!(approx_eql_abs_tol!(n, Vector::from_array([0.6, 0.8]), 1e-6));
-    assert!(approx_eql_abs_tol!(nt, Vector::from_array([0.6, 0.8]), 1e-6));
+    assert_approx_eql_abs_tol!(n.length(), 1.0, 1e-6);
+    assert_approx_eql_abs_tol!(nt.length(), 1.0, 1e-6);
+    assert_approx_eql_abs_tol!(n, Vector::from_array([0.6, 0.8]), 1e-6);
+    assert_approx_eql_abs_tol!(nt, Vector::from_array([0.6, 0.8]), 1e-6);
 
     let a = Vector::<i32, 3>::from_array([1, 2, 3]);
     assert_eq!(a.negate().into_array(), [-1, -2, -3]);
@@ -318,9 +319,9 @@ fn lerp_surface() {
     let trait_path = <Vector<f32, 3> as Lerp>::lerp(a, b, 0.25);
     let expected = Vector::<f32, 3>::from_array([2.5, 12.5, 22.5]);
 
-    assert!(approx_eql_abs_tol!(inherent, expected, 1e-6));
-    assert!(approx_eql_abs_tol!(trait_path, expected, 1e-6));
-    assert!(approx_eql_abs_tol!(inherent, trait_path, 1e-6));
+    assert_approx_eql_abs_tol!(inherent, expected, 1e-6);
+    assert_approx_eql_abs_tol!(trait_path, expected, 1e-6);
+    assert_approx_eql_abs_tol!(inherent, trait_path, 1e-6);
 }
 
 #[cfg(feature = "bytemuck")]
@@ -384,8 +385,8 @@ fn minmax_surface() {
     let min_f = af.min(bf);
     let max_f = af.max(bf);
 
-    assert!(approx_eql_abs_tol!(min_f, Vector::<f32, 2>::from_array([3.3, 2.2]), 1e-6));
-    assert!(approx_eql_abs_tol!(max_f, Vector::<f32, 2>::from_array([5.5, 7.7]), 1e-6));
+    assert_approx_eql_abs_tol!(min_f, Vector::<f32, 2>::from_array([3.3, 2.2]), 1e-6);
+    assert_approx_eql_abs_tol!(max_f, Vector::<f32, 2>::from_array([5.5, 7.7]), 1e-6);
 }
 
 #[test]
@@ -423,7 +424,7 @@ fn abs_surface() {
 
     let nf = Vector::<f32, 2>::from_array([-1.5, 2.5]);
     let abs_f = nf.abs();
-    assert!(approx_eql_abs_tol!(abs_f, Vector::<f32, 2>::from_array([1.5, 2.5]), 1e-6));
+    assert_approx_eql_abs_tol!(abs_f, Vector::<f32, 2>::from_array([1.5, 2.5]), 1e-6);
 }
 
 #[test]
@@ -480,19 +481,19 @@ fn cross_product_surface() {
     let a = Vec3::new(1_f32, 2.0, 3.0);
     let b = Vec3::new(4_f32, 5.0, 6.0);
     let cross = a.cross(b);
-    assert!(approx_eql_abs_tol!(cross, Vec3::new(-3.0, 6.0, -3.0), 1e-6));
+    assert_approx_eql_abs_tol!(cross, Vec3::new(-3.0, 6.0, -3.0), 1e-6);
 
     // Standard basis vectors cross products
     let x = Vec3::new(1_f32, 0.0, 0.0);
     let y = Vec3::new(0_f32, 1.0, 0.0);
     let z = Vec3::new(0_f32, 0.0, 1.0);
 
-    assert!(approx_eql_abs_tol!(x.cross(y), z, 1e-6));
-    assert!(approx_eql_abs_tol!(y.cross(z), x, 1e-6));
-    assert!(approx_eql_abs_tol!(z.cross(x), y, 1e-6));
+    assert_approx_eql_abs_tol!(x.cross(y), z, 1e-6);
+    assert_approx_eql_abs_tol!(y.cross(z), x, 1e-6);
+    assert_approx_eql_abs_tol!(z.cross(x), y, 1e-6);
 
     // Anti-commutativity: a × b = -(b × a)
     let result1 = a.cross(b);
     let result2 = b.cross(a);
-    assert!(approx_eql_abs_tol!(result1, -result2, 1e-6));
+    assert_approx_eql_abs_tol!(result1, -result2, 1e-6);
 }
