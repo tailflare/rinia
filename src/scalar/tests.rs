@@ -396,22 +396,35 @@ fn lossy_cast_surface() {
 #[test]
 fn saturating_cast_surface() {
     // unsigned -> unsigned
+    assert_eq!(<u32 as SaturatingCast<u32>>::saturating_cast(42), 42);
     assert_eq!(<u32 as SaturatingCast<u8>>::saturating_cast(0), 0_u8);
     assert_eq!(<u32 as SaturatingCast<u8>>::saturating_cast(255), 255_u8);
     assert_eq!(<u32 as SaturatingCast<u8>>::saturating_cast(256), u8::MAX);
+    assert_eq!(<u8 as SaturatingCast<u64>>::saturating_cast(255), 255_u64);
+    assert_eq!(<u32 as SaturatingCast<u64>>::saturating_cast(u32::MAX), u32::MAX as u64);
 
     // signed -> signed
+    assert_eq!(<i32 as SaturatingCast<i32>>::saturating_cast(-5), -5);
     assert_eq!(<i32 as SaturatingCast<i8>>::saturating_cast(-200), i8::MIN);
     assert_eq!(<i32 as SaturatingCast<i8>>::saturating_cast(-128), -128_i8);
     assert_eq!(<i32 as SaturatingCast<i8>>::saturating_cast(127), 127_i8);
     assert_eq!(<i32 as SaturatingCast<i8>>::saturating_cast(200), i8::MAX);
+    assert_eq!(<i8 as SaturatingCast<i64>>::saturating_cast(-128), -128_i64);
+    assert_eq!(<i16 as SaturatingCast<i64>>::saturating_cast(i16::MIN), i16::MIN as i64);
 
     // unsigned -> signed
+    assert_eq!(<u8 as SaturatingCast<i16>>::saturating_cast(255), 255_i16);
+    assert_eq!(<u16 as SaturatingCast<i32>>::saturating_cast(u16::MAX), u16::MAX as i32);
+    assert_eq!(<u32 as SaturatingCast<i32>>::saturating_cast(i32::MAX as u32 + 1), i32::MAX);
     assert_eq!(<u32 as SaturatingCast<i16>>::saturating_cast(0), 0_i16);
     assert_eq!(<u32 as SaturatingCast<i16>>::saturating_cast(i16::MAX as u32), i16::MAX);
     assert_eq!(<u32 as SaturatingCast<i16>>::saturating_cast((i16::MAX as u32) + 1), i16::MAX);
 
     // signed -> unsigned
+    assert_eq!(<i8 as SaturatingCast<u16>>::saturating_cast(-1), 0_u16);
+    assert_eq!(<i8 as SaturatingCast<u16>>::saturating_cast(127), 127_u16);
+    assert_eq!(<i32 as SaturatingCast<u32>>::saturating_cast(i32::MAX), i32::MAX as u32);
+    assert_eq!(<i32 as SaturatingCast<u32>>::saturating_cast(-10), 0_u32);
     assert_eq!(<i32 as SaturatingCast<u16>>::saturating_cast(-100), u16::MIN);
     assert_eq!(<i32 as SaturatingCast<u16>>::saturating_cast(0), 0_u16);
     assert_eq!(<i32 as SaturatingCast<u16>>::saturating_cast(u16::MAX as i32), u16::MAX);

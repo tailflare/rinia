@@ -36,7 +36,22 @@ macro_rules! impl_scalar_lossy_casts {
     };
 }
 
-macro_rules! impl_scalar_saturating_cast_unsigned_to_unsigned {
+macro_rules! impl_scalar_saturating_cast_unsigned_to_unsigned_wide {
+    ($($src:ty => [$($dst:ty),* $(,)?]),* $(,)?) => {
+        $(
+            $(
+                impl $crate::numeric::SaturatingCast<$dst> for $src {
+                    #[inline]
+                    fn saturating_cast(self) -> $dst {
+                        self as $dst
+                    }
+                }
+            )*
+        )*
+    };
+}
+
+macro_rules! impl_scalar_saturating_cast_unsigned_to_unsigned_narrow {
     ($($src:ty => [$($dst:ty),* $(,)?]),* $(,)?) => {
         $(
             $(
@@ -55,7 +70,7 @@ macro_rules! impl_scalar_saturating_cast_unsigned_to_unsigned {
     };
 }
 
-macro_rules! impl_scalar_saturating_cast_signed_to_signed {
+macro_rules! impl_scalar_saturating_cast_signed_to_signed_narrow {
     ($($src:ty => [$($dst:ty),* $(,)?]),* $(,)?) => {
         $(
             $(
@@ -69,6 +84,21 @@ macro_rules! impl_scalar_saturating_cast_signed_to_signed {
                         } else {
                             self as $dst
                         }
+                    }
+                }
+            )*
+        )*
+    };
+}
+
+macro_rules! impl_scalar_saturating_cast_signed_to_signed_wide {
+    ($($src:ty => [$($dst:ty),* $(,)?]),* $(,)?) => {
+        $(
+            $(
+                impl $crate::numeric::SaturatingCast<$dst> for $src {
+                    #[inline]
+                    fn saturating_cast(self) -> $dst {
+                        self as $dst
                     }
                 }
             )*
@@ -95,7 +125,26 @@ macro_rules! impl_scalar_saturating_cast_unsigned_to_signed {
     };
 }
 
-macro_rules! impl_scalar_saturating_cast_signed_to_unsigned {
+macro_rules! impl_scalar_saturating_cast_signed_to_unsigned_wide {
+    ($($src:ty => [$($dst:ty),* $(,)?]),* $(,)?) => {
+        $(
+            $(
+                impl $crate::numeric::SaturatingCast<$dst> for $src {
+                    #[inline]
+                    fn saturating_cast(self) -> $dst {
+                        if self < 0 {
+                            0
+                        } else {
+                            self as $dst
+                        }
+                    }
+                }
+            )*
+        )*
+    };
+}
+
+macro_rules! impl_scalar_saturating_cast_signed_to_unsigned_narrow {
     ($($src:ty => [$($dst:ty),* $(,)?]),* $(,)?) => {
         $(
             $(
@@ -342,10 +391,13 @@ pub(crate) use impl_scalar_lossy_casts;
 pub(crate) use impl_scalar_saturating_cast_float_to_float;
 pub(crate) use impl_scalar_saturating_cast_float_to_int;
 pub(crate) use impl_scalar_saturating_cast_int_to_float;
-pub(crate) use impl_scalar_saturating_cast_signed_to_signed;
-pub(crate) use impl_scalar_saturating_cast_signed_to_unsigned;
+pub(crate) use impl_scalar_saturating_cast_signed_to_signed_narrow;
+pub(crate) use impl_scalar_saturating_cast_signed_to_signed_wide;
+pub(crate) use impl_scalar_saturating_cast_signed_to_unsigned_narrow;
+pub(crate) use impl_scalar_saturating_cast_signed_to_unsigned_wide;
 pub(crate) use impl_scalar_saturating_cast_unsigned_to_signed;
-pub(crate) use impl_scalar_saturating_cast_unsigned_to_unsigned;
+pub(crate) use impl_scalar_saturating_cast_unsigned_to_unsigned_narrow;
+pub(crate) use impl_scalar_saturating_cast_unsigned_to_unsigned_wide;
 pub(crate) use impl_scalar_signed_cast;
 pub(crate) use impl_scalar_try_cast_float_to_float;
 pub(crate) use impl_scalar_try_cast_float_to_int;
