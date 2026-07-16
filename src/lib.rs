@@ -19,7 +19,7 @@ pub mod vector;
 // Our surface-level re-exports
 pub use self::{
     quaternion::{Quat, Quatd, Quaternion, Quatf},
-    scalar::{Scalar, Scalard, Scalarf},
+    scalar::{Float, Int, Scalar, Scalard, Scalarf, Signed, SignedInt, Unsigned, UnsignedInt},
     vector::{Vec2, Vec2d, Vec2f, Vec3, Vec3d, Vec3f, Vec4, Vec4d, Vec4f, Vector},
 };
 
@@ -36,10 +36,7 @@ pub mod prelude {
         algebra::*,
         numeric::*,
         quaternion::{Quat, Quatd, Quaternion, Quatf},
-        scalar::{
-            Float, FloatOps, HasScalar, Int, Scalar, ScalarOps, Scalard, Scalarf, Signed,
-            SignedInt, SignedOps, Unsigned, UnsignedInt,
-        },
+        scalar::*,
         vector::{Vec2, Vec2d, Vec2f, Vec3, Vec3d, Vec3f, Vec4, Vec4d, Vec4f, Vector},
     };
 }
