@@ -38,9 +38,6 @@ where
     }
 }
 
-// Implement casts
-crate::impl_numeric_casts_transparent!([T], wrapper: Quaternion, Quaternion<T> => Quaternion<U>, item: T, field: data);
-
 // Bytemuck trait implementations for Quaternion<T>
 common::impl_bytemuck_basic!([T], Quaternion<T>, item: T);
 

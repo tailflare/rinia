@@ -3,6 +3,15 @@ use crate::{
     tuple::Tuple,
 };
 
+// Implement casts
+crate::impl_numeric_casts_transparent!(
+    [T, const N: usize],
+    wrapper: Tuple,
+    Tuple<T, N> => Tuple<U, N>,
+    item: T,
+    field: inner
+);
+
 // BoundedMin inherent
 impl<T, const N: usize> Tuple<T, N>
 where

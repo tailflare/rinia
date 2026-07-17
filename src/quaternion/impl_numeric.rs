@@ -6,6 +6,9 @@ use crate::{
     quaternion::Quaternion,
 };
 
+// Implement casts
+crate::impl_numeric_casts_transparent!([T], wrapper: Quaternion, Quaternion<T> => Quaternion<U>, item: T, field: data);
+
 // Zero inherent
 impl<T> Quaternion<T>
 where

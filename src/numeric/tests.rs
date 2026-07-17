@@ -13,8 +13,21 @@ struct Thick<T> {
     pub value2: T,
 }
 
+#[derive(Clone, Copy, Debug, PartialEq, Eq)]
+struct ThickConst<T, const N: usize> {
+    pub value1: T,
+    pub value2: T,
+}
+
 crate::impl_numeric_casts_transparent!(Thin<T>);
 crate::impl_numeric_casts_named_fields!(Thick<T>, [value1, value2]);
+crate::impl_numeric_casts_named_fields!(
+    [T, const N: usize],
+    wrapper: ThickConst,
+    ThickConst<T, N> => ThickConst<U, N>,
+    item: T,
+    fields: [value1, value2],
+);
 
 #[test]
 fn transparent_casts_inherent_surface() {
@@ -127,6 +140,59 @@ fn transparent_casts_named_fields_trait_surface() {
         value2: 1.5_f32,
     });
     assert_eq!(try_exact_err, Err(CastError::Fractional));
+}
+
+#[test]
+fn transparent_casts_named_fields_complex_form_surface() {
+    let src = ThickConst::<i32, 2> { value1: 7_i32, value2: 300_i32 };
+
+    let casted: ThickConst<i64, 2> = src.cast();
+    assert_eq!(casted, ThickConst { value1: 7_i64, value2: 300_i64 });
+    assert_eq!(
+        ThickConst::<i64, 2>::cast_from(ThickConst::<i32, 2> { value1: 7_i32, value2: 300_i32 }),
+        ThickConst { value1: 7_i64, value2: 300_i64 }
+    );
+
+    let lossy: ThickConst<u8, 2> = src.lossy_cast();
+    assert_eq!(lossy, ThickConst { value1: 7_u8, value2: 44_u8 });
+    assert_eq!(
+        ThickConst::<u8, 2>::lossy_cast_from(ThickConst::<i32, 2> {
+            value1: 7_i32,
+            value2: 300_i32
+        }),
+        ThickConst { value1: 7_u8, value2: 44_u8 }
+    );
+
+    let saturating: ThickConst<u8, 2> = src.saturating_cast();
+    assert_eq!(saturating, ThickConst { value1: 7_u8, value2: u8::MAX });
+    assert_eq!(
+        ThickConst::<u8, 2>::saturating_cast_from(ThickConst::<i32, 2> {
+            value1: 7_i32,
+            value2: 300_i32,
+        }),
+        ThickConst { value1: 7_u8, value2: u8::MAX }
+    );
+
+    let try_err: Result<ThickConst<u8, 2>, CastError> = src.try_cast();
+    assert_eq!(try_err, Err(CastError::OutOfRange));
+    assert_eq!(
+        ThickConst::<u8, 2>::try_cast_from(ThickConst::<i32, 2> { value1: 7_i32, value2: 300_i32 }),
+        Err(CastError::OutOfRange)
+    );
+
+    let try_exact_err: Result<ThickConst<i32, 2>, CastError> =
+        ThickConst::<f32, 2> { value1: 1.0_f32, value2: 1.5_f32 }.try_exact_cast();
+    assert_eq!(try_exact_err, Err(CastError::Fractional));
+    assert_eq!(
+        ThickConst::<i32, 2>::try_exact_cast_from(ThickConst::<f32, 2> {
+            value1: 1.0_f32,
+            value2: 1.5_f32,
+        }),
+        Err(CastError::Fractional)
+    );
+
+    let trait_casted = <ThickConst<i32, 2> as Cast<ThickConst<i64, 2>>>::cast(src);
+    assert_eq!(trait_casted, ThickConst { value1: 7_i64, value2: 300_i64 });
 }
 
 #[test]

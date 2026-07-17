@@ -325,6 +325,179 @@ macro_rules! impl_numeric_casts_transparent {
 
 #[macro_export]
 macro_rules! impl_numeric_casts_named_fields {
+    (
+        [$($impl_generics:tt)*],
+        wrapper: $wrapper:ident,
+        $outer:ty => $cast_outer:ty,
+        item: $item:ty,
+        fields: [$($field:ident),+ $(,)?]
+        $(,)?
+    ) => {
+        // Cast inherents
+        impl<$($impl_generics)*> $outer {
+            /// Returns a new value with the fields cast to type `U`.
+            #[inline]
+            pub fn cast<U>(self) -> $cast_outer
+            where
+                $item: $crate::numeric::Cast<U>,
+            {
+                $wrapper {
+                    $($field: $crate::numeric::Cast::cast(self.$field)),+
+                }
+            }
+
+            /// Casts `value` into `Self`.
+            #[inline]
+            pub fn cast_from<U>(value: $cast_outer) -> Self
+            where
+                U: $crate::numeric::Cast<$item>,
+            {
+                value.cast::<$item>()
+            }
+
+            /// Returns a new value with the fields lossy cast to type `U`.
+            #[inline]
+            pub fn lossy_cast<U>(self) -> $cast_outer
+            where
+                $item: $crate::numeric::LossyCast<U>,
+            {
+                $wrapper {
+                    $($field: $crate::numeric::LossyCast::lossy_cast(self.$field)),+
+                }
+            }
+
+            /// Lossy casts `value` into `Self`.
+            #[inline]
+            pub fn lossy_cast_from<U>(value: $cast_outer) -> Self
+            where
+                U: $crate::numeric::LossyCast<$item>,
+            {
+                value.lossy_cast::<$item>()
+            }
+
+            /// Returns a new value with the fields saturating cast to type `U`.
+            #[inline]
+            pub fn saturating_cast<U>(self) -> $cast_outer
+            where
+                $item: $crate::numeric::SaturatingCast<U>,
+            {
+                $wrapper {
+                    $($field: $crate::numeric::SaturatingCast::saturating_cast(self.$field)),+
+                }
+            }
+
+            /// Saturating casts `value` into `Self`.
+            #[inline]
+            pub fn saturating_cast_from<U>(value: $cast_outer) -> Self
+            where
+                U: $crate::numeric::SaturatingCast<$item>,
+            {
+                value.saturating_cast::<$item>()
+            }
+
+            /// Returns a new value with the fields try cast to type `U`.
+            #[inline]
+            pub fn try_cast<U>(self) -> Result<$cast_outer, $crate::numeric::CastError>
+            where
+                $item: $crate::numeric::TryCast<U>,
+            {
+                Ok($wrapper {
+                    $($field: $crate::numeric::TryCast::try_cast(self.$field)?),+
+                })
+            }
+
+            /// Try casts `value` into `Self`.
+            #[inline]
+            pub fn try_cast_from<U>(
+                value: $cast_outer,
+            ) -> Result<Self, $crate::numeric::CastError>
+            where
+                U: $crate::numeric::TryCast<$item>,
+            {
+                value.try_cast::<$item>()
+            }
+
+            /// Returns a new value with the fields try exact cast to type `U`.
+            #[inline]
+            pub fn try_exact_cast<U>(
+                self,
+            ) -> Result<$cast_outer, $crate::numeric::CastError>
+            where
+                $item: $crate::numeric::TryExactCast<U>,
+            {
+                Ok($wrapper {
+                    $($field: $crate::numeric::TryExactCast::try_exact_cast(self.$field)?),+
+                })
+            }
+
+            /// Try exact casts `value` into `Self`.
+            #[inline]
+            pub fn try_exact_cast_from<U>(
+                value: $cast_outer,
+            ) -> Result<Self, $crate::numeric::CastError>
+            where
+                U: $crate::numeric::TryExactCast<$item>,
+            {
+                value.try_exact_cast::<$item>()
+            }
+        }
+
+        // Cast trait
+        impl<$($impl_generics)*, U> $crate::numeric::Cast<$cast_outer> for $outer
+        where
+            $item: $crate::numeric::Cast<U>,
+        {
+            #[inline]
+            fn cast(self) -> $cast_outer {
+                <$outer>::cast::<U>(self)
+            }
+        }
+
+        // LossyCast trait
+        impl<$($impl_generics)*, U> $crate::numeric::LossyCast<$cast_outer> for $outer
+        where
+            $item: $crate::numeric::LossyCast<U>,
+        {
+            #[inline]
+            fn lossy_cast(self) -> $cast_outer {
+                <$outer>::lossy_cast::<U>(self)
+            }
+        }
+
+        // SaturatingCast trait
+        impl<$($impl_generics)*, U> $crate::numeric::SaturatingCast<$cast_outer> for $outer
+        where
+            $item: $crate::numeric::SaturatingCast<U>,
+        {
+            #[inline]
+            fn saturating_cast(self) -> $cast_outer {
+                <$outer>::saturating_cast::<U>(self)
+            }
+        }
+
+        // TryCast trait
+        impl<$($impl_generics)*, U> $crate::numeric::TryCast<$cast_outer> for $outer
+        where
+            $item: $crate::numeric::TryCast<U>,
+        {
+            #[inline]
+            fn try_cast(self) -> Result<$cast_outer, $crate::numeric::CastError> {
+                <$outer>::try_cast::<U>(self)
+            }
+        }
+
+        // TryExactCast trait
+        impl<$($impl_generics)*, U> $crate::numeric::TryExactCast<$cast_outer> for $outer
+        where
+            $item: $crate::numeric::TryExactCast<U>,
+        {
+            #[inline]
+            fn try_exact_cast(self) -> Result<$cast_outer, $crate::numeric::CastError> {
+                <$outer>::try_exact_cast::<U>(self)
+            }
+        }
+    };
+
     ($wrapper:ident<$t:ident>, [$($field:ident),+ $(,)?]) => {
         // Cast inherents
         impl<$t> $wrapper<$t> {
