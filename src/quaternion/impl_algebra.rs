@@ -271,7 +271,7 @@ where
         + NegOne
         + Clamp
         + PartialOrd
-        + ApproxEqAbs<Tolerance = T>,
+        + ApproxEqAbs,
 {
     /// Performs spherical linear interpolation between two quaternions.
     ///
@@ -335,7 +335,7 @@ where
         + Two
         + NegOne
         + Clamp
-        + ApproxEqAbs<Tolerance = T>,
+        + ApproxEqAbs,
 {
     /// Returns the rotation axis and angle.
     ///

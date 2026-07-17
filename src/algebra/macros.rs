@@ -13,6 +13,42 @@ macro_rules! impl_approx_eq_wrapper {
 		true $( && $crate::algebra::ApproxEqRel::approx_eq_rel_tol(&$lhs.$field, &$rhs.$field, $tol) )+
 	};
 
+	(@impl_inherent
+		[$($impl_generics:tt)*],
+		impl: $outer:ty,
+		item: $item:ident,
+		bounds: [$($bounds:tt)*],
+		trait: $trait_name:ident,
+		default_const: $default_const:ident,
+		method_tol: $method_tol:ident,
+		method_default: $method_default:ident,
+		body: |$lhs:ident, $rhs:ident, $tol:ident| $expr:expr
+	) => {
+		impl<$($impl_generics)*> $outer
+		where
+			$item: Copy
+				+ $crate::algebra::$trait_name
+				$($bounds)*
+		{
+			#[inline]
+			pub fn $method_tol(
+				&self,
+				other: &Self,
+				tol: <$item as $crate::algebra::$trait_name>::Tolerance,
+			) -> bool {
+				let $lhs = self;
+				let $rhs = other;
+				let $tol = tol;
+				$expr
+			}
+
+			#[inline]
+			pub fn $method_default(&self, other: &Self) -> bool {
+				self.$method_tol(other, <$item as $crate::algebra::$trait_name>::$default_const)
+			}
+		}
+	};
+
 	(@impl_trait
 		[$($impl_generics:tt)*],
 		impl: $outer:ty,
@@ -28,10 +64,10 @@ macro_rules! impl_approx_eq_wrapper {
 		impl<$($impl_generics)*> $crate::algebra::$trait_name for $outer
 		where
 			$item: Copy
-				+ $crate::algebra::$bound_trait<Tolerance = $item>
+				+ $crate::algebra::$bound_trait
 				$($bounds)*
 		{
-			type Tolerance = $item;
+			type Tolerance = <$item as $crate::algebra::$bound_trait>::Tolerance;
 			const $default_const: Self::Tolerance =
 				<$item as $crate::algebra::$default_from_trait>::$default_const;
 
@@ -53,56 +89,44 @@ macro_rules! impl_approx_eq_wrapper {
 		fields: [$($field:tt),+ $(,)?]
 	) => {
 		// ApproxEqAbs inherents
-		impl<$($impl_generics)*> $outer
-		where
-			$item: Copy
-				+ $crate::algebra::ApproxEqAbs<Tolerance = $item>
-				$($bounds)*
-		{
-			/// Checks if two values are approximately equal within a given absolute tolerance.
-			#[inline]
-			pub fn approx_eq_abs_tol(&self, other: &Self, tol: $item) -> bool {
-				$crate::impl_approx_eq_wrapper!(
-					@emit_cmp abs,
-					self,
-					other,
-					tol,
-					[$($field),+]
-				)
-			}
-
-			/// Checks if two values are approximately equal using the default absolute tolerance.
-			#[inline]
-			pub fn approx_eq_abs(&self, other: &Self) -> bool {
-				self.approx_eq_abs_tol(other, <$item as $crate::algebra::ApproxEqAbs>::DEFAULT_TOLERANCE_ABS)
-			}
-		}
+		$crate::impl_approx_eq_wrapper!(
+			@impl_inherent
+			[$($impl_generics)*],
+			impl: $outer,
+			item: $item,
+			bounds: [$($bounds)*],
+			trait: ApproxEqAbs,
+			default_const: DEFAULT_TOLERANCE_ABS,
+			method_tol: approx_eq_abs_tol,
+			method_default: approx_eq_abs,
+			body: |lhs, rhs, tol| $crate::impl_approx_eq_wrapper!(
+				@emit_cmp abs,
+				lhs,
+				rhs,
+				tol,
+				[$($field),+]
+			)
+		);
 
 		// ApproxEqRel inherents
-		impl<$($impl_generics)*> $outer
-		where
-			$item: Copy
-				+ $crate::algebra::ApproxEqRel<Tolerance = $item>
-				$($bounds)*
-		{
-			/// Checks if two values are approximately equal within a given relative tolerance.
-			#[inline]
-			pub fn approx_eq_rel_tol(&self, other: &Self, tol: $item) -> bool {
-				$crate::impl_approx_eq_wrapper!(
-					@emit_cmp rel,
-					self,
-					other,
-					tol,
-					[$($field),+]
-				)
-			}
-
-			/// Checks if two values are approximately equal using the default relative tolerance.
-			#[inline]
-			pub fn approx_eq_rel(&self, other: &Self) -> bool {
-				self.approx_eq_rel_tol(other, <$item as $crate::algebra::ApproxEqRel>::DEFAULT_TOLERANCE_REL)
-			}
-		}
+		$crate::impl_approx_eq_wrapper!(
+			@impl_inherent
+			[$($impl_generics)*],
+			impl: $outer,
+			item: $item,
+			bounds: [$($bounds)*],
+			trait: ApproxEqRel,
+			default_const: DEFAULT_TOLERANCE_REL,
+			method_tol: approx_eq_rel_tol,
+			method_default: approx_eq_rel,
+			body: |lhs, rhs, tol| $crate::impl_approx_eq_wrapper!(
+				@emit_cmp rel,
+				lhs,
+				rhs,
+				tol,
+				[$($field),+]
+			)
+		);
 
 		// ApproxEqAbs trait
 		$crate::impl_approx_eq_wrapper!(
@@ -156,50 +180,32 @@ macro_rules! impl_approx_eq_wrapper {
 		compare_rel: |$rel_lhs:ident, $rel_rhs:ident, $rel_tol:ident| $rel_expr:expr
 	) => {
 		// ApproxEqAbs inherents
-		impl<$($impl_generics)*> $outer
-		where
-			$item: Copy
-				+ $crate::algebra::ApproxEqAbs<Tolerance = $item>
-				$($bounds)*
-		{
-			/// Checks if two values are approximately equal within a given absolute tolerance.
-			#[inline]
-			pub fn approx_eq_abs_tol(&self, other: &Self, tol: $item) -> bool {
-				let $abs_lhs = self;
-				let $abs_rhs = other;
-				let $abs_tol = tol;
-				$abs_expr
-			}
-
-			/// Checks if two values are approximately equal using the default absolute tolerance.
-			#[inline]
-			pub fn approx_eq_abs(&self, other: &Self) -> bool {
-				self.approx_eq_abs_tol(other, <$item as $crate::algebra::ApproxEqAbs>::DEFAULT_TOLERANCE_ABS)
-			}
-		}
+		$crate::impl_approx_eq_wrapper!(
+			@impl_inherent
+			[$($impl_generics)*],
+			impl: $outer,
+			item: $item,
+			bounds: [$($bounds)*],
+			trait: ApproxEqAbs,
+			default_const: DEFAULT_TOLERANCE_ABS,
+			method_tol: approx_eq_abs_tol,
+			method_default: approx_eq_abs,
+			body: |$abs_lhs, $abs_rhs, $abs_tol| $abs_expr
+		);
 
 		// ApproxEqRel inherents
-		impl<$($impl_generics)*> $outer
-		where
-			$item: Copy
-				+ $crate::algebra::ApproxEqRel<Tolerance = $item>
-				$($bounds)*
-		{
-			/// Checks if two values are approximately equal within a given relative tolerance.
-			#[inline]
-			pub fn approx_eq_rel_tol(&self, other: &Self, tol: $item) -> bool {
-				let $rel_lhs = self;
-				let $rel_rhs = other;
-				let $rel_tol = tol;
-				$rel_expr
-			}
-
-			/// Checks if two values are approximately equal using the default relative tolerance.
-			#[inline]
-			pub fn approx_eq_rel(&self, other: &Self) -> bool {
-				self.approx_eq_rel_tol(other, <$item as $crate::algebra::ApproxEqRel>::DEFAULT_TOLERANCE_REL)
-			}
-		}
+		$crate::impl_approx_eq_wrapper!(
+			@impl_inherent
+			[$($impl_generics)*],
+			impl: $outer,
+			item: $item,
+			bounds: [$($bounds)*],
+			trait: ApproxEqRel,
+			default_const: DEFAULT_TOLERANCE_REL,
+			method_tol: approx_eq_rel_tol,
+			method_default: approx_eq_rel,
+			body: |$rel_lhs, $rel_rhs, $rel_tol| $rel_expr
+		);
 
 		// ApproxEqAbs trait
 		$crate::impl_approx_eq_wrapper!(
