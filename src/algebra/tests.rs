@@ -2,7 +2,11 @@
 
 use alloc::vec::Vec;
 
-use crate::algebra::{ApproxEqAbs, ApproxEqRel};
+use crate::{
+    algebra::{ApproxEqAbs, ApproxEqRel},
+    approx_eq_abs, approx_eq_rel, approx_ne_abs, approx_ne_rel, assert_approx_eq_abs,
+    assert_approx_eq_rel, assert_approx_ne_abs, assert_approx_ne_rel,
+};
 
 #[derive(Clone, Copy, Debug, PartialEq, Eq)]
 struct Thin<T>(T);
@@ -236,4 +240,121 @@ fn approx_eq_rel_vec_blanket_impl() {
 
     assert!(lhs.clone().approx_eq_rel_tol(rhs_close, 0.001_f32));
     assert!(!lhs.approx_eq_rel_tol(rhs_short, 0.001_f32));
+}
+
+#[test]
+fn approx_eq_macro_variants_surface() {
+    assert!(approx_eq_abs!(1.0_f32, 1.0_f32 + 5e-7));
+    assert!(approx_eq_abs!(1.0_f32, 1.0_f32 + 5e-7, 1e-6_f32));
+    assert!(approx_ne_abs!(1.0_f32, 1.1_f32));
+    assert!(approx_ne_abs!(1.0_f32, 1.1_f32, 1e-6_f32));
+
+    assert!(approx_eq_rel!(1000.0_f32, 1000.001_f32));
+    assert!(approx_eq_rel!(1000.0_f32, 1000.001_f32, 1e-5_f32));
+    assert!(approx_ne_rel!(1.0_f32, 2.0_f32));
+    assert!(approx_ne_rel!(1.0_f32, 2.0_f32, 1e-5_f32));
+
+    assert_approx_eq_abs!(1.0_f32, 1.0_f32 + 5e-7);
+    assert_approx_eq_abs!(1.0_f32, 1.0_f32 + 5e-7, 1e-6_f32);
+    assert_approx_eq_abs!(1.0_f32, 1.0_f32 + 5e-7, message = "abs {} message form", "default");
+    assert_approx_eq_abs!(
+        1.0_f32,
+        1.0_f32 + 5e-7,
+        1e-6_f32,
+        message = "abs {} message form",
+        "tol"
+    );
+
+    assert_approx_ne_abs!(1.0_f32, 1.1_f32);
+    assert_approx_ne_abs!(1.0_f32, 1.1_f32, 1e-6_f32);
+    assert_approx_ne_abs!(1.0_f32, 1.1_f32, message = "ne abs {} message form", "default");
+    assert_approx_ne_abs!(1.0_f32, 1.1_f32, 1e-6_f32, message = "ne abs {} message form", "tol");
+
+    assert_approx_eq_rel!(1000.0_f32, 1000.001_f32);
+    assert_approx_eq_rel!(1000.0_f32, 1000.001_f32, 1e-5_f32);
+    assert_approx_eq_rel!(1000.0_f32, 1000.001_f32, message = "rel {} message form", "default");
+    assert_approx_eq_rel!(
+        1000.0_f32,
+        1000.001_f32,
+        1e-5_f32,
+        message = "rel {} message form",
+        "tol"
+    );
+
+    assert_approx_ne_rel!(1.0_f32, 2.0_f32);
+    assert_approx_ne_rel!(1.0_f32, 2.0_f32, 1e-5_f32);
+    assert_approx_ne_rel!(1.0_f32, 2.0_f32, message = "ne rel {} message form", "default");
+    assert_approx_ne_rel!(1.0_f32, 2.0_f32, 1e-5_f32, message = "ne rel {} message form", "tol");
+}
+
+#[test]
+#[should_panic(expected = "abs message panic: 1 2")]
+fn approx_eq_abs_message_variant_panics() {
+    assert_approx_eq_abs!(1.0_f32, 2.0_f32, message = "abs message panic: {} {}", 1, 2);
+}
+
+#[test]
+#[should_panic(expected = "abs tol message panic: 0.000001")]
+fn approx_eq_abs_tol_message_variant_panics() {
+    assert_approx_eq_abs!(
+        1.0_f32,
+        2.0_f32,
+        1e-6_f32,
+        message = "abs tol message panic: {}",
+        1e-6_f32
+    );
+}
+
+#[test]
+#[should_panic(expected = "ne abs message panic: x")]
+fn approx_ne_abs_message_variant_panics() {
+    assert_approx_ne_abs!(1.0_f32, 1.0_f32 + 5e-7, message = "ne abs message panic: {}", "x");
+}
+
+#[test]
+#[should_panic(expected = "ne abs tol message panic: 7")]
+fn approx_ne_abs_tol_message_variant_panics() {
+    assert_approx_ne_abs!(
+        1.0_f32,
+        1.0_f32 + 5e-7,
+        1e-6_f32,
+        message = "ne abs tol message panic: {}",
+        7
+    );
+}
+
+#[test]
+#[should_panic(expected = "rel message panic: lhs rhs")]
+fn approx_eq_rel_message_variant_panics() {
+    assert_approx_eq_rel!(1.0_f32, 2.0_f32, message = "rel message panic: {} {}", "lhs", "rhs");
+}
+
+#[test]
+#[should_panic(expected = "rel tol message panic: 0.00001")]
+fn approx_eq_rel_tol_message_variant_panics() {
+    assert_approx_eq_rel!(
+        1.0_f32,
+        2.0_f32,
+        1e-5_f32,
+        message = "rel tol message panic: {}",
+        1e-5_f32
+    );
+}
+
+#[test]
+#[should_panic(expected = "ne rel message panic: z")]
+fn approx_ne_rel_message_variant_panics() {
+    assert_approx_ne_rel!(100_000.0_f32, 100_000.5_f32, message = "ne rel message panic: {}", "z");
+}
+
+#[test]
+#[should_panic(expected = "ne rel tol message panic: ok")]
+fn approx_ne_rel_tol_message_variant_panics() {
+    assert_approx_ne_rel!(
+        1000.0_f32,
+        1000.001_f32,
+        1e-5_f32,
+        message = "ne rel tol message panic: {}",
+        "ok"
+    );
 }

@@ -4,8 +4,7 @@ use alloc::vec::Vec;
 
 use crate::{
     algebra::{Dot, Identity, Inverse, Length, LengthSquared, Lerp, Normalize},
-    assert_approx_eq_abs, assert_approx_eq_abs_tol, assert_approx_eq_rel, assert_approx_eq_rel_tol,
-    assert_approx_ne_abs, assert_approx_ne_abs_tol, assert_approx_ne_rel, assert_approx_ne_rel_tol,
+    assert_approx_eq_abs, assert_approx_eq_rel, assert_approx_ne_abs, assert_approx_ne_rel,
     numeric::{
         Cast, CastFrom, Infinite, IsFinite, IsZero, LossyCast, LossyCastFrom, Nan, Negate,
         SaturatingCast, SaturatingCastFrom, TryCast, TryCastFrom, TryExactCast, TryExactCastFrom,
@@ -235,13 +234,13 @@ fn approx_eq_abs_surface() {
     let minus_q = Quaternion::from_array([-0.0_f32, -1.0, -2.0, -3.0]);
     let far = Quaternion::from_array([0.0_f32, 1.0, 2.0, 3.2]);
 
-    assert_approx_eq_abs_tol!(q, minus_q, 1e-6);
-    assert_approx_ne_abs_tol!(q, far, 1e-6);
+    assert_approx_eq_abs!(q, minus_q, 1e-6);
+    assert_approx_ne_abs!(q, far, 1e-6);
     assert_approx_eq_abs!(q, minus_q);
     assert_approx_ne_abs!(q, far);
 
-    assert_approx_eq_abs_tol!(q, minus_q, 1e-6);
-    assert_approx_ne_abs_tol!(q, far, 1e-6);
+    assert_approx_eq_abs!(q, minus_q, 1e-6);
+    assert_approx_ne_abs!(q, far, 1e-6);
     assert_approx_eq_abs!(q, minus_q);
     assert_approx_ne_abs!(q, far);
 }
@@ -252,13 +251,13 @@ fn approx_eq_rel_surface() {
     let minus_q = Quaternion::from_array([-1.0_f32, -2.0, -3.0, -4.0]);
     let far = Quaternion::from_array([1.0_f32, 2.0, 3.0, 4.2]);
 
-    assert_approx_eq_rel_tol!(q, minus_q, 1e-4);
-    assert_approx_ne_rel_tol!(q, far, 1e-4);
+    assert_approx_eq_rel!(q, minus_q, 1e-4);
+    assert_approx_ne_rel!(q, far, 1e-4);
     assert_approx_eq_rel!(q, minus_q);
     assert_approx_ne_rel!(q, far);
 
-    assert_approx_eq_rel_tol!(q, minus_q, 1e-4);
-    assert_approx_ne_rel_tol!(q, far, 1e-4);
+    assert_approx_eq_rel!(q, minus_q, 1e-4);
+    assert_approx_ne_rel!(q, far, 1e-4);
     assert_approx_eq_rel!(q, minus_q);
     assert_approx_ne_rel!(q, far);
 }
@@ -315,8 +314,8 @@ fn rotate_vector_surface() {
     let rotated_op = qz_180 * v;
     let expected = Vector::from_array([-1.0_f32, -2.0, 0.0]);
 
-    assert_approx_eq_abs_tol!(rotated_inherent, rotated_op, 1e-6);
-    assert_approx_eq_abs_tol!(rotated_inherent, expected, 1e-6);
+    assert_approx_eq_abs!(rotated_inherent, rotated_op, 1e-6);
+    assert_approx_eq_abs!(rotated_inherent, expected, 1e-6);
 }
 
 #[test]
@@ -326,21 +325,21 @@ fn axis_angle_surface() {
 
     let q_from = Quaternion::from_axis_angle(axis_z, angle_pi);
     let qz_180 = Quaternion::from_array([0.0_f32, 0.0, 1.0, 0.0]);
-    assert_approx_eq_abs_tol!(q_from, qz_180, 1e-6);
+    assert_approx_eq_abs!(q_from, qz_180, 1e-6);
 
     let (axis, angle) = qz_180.to_axis_angle();
 
-    assert_approx_eq_abs_tol!(axis, Vector::from_array([0.0_f32, 0.0, 1.0]), 1e-6);
-    assert_approx_eq_abs_tol!(angle, core::f32::consts::PI, 1e-6);
+    assert_approx_eq_abs!(axis, Vector::from_array([0.0_f32, 0.0, 1.0]), 1e-6);
+    assert_approx_eq_abs!(angle, core::f32::consts::PI, 1e-6);
 
     let reconstructed = Quaternion::from_axis_angle(axis, angle);
-    assert_approx_eq_abs_tol!(reconstructed, qz_180, 1e-6);
+    assert_approx_eq_abs!(reconstructed, qz_180, 1e-6);
 
     let identity = Quaternion::from_array([0.0_f32, 0.0, 0.0, 1.0]);
     let (identity_axis, identity_angle) = identity.to_axis_angle();
 
-    assert_approx_eq_abs_tol!(identity_axis, Vector::from_array([1.0_f32, 0.0, 0.0]), 1e-6);
-    assert_approx_eq_abs_tol!(identity_angle, 0.0_f32, 1e-6);
+    assert_approx_eq_abs!(identity_axis, Vector::from_array([1.0_f32, 0.0, 0.0]), 1e-6);
+    assert_approx_eq_abs!(identity_angle, 0.0_f32, 1e-6);
 }
 
 #[test]
@@ -364,41 +363,41 @@ fn interpolation_surface() {
     let lerp_trait = <Quaternion<f32> as Lerp>::lerp(id, z_180, 0.5);
     let lerp_expected = Quaternion::from_array([0.0_f32, 0.0, 0.5, 0.5]);
 
-    assert_approx_eq_abs_tol!(lerp_inherent, lerp_trait, 1e-6);
-    assert_approx_eq_abs_tol!(lerp_inherent, lerp_expected, 1e-6);
+    assert_approx_eq_abs!(lerp_inherent, lerp_trait, 1e-6);
+    assert_approx_eq_abs!(lerp_inherent, lerp_expected, 1e-6);
 
     let nlerp_half = id.nlerp(z_180, 0.5);
     let nlerp_half_neg_rhs = id.nlerp(-z_180, 0.5);
 
-    assert_approx_eq_abs_tol!(nlerp_half.length(), 1.0, 1e-6);
-    assert_approx_eq_abs_tol!(nlerp_half, half_turn, 1e-6);
-    assert_approx_eq_abs_tol!(nlerp_half_neg_rhs, half_turn_neg_branch, 1e-6);
+    assert_approx_eq_abs!(nlerp_half.length(), 1.0, 1e-6);
+    assert_approx_eq_abs!(nlerp_half, half_turn, 1e-6);
+    assert_approx_eq_abs!(nlerp_half_neg_rhs, half_turn_neg_branch, 1e-6);
 
     let slerp_half = id.slerp(z_180, 0.5);
     let slerp_half_neg_rhs = id.slerp(-z_180, 0.5);
 
-    assert_approx_eq_abs_tol!(slerp_half.length(), 1.0, 1e-6);
-    assert_approx_eq_abs_tol!(slerp_half, half_turn, 1e-6);
-    assert_approx_eq_abs_tol!(slerp_half_neg_rhs, half_turn_neg_branch, 1e-6);
+    assert_approx_eq_abs!(slerp_half.length(), 1.0, 1e-6);
+    assert_approx_eq_abs!(slerp_half, half_turn, 1e-6);
+    assert_approx_eq_abs!(slerp_half_neg_rhs, half_turn_neg_branch, 1e-6);
 }
 
 #[test]
 fn length_and_normalize_surface() {
     let q = Quaternion::<f32>::from_array([0.0, 0.0, 3.0, 4.0]);
 
-    assert_approx_eq_abs_tol!(q.length_squared(), 25.0, 1e-6);
-    assert_approx_eq_abs_tol!(<Quaternion<f32> as LengthSquared>::length_squared(q), 25.0, 1e-6);
+    assert_approx_eq_abs!(q.length_squared(), 25.0, 1e-6);
+    assert_approx_eq_abs!(<Quaternion<f32> as LengthSquared>::length_squared(q), 25.0, 1e-6);
 
-    assert_approx_eq_abs_tol!(q.length(), 5.0, 1e-6);
-    assert_approx_eq_abs_tol!(<Quaternion<f32> as Length>::length(q), 5.0, 1e-6);
+    assert_approx_eq_abs!(q.length(), 5.0, 1e-6);
+    assert_approx_eq_abs!(<Quaternion<f32> as Length>::length(q), 5.0, 1e-6);
 
     let n = q.normalize();
     let nt = <Quaternion<f32> as Normalize>::normalize(q);
 
-    assert_approx_eq_abs_tol!(n.length(), 1.0, 1e-6);
-    assert_approx_eq_abs_tol!(nt.length(), 1.0, 1e-6);
-    assert_approx_eq_abs_tol!(n, Quaternion::from_array([0.0, 0.0, 0.6, 0.8]), 1e-6);
-    assert_approx_eq_abs_tol!(nt, Quaternion::from_array([0.0, 0.0, 0.6, 0.8]), 1e-6);
+    assert_approx_eq_abs!(n.length(), 1.0, 1e-6);
+    assert_approx_eq_abs!(nt.length(), 1.0, 1e-6);
+    assert_approx_eq_abs!(n, Quaternion::from_array([0.0, 0.0, 0.6, 0.8]), 1e-6);
+    assert_approx_eq_abs!(nt, Quaternion::from_array([0.0, 0.0, 0.6, 0.8]), 1e-6);
 
     let a = Quaternion::from_array([1_i32, 2, 3, 4]);
     assert_eq!(a.negate().into_array(), [-1, -2, -3, -4]);
