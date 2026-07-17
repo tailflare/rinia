@@ -7,8 +7,8 @@ macro_rules! _impl_scalar_approx_eq {
 				const DEFAULT_TOLERANCE_ABS: Self::Tolerance = $default_abs_tol;
 
 				#[inline]
-				fn approx_eq_abs_tol(self, other: Self, tol: Self::Tolerance) -> bool {
-					(self - other).abs() <= tol
+				fn approx_eq_abs_tol(&self, other: &Self, tol: Self::Tolerance) -> bool {
+					(*self - *other).abs() <= tol
 				}
 			}
 
@@ -18,12 +18,12 @@ macro_rules! _impl_scalar_approx_eq {
 				const DEFAULT_TOLERANCE_REL: Self::Tolerance = $default_rel_tol;
 
 				#[inline]
-				fn approx_eq_rel_tol(self, other: Self, tol: Self::Tolerance) -> bool {
-					if self == other {
+				fn approx_eq_rel_tol(&self, other: &Self, tol: Self::Tolerance) -> bool {
+					if *self == *other {
 						return true;
 					}
 
-					(self - other).abs() <= tol * self.abs().max(other.abs())
+					(*self - *other).abs() <= tol * self.abs().max(other.abs())
 				}
 			}
 		)+

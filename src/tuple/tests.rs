@@ -227,8 +227,8 @@ fn approx_eq_abs_surface() {
     let b = Tuple::from_array([1.0_f32 + 5e-7, 2.0 - 5e-7, 3.0 + 5e-7]);
     let c = Tuple::from_array([1.0_f32 + 2e-4, 2.0, 3.0]);
 
-    assert!(a.approx_eq_abs_tol(b, 1e-6));
-    assert!(!a.approx_eq_abs_tol(c, 1e-6));
+    assert!(a.approx_eq_abs_tol(&b, 1e-6));
+    assert!(!a.approx_eq_abs_tol(&c, 1e-6));
 }
 
 #[test]
@@ -237,8 +237,8 @@ fn approx_eq_rel_surface() {
     let b = Tuple::from_array([10.0_f32 + 5e-5, 20.0 - 5e-5, 30.0 + 5e-5]);
     let c = Tuple::from_array([10.0_f32 + 5e-2, 20.0, 30.0]);
 
-    assert!(a.approx_eq_rel_tol(b, 1e-4));
-    assert!(!a.approx_eq_rel_tol(c, 1e-4));
+    assert!(a.approx_eq_rel_tol(&b, 1e-4));
+    assert!(!a.approx_eq_rel_tol(&c, 1e-4));
 }
 
 #[test]

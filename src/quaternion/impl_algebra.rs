@@ -32,12 +32,12 @@ crate::impl_approx_eq_wrapper!(
     compare_abs: |lhs, rhs, tol| {
         let lhs_data = lhs.data;
         let rhs_data = rhs.data;
-        lhs_data.approx_eq_abs_tol(rhs_data, tol) || lhs_data.approx_eq_abs_tol(-rhs_data, tol)
+        lhs_data.approx_eq_abs_tol(&rhs_data, tol) || lhs_data.approx_eq_abs_tol(&-rhs_data, tol)
     },
     compare_rel: |lhs, rhs, tol| {
         let lhs_data = lhs.data;
         let rhs_data = rhs.data;
-        lhs_data.approx_eq_rel_tol(rhs_data, tol) || lhs_data.approx_eq_rel_tol(-rhs_data, tol)
+        lhs_data.approx_eq_rel_tol(&rhs_data, tol) || lhs_data.approx_eq_rel_tol(&-rhs_data, tol)
     },
 );
 
@@ -290,7 +290,7 @@ where
         dot = dot.clamp_value(T::NEG_ONE, T::ONE);
 
         // Avoid instability when the angle is very small.
-        if dot.approx_eq_abs(T::ONE) {
+        if dot.approx_eq_abs(&T::ONE) {
             return self.nlerp(rhs, t);
         }
 
@@ -348,7 +348,7 @@ where
         let sin_half_angle = half_angle.sin();
 
         // Identity rotation has no unique axis.
-        if sin_half_angle.approx_eq_abs(T::ZERO) {
+        if sin_half_angle.approx_eq_abs(&T::ZERO) {
             return (Vector::<T, 3>::new(T::ONE, T::ZERO, T::ZERO), T::ZERO);
         }
 

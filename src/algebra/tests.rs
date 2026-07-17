@@ -55,10 +55,10 @@ crate::impl_approx_eq_wrapper!(
     item: T,
     extra_bounds: [core::ops::Neg<Output = T>],
     compare_abs: |lhs, rhs, tol| {
-        lhs.value.approx_eq_abs_tol(rhs.value, tol) || lhs.value.approx_eq_abs_tol(-rhs.value, tol)
+        lhs.value.approx_eq_abs_tol(&rhs.value, tol) || lhs.value.approx_eq_abs_tol(&-rhs.value, tol)
     },
     compare_rel: |lhs, rhs, tol| {
-        lhs.value.approx_eq_rel_tol(rhs.value, tol) || lhs.value.approx_eq_rel_tol(-rhs.value, tol)
+        lhs.value.approx_eq_rel_tol(&rhs.value, tol) || lhs.value.approx_eq_rel_tol(&-rhs.value, tol)
     },
 );
 
@@ -68,22 +68,22 @@ fn approx_eq_wrapper_thin_surface() {
     let rhs_close = Thin(1.0005_f32);
     let rhs_far = Thin(1.01_f32);
 
-    assert!(lhs.approx_eq_abs_tol(rhs_close, 0.001_f32));
-    assert!(!lhs.approx_eq_abs_tol(rhs_far, 0.001_f32));
+    assert!(lhs.approx_eq_abs_tol(&rhs_close, 0.001_f32));
+    assert!(!lhs.approx_eq_abs_tol(&rhs_far, 0.001_f32));
 
-    assert!(lhs.approx_eq_rel_tol(rhs_close, 0.001_f32));
-    assert!(!lhs.approx_eq_rel_tol(rhs_far, 0.001_f32));
+    assert!(lhs.approx_eq_rel_tol(&rhs_close, 0.001_f32));
+    assert!(!lhs.approx_eq_rel_tol(&rhs_far, 0.001_f32));
 
-    assert!(lhs.approx_eq_abs(lhs));
-    assert!(lhs.approx_eq_rel(lhs));
+    assert!(lhs.approx_eq_abs(&lhs));
+    assert!(lhs.approx_eq_rel(&lhs));
 
-    assert!(<Thin<f32> as ApproxEqAbs>::approx_eq_abs_tol(lhs, rhs_close, 0.001_f32));
-    assert!(!<Thin<f32> as ApproxEqAbs>::approx_eq_abs_tol(lhs, rhs_far, 0.001_f32));
-    assert!(<Thin<f32> as ApproxEqAbs>::approx_eq_abs(lhs, lhs));
+    assert!(<Thin<f32> as ApproxEqAbs>::approx_eq_abs_tol(&lhs, &rhs_close, 0.001_f32));
+    assert!(!<Thin<f32> as ApproxEqAbs>::approx_eq_abs_tol(&lhs, &rhs_far, 0.001_f32));
+    assert!(<Thin<f32> as ApproxEqAbs>::approx_eq_abs(&lhs, &lhs));
 
-    assert!(<Thin<f32> as ApproxEqRel>::approx_eq_rel_tol(lhs, rhs_close, 0.001_f32));
-    assert!(!<Thin<f32> as ApproxEqRel>::approx_eq_rel_tol(lhs, rhs_far, 0.001_f32));
-    assert!(<Thin<f32> as ApproxEqRel>::approx_eq_rel(lhs, lhs));
+    assert!(<Thin<f32> as ApproxEqRel>::approx_eq_rel_tol(&lhs, &rhs_close, 0.001_f32));
+    assert!(!<Thin<f32> as ApproxEqRel>::approx_eq_rel_tol(&lhs, &rhs_far, 0.001_f32));
+    assert!(<Thin<f32> as ApproxEqRel>::approx_eq_rel(&lhs, &lhs));
 }
 
 #[test]
@@ -92,22 +92,22 @@ fn approx_eq_wrapper_thick_single_surface() {
     let rhs_close = ThickSingle { value: 1.0005_f32 };
     let rhs_far = ThickSingle { value: 1.01_f32 };
 
-    assert!(lhs.approx_eq_abs_tol(rhs_close, 0.001_f32));
-    assert!(!lhs.approx_eq_abs_tol(rhs_far, 0.001_f32));
+    assert!(lhs.approx_eq_abs_tol(&rhs_close, 0.001_f32));
+    assert!(!lhs.approx_eq_abs_tol(&rhs_far, 0.001_f32));
 
-    assert!(lhs.approx_eq_rel_tol(rhs_close, 0.001_f32));
-    assert!(!lhs.approx_eq_rel_tol(rhs_far, 0.001_f32));
+    assert!(lhs.approx_eq_rel_tol(&rhs_close, 0.001_f32));
+    assert!(!lhs.approx_eq_rel_tol(&rhs_far, 0.001_f32));
 
-    assert!(lhs.approx_eq_abs(lhs));
-    assert!(lhs.approx_eq_rel(lhs));
+    assert!(lhs.approx_eq_abs(&lhs));
+    assert!(lhs.approx_eq_rel(&lhs));
 
-    assert!(<ThickSingle<f32> as ApproxEqAbs>::approx_eq_abs_tol(lhs, rhs_close, 0.001_f32));
-    assert!(!<ThickSingle<f32> as ApproxEqAbs>::approx_eq_abs_tol(lhs, rhs_far, 0.001_f32));
-    assert!(<ThickSingle<f32> as ApproxEqAbs>::approx_eq_abs(lhs, lhs));
+    assert!(<ThickSingle<f32> as ApproxEqAbs>::approx_eq_abs_tol(&lhs, &rhs_close, 0.001_f32));
+    assert!(!<ThickSingle<f32> as ApproxEqAbs>::approx_eq_abs_tol(&lhs, &rhs_far, 0.001_f32));
+    assert!(<ThickSingle<f32> as ApproxEqAbs>::approx_eq_abs(&lhs, &lhs));
 
-    assert!(<ThickSingle<f32> as ApproxEqRel>::approx_eq_rel_tol(lhs, rhs_close, 0.001_f32));
-    assert!(!<ThickSingle<f32> as ApproxEqRel>::approx_eq_rel_tol(lhs, rhs_far, 0.001_f32));
-    assert!(<ThickSingle<f32> as ApproxEqRel>::approx_eq_rel(lhs, lhs));
+    assert!(<ThickSingle<f32> as ApproxEqRel>::approx_eq_rel_tol(&lhs, &rhs_close, 0.001_f32));
+    assert!(!<ThickSingle<f32> as ApproxEqRel>::approx_eq_rel_tol(&lhs, &rhs_far, 0.001_f32));
+    assert!(<ThickSingle<f32> as ApproxEqRel>::approx_eq_rel(&lhs, &lhs));
 }
 
 #[test]
@@ -116,22 +116,22 @@ fn approx_eq_wrapper_thick_multi_surface() {
     let rhs_close = ThickMulti { value1: 10.0_f32, value2: 20.01_f32 };
     let rhs_far = ThickMulti { value1: 10.0_f32, value2: 20.5_f32 };
 
-    assert!(lhs.approx_eq_abs_tol(rhs_close, 0.02_f32));
-    assert!(!lhs.approx_eq_abs_tol(rhs_far, 0.02_f32));
+    assert!(lhs.approx_eq_abs_tol(&rhs_close, 0.02_f32));
+    assert!(!lhs.approx_eq_abs_tol(&rhs_far, 0.02_f32));
 
-    assert!(lhs.approx_eq_rel_tol(rhs_close, 0.001_f32));
-    assert!(!lhs.approx_eq_rel_tol(rhs_far, 0.001_f32));
+    assert!(lhs.approx_eq_rel_tol(&rhs_close, 0.001_f32));
+    assert!(!lhs.approx_eq_rel_tol(&rhs_far, 0.001_f32));
 
-    assert!(lhs.approx_eq_abs(lhs));
-    assert!(lhs.approx_eq_rel(lhs));
+    assert!(lhs.approx_eq_abs(&lhs));
+    assert!(lhs.approx_eq_rel(&lhs));
 
-    assert!(<ThickMulti<f32> as ApproxEqAbs>::approx_eq_abs_tol(lhs, rhs_close, 0.02_f32));
-    assert!(!<ThickMulti<f32> as ApproxEqAbs>::approx_eq_abs_tol(lhs, rhs_far, 0.02_f32));
-    assert!(<ThickMulti<f32> as ApproxEqAbs>::approx_eq_abs(lhs, lhs));
+    assert!(<ThickMulti<f32> as ApproxEqAbs>::approx_eq_abs_tol(&lhs, &rhs_close, 0.02_f32));
+    assert!(!<ThickMulti<f32> as ApproxEqAbs>::approx_eq_abs_tol(&lhs, &rhs_far, 0.02_f32));
+    assert!(<ThickMulti<f32> as ApproxEqAbs>::approx_eq_abs(&lhs, &lhs));
 
-    assert!(<ThickMulti<f32> as ApproxEqRel>::approx_eq_rel_tol(lhs, rhs_close, 0.001_f32));
-    assert!(!<ThickMulti<f32> as ApproxEqRel>::approx_eq_rel_tol(lhs, rhs_far, 0.001_f32));
-    assert!(<ThickMulti<f32> as ApproxEqRel>::approx_eq_rel(lhs, lhs));
+    assert!(<ThickMulti<f32> as ApproxEqRel>::approx_eq_rel_tol(&lhs, &rhs_close, 0.001_f32));
+    assert!(!<ThickMulti<f32> as ApproxEqRel>::approx_eq_rel_tol(&lhs, &rhs_far, 0.001_f32));
+    assert!(<ThickMulti<f32> as ApproxEqRel>::approx_eq_rel(&lhs, &lhs));
 }
 
 #[test]
@@ -140,22 +140,22 @@ fn approx_eq_wrapper_thick_const_surface() {
     let rhs_close = ThickConst::<f32, 2> { value1: 10.0_f32, value2: 20.01_f32 };
     let rhs_far = ThickConst::<f32, 2> { value1: 10.0_f32, value2: 20.5_f32 };
 
-    assert!(lhs.approx_eq_abs_tol(rhs_close, 0.02_f32));
-    assert!(!lhs.approx_eq_abs_tol(rhs_far, 0.02_f32));
+    assert!(lhs.approx_eq_abs_tol(&rhs_close, 0.02_f32));
+    assert!(!lhs.approx_eq_abs_tol(&rhs_far, 0.02_f32));
 
-    assert!(lhs.approx_eq_rel_tol(rhs_close, 0.001_f32));
-    assert!(!lhs.approx_eq_rel_tol(rhs_far, 0.001_f32));
+    assert!(lhs.approx_eq_rel_tol(&rhs_close, 0.001_f32));
+    assert!(!lhs.approx_eq_rel_tol(&rhs_far, 0.001_f32));
 
-    assert!(lhs.approx_eq_abs(lhs));
-    assert!(lhs.approx_eq_rel(lhs));
+    assert!(lhs.approx_eq_abs(&lhs));
+    assert!(lhs.approx_eq_rel(&lhs));
 
-    assert!(<ThickConst<f32, 2> as ApproxEqAbs>::approx_eq_abs_tol(lhs, rhs_close, 0.02_f32));
-    assert!(!<ThickConst<f32, 2> as ApproxEqAbs>::approx_eq_abs_tol(lhs, rhs_far, 0.02_f32));
-    assert!(<ThickConst<f32, 2> as ApproxEqAbs>::approx_eq_abs(lhs, lhs));
+    assert!(<ThickConst<f32, 2> as ApproxEqAbs>::approx_eq_abs_tol(&lhs, &rhs_close, 0.02_f32));
+    assert!(!<ThickConst<f32, 2> as ApproxEqAbs>::approx_eq_abs_tol(&lhs, &rhs_far, 0.02_f32));
+    assert!(<ThickConst<f32, 2> as ApproxEqAbs>::approx_eq_abs(&lhs, &lhs));
 
-    assert!(<ThickConst<f32, 2> as ApproxEqRel>::approx_eq_rel_tol(lhs, rhs_close, 0.001_f32));
-    assert!(!<ThickConst<f32, 2> as ApproxEqRel>::approx_eq_rel_tol(lhs, rhs_far, 0.001_f32));
-    assert!(<ThickConst<f32, 2> as ApproxEqRel>::approx_eq_rel(lhs, lhs));
+    assert!(<ThickConst<f32, 2> as ApproxEqRel>::approx_eq_rel_tol(&lhs, &rhs_close, 0.001_f32));
+    assert!(!<ThickConst<f32, 2> as ApproxEqRel>::approx_eq_rel_tol(&lhs, &rhs_far, 0.001_f32));
+    assert!(<ThickConst<f32, 2> as ApproxEqRel>::approx_eq_rel(&lhs, &lhs));
 }
 
 #[test]
@@ -164,22 +164,22 @@ fn approx_eq_wrapper_signed_callback_surface() {
     let rhs_sign_flipped = SignedEq { value: -2.0_f32 };
     let rhs_far = SignedEq { value: -3.0_f32 };
 
-    assert!(lhs.approx_eq_abs_tol(rhs_sign_flipped, 0.001_f32));
-    assert!(!lhs.approx_eq_abs_tol(rhs_far, 0.001_f32));
+    assert!(lhs.approx_eq_abs_tol(&rhs_sign_flipped, 0.001_f32));
+    assert!(!lhs.approx_eq_abs_tol(&rhs_far, 0.001_f32));
 
-    assert!(lhs.approx_eq_rel_tol(rhs_sign_flipped, 0.001_f32));
-    assert!(!lhs.approx_eq_rel_tol(rhs_far, 0.001_f32));
+    assert!(lhs.approx_eq_rel_tol(&rhs_sign_flipped, 0.001_f32));
+    assert!(!lhs.approx_eq_rel_tol(&rhs_far, 0.001_f32));
 
-    assert!(lhs.approx_eq_abs(lhs));
-    assert!(lhs.approx_eq_rel(lhs));
+    assert!(lhs.approx_eq_abs(&lhs));
+    assert!(lhs.approx_eq_rel(&lhs));
 
-    assert!(<SignedEq<f32> as ApproxEqAbs>::approx_eq_abs_tol(lhs, rhs_sign_flipped, 0.001_f32));
-    assert!(!<SignedEq<f32> as ApproxEqAbs>::approx_eq_abs_tol(lhs, rhs_far, 0.001_f32));
-    assert!(<SignedEq<f32> as ApproxEqAbs>::approx_eq_abs(lhs, lhs));
+    assert!(<SignedEq<f32> as ApproxEqAbs>::approx_eq_abs_tol(&lhs, &rhs_sign_flipped, 0.001_f32));
+    assert!(!<SignedEq<f32> as ApproxEqAbs>::approx_eq_abs_tol(&lhs, &rhs_far, 0.001_f32));
+    assert!(<SignedEq<f32> as ApproxEqAbs>::approx_eq_abs(&lhs, &lhs));
 
-    assert!(<SignedEq<f32> as ApproxEqRel>::approx_eq_rel_tol(lhs, rhs_sign_flipped, 0.001_f32));
-    assert!(!<SignedEq<f32> as ApproxEqRel>::approx_eq_rel_tol(lhs, rhs_far, 0.001_f32));
-    assert!(<SignedEq<f32> as ApproxEqRel>::approx_eq_rel(lhs, lhs));
+    assert!(<SignedEq<f32> as ApproxEqRel>::approx_eq_rel_tol(&lhs, &rhs_sign_flipped, 0.001_f32));
+    assert!(!<SignedEq<f32> as ApproxEqRel>::approx_eq_rel_tol(&lhs, &rhs_far, 0.001_f32));
+    assert!(<SignedEq<f32> as ApproxEqRel>::approx_eq_rel(&lhs, &lhs));
 }
 
 #[test]
@@ -188,8 +188,8 @@ fn approx_eq_abs_array_blanket_impl() {
     let rhs_close = [1.0_f32, 2.0005_f32, 3.0_f32];
     let rhs_far = [1.0_f32, 2.01_f32, 3.0_f32];
 
-    assert!(lhs.approx_eq_abs_tol(rhs_close, 0.001_f32));
-    assert!(!lhs.approx_eq_abs_tol(rhs_far, 0.001_f32));
+    assert!(lhs.approx_eq_abs_tol(&rhs_close, 0.001_f32));
+    assert!(!lhs.approx_eq_abs_tol(&rhs_far, 0.001_f32));
 }
 
 #[test]
@@ -198,8 +198,8 @@ fn approx_eq_rel_array_blanket_impl() {
     let rhs_close = [100.05_f32, 200.0_f32, 300.0_f32];
     let rhs_far = [101.0_f32, 200.0_f32, 300.0_f32];
 
-    assert!(lhs.approx_eq_rel_tol(rhs_close, 0.001_f32));
-    assert!(!lhs.approx_eq_rel_tol(rhs_far, 0.001_f32));
+    assert!(lhs.approx_eq_rel_tol(&rhs_close, 0.001_f32));
+    assert!(!lhs.approx_eq_rel_tol(&rhs_far, 0.001_f32));
 }
 
 #[test]
@@ -208,8 +208,8 @@ fn approx_eq_abs_slice_blanket_impl() {
     let rhs_close = [1.0_f32, 2.0_f32, 3.0005_f32, 4.0_f32];
     let rhs_short = [1.0_f32, 2.0_f32, 3.0_f32];
 
-    assert!((&lhs[..]).approx_eq_abs_tol(&rhs_close[..], 0.001_f32));
-    assert!(!(&lhs[..]).approx_eq_abs_tol(&rhs_short[..], 0.001_f32));
+    assert!((lhs[..]).approx_eq_abs_tol(&rhs_close[..], 0.001_f32));
+    assert!(!(lhs[..]).approx_eq_abs_tol(&rhs_short[..], 0.001_f32));
 }
 
 #[test]
@@ -218,8 +218,8 @@ fn approx_eq_rel_slice_blanket_impl() {
     let rhs_close = [10.0_f32, 20.01_f32, 30.0_f32, 40.0_f32];
     let rhs_short = [10.0_f32, 20.0_f32, 30.0_f32];
 
-    assert!((&lhs[..]).approx_eq_rel_tol(&rhs_close[..], 0.001_f32));
-    assert!(!(&lhs[..]).approx_eq_rel_tol(&rhs_short[..], 0.001_f32));
+    assert!((lhs[..]).approx_eq_rel_tol(&rhs_close[..], 0.001_f32));
+    assert!(!(lhs[..]).approx_eq_rel_tol(&rhs_short[..], 0.001_f32));
 }
 
 #[test]
@@ -228,8 +228,8 @@ fn approx_eq_abs_vec_blanket_impl() {
     let rhs_close = Vec::from([1.0_f32, 2.0_f32, 3.0005_f32]);
     let rhs_short = Vec::from([1.0_f32, 2.0_f32]);
 
-    assert!(lhs.clone().approx_eq_abs_tol(rhs_close, 0.001_f32));
-    assert!(!lhs.approx_eq_abs_tol(rhs_short, 0.001_f32));
+    assert!(lhs.approx_eq_abs_tol(&rhs_close, 0.001_f32));
+    assert!(!lhs.approx_eq_abs_tol(&rhs_short, 0.001_f32));
 }
 
 #[test]
@@ -238,8 +238,8 @@ fn approx_eq_rel_vec_blanket_impl() {
     let rhs_close = Vec::from([10.0_f32, 20.01_f32, 30.0_f32]);
     let rhs_short = Vec::from([10.0_f32, 20.0_f32]);
 
-    assert!(lhs.clone().approx_eq_rel_tol(rhs_close, 0.001_f32));
-    assert!(!lhs.approx_eq_rel_tol(rhs_short, 0.001_f32));
+    assert!(lhs.approx_eq_rel_tol(&rhs_close, 0.001_f32));
+    assert!(!lhs.approx_eq_rel_tol(&rhs_short, 0.001_f32));
 }
 
 #[test]

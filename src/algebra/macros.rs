@@ -6,11 +6,11 @@
 #[macro_export]
 macro_rules! impl_approx_eq_wrapper {
 	(@emit_cmp abs, $lhs:ident, $rhs:ident, $tol:ident, [$($field:tt),+]) => {
-		true $( && $crate::algebra::ApproxEqAbs::approx_eq_abs_tol($lhs.$field, $rhs.$field, $tol) )+
+		true $( && $crate::algebra::ApproxEqAbs::approx_eq_abs_tol(&$lhs.$field, &$rhs.$field, $tol) )+
 	};
 
 	(@emit_cmp rel, $lhs:ident, $rhs:ident, $tol:ident, [$($field:tt),+]) => {
-		true $( && $crate::algebra::ApproxEqRel::approx_eq_rel_tol($lhs.$field, $rhs.$field, $tol) )+
+		true $( && $crate::algebra::ApproxEqRel::approx_eq_rel_tol(&$lhs.$field, &$rhs.$field, $tol) )+
 	};
 
 	(@impl_trait
@@ -36,7 +36,7 @@ macro_rules! impl_approx_eq_wrapper {
 				<$item as $crate::algebra::$default_from_trait>::$default_const;
 
 			#[inline]
-			fn $method_name(self, other: Self, tol: Self::Tolerance) -> bool {
+			fn $method_name(&self, other: &Self, tol: Self::Tolerance) -> bool {
 				let $lhs = self;
 				let $rhs = other;
 				let $tol = tol;
@@ -61,7 +61,7 @@ macro_rules! impl_approx_eq_wrapper {
 		{
 			/// Checks if two values are approximately equal within a given absolute tolerance.
 			#[inline]
-			pub fn approx_eq_abs_tol(self, other: Self, tol: $item) -> bool {
+			pub fn approx_eq_abs_tol(&self, other: &Self, tol: $item) -> bool {
 				$crate::impl_approx_eq_wrapper!(
 					@emit_cmp abs,
 					self,
@@ -73,7 +73,7 @@ macro_rules! impl_approx_eq_wrapper {
 
 			/// Checks if two values are approximately equal using the default absolute tolerance.
 			#[inline]
-			pub fn approx_eq_abs(self, other: Self) -> bool {
+			pub fn approx_eq_abs(&self, other: &Self) -> bool {
 				self.approx_eq_abs_tol(other, <$item as $crate::algebra::ApproxEqAbs>::DEFAULT_TOLERANCE_ABS)
 			}
 		}
@@ -87,7 +87,7 @@ macro_rules! impl_approx_eq_wrapper {
 		{
 			/// Checks if two values are approximately equal within a given relative tolerance.
 			#[inline]
-			pub fn approx_eq_rel_tol(self, other: Self, tol: $item) -> bool {
+			pub fn approx_eq_rel_tol(&self, other: &Self, tol: $item) -> bool {
 				$crate::impl_approx_eq_wrapper!(
 					@emit_cmp rel,
 					self,
@@ -99,7 +99,7 @@ macro_rules! impl_approx_eq_wrapper {
 
 			/// Checks if two values are approximately equal using the default relative tolerance.
 			#[inline]
-			pub fn approx_eq_rel(self, other: Self) -> bool {
+			pub fn approx_eq_rel(&self, other: &Self) -> bool {
 				self.approx_eq_rel_tol(other, <$item as $crate::algebra::ApproxEqRel>::DEFAULT_TOLERANCE_REL)
 			}
 		}
@@ -164,7 +164,7 @@ macro_rules! impl_approx_eq_wrapper {
 		{
 			/// Checks if two values are approximately equal within a given absolute tolerance.
 			#[inline]
-			pub fn approx_eq_abs_tol(self, other: Self, tol: $item) -> bool {
+			pub fn approx_eq_abs_tol(&self, other: &Self, tol: $item) -> bool {
 				let $abs_lhs = self;
 				let $abs_rhs = other;
 				let $abs_tol = tol;
@@ -173,7 +173,7 @@ macro_rules! impl_approx_eq_wrapper {
 
 			/// Checks if two values are approximately equal using the default absolute tolerance.
 			#[inline]
-			pub fn approx_eq_abs(self, other: Self) -> bool {
+			pub fn approx_eq_abs(&self, other: &Self) -> bool {
 				self.approx_eq_abs_tol(other, <$item as $crate::algebra::ApproxEqAbs>::DEFAULT_TOLERANCE_ABS)
 			}
 		}
@@ -187,7 +187,7 @@ macro_rules! impl_approx_eq_wrapper {
 		{
 			/// Checks if two values are approximately equal within a given relative tolerance.
 			#[inline]
-			pub fn approx_eq_rel_tol(self, other: Self, tol: $item) -> bool {
+			pub fn approx_eq_rel_tol(&self, other: &Self, tol: $item) -> bool {
 				let $rel_lhs = self;
 				let $rel_rhs = other;
 				let $rel_tol = tol;
@@ -196,7 +196,7 @@ macro_rules! impl_approx_eq_wrapper {
 
 			/// Checks if two values are approximately equal using the default relative tolerance.
 			#[inline]
-			pub fn approx_eq_rel(self, other: Self) -> bool {
+			pub fn approx_eq_rel(&self, other: &Self) -> bool {
 				self.approx_eq_rel_tol(other, <$item as $crate::algebra::ApproxEqRel>::DEFAULT_TOLERANCE_REL)
 			}
 		}
