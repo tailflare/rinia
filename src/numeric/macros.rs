@@ -57,7 +57,10 @@ macro_rules! impl_numeric_casts_wrapper {
             {
                 value.cast::<$item>()
             }
+        }
 
+        // LossyCast inherents
+        impl<$($impl_generics)*> $outer {
             /// Returns a new value lossy cast to type `U`.
             #[inline]
             pub fn lossy_cast<U>(self) -> $cast_outer
@@ -81,7 +84,10 @@ macro_rules! impl_numeric_casts_wrapper {
             {
                 value.lossy_cast::<$item>()
             }
+        }
 
+        // SaturatingCast inherents
+        impl<$($impl_generics)*> $outer {
             /// Returns a new value saturating cast to type `U`.
             #[inline]
             pub fn saturating_cast<U>(self) -> $cast_outer
@@ -105,7 +111,10 @@ macro_rules! impl_numeric_casts_wrapper {
             {
                 value.saturating_cast::<$item>()
             }
+        }
 
+        // TryCast inherents
+        impl<$($impl_generics)*> $outer {
             /// Returns a new value with try cast to type `U`.
             #[inline]
             pub fn try_cast<U>(self) -> Result<$cast_outer, $crate::numeric::CastError>
@@ -131,7 +140,10 @@ macro_rules! impl_numeric_casts_wrapper {
             {
                 value.try_cast::<$item>()
             }
+        }
 
+        // TryExactCast inherents
+        impl<$($impl_generics)*> $outer {
             /// Returns a new value with try exact cast to type `U`.
             #[inline]
             pub fn try_exact_cast<U>(
