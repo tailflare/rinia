@@ -30,7 +30,7 @@ where
 }
 
 // Bytemuck trait implementations for Vector<T, N>
-common::impl_bytemuck_basic!([T, const N: usize], Vector<T, N>, item: T);
+common::_impl_bytemuck_basic!([T, const N: usize], Vector<T, N>, item: T);
 
 // Blanket impl for HasScalar for Vector<T, N> where T implements Scalar
 impl<T, const N: usize> HasScalar for Vector<T, N>

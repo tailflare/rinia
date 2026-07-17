@@ -50,7 +50,7 @@ where
 }
 
 // Implement Finite/Infinite/Nan for Quaternion<T>.
-common::impl_tuple_wrapper_numeric_predicates!([T], Quaternion<T>, item: T, len: 4);
+common::_impl_tuple_wrapper_numeric_predicates!([T], Quaternion<T>, item: T, len: 4);
 
 // Negate inherent
 impl<T> Quaternion<T>

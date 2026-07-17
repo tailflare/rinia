@@ -1,4 +1,4 @@
-macro_rules! impl_marker_trait {
+macro_rules! _impl_marker_trait {
 	($trait:path, [$($ty:ty),+ $(,)?]) => {
 		$(
 			impl $trait for $ty {}
@@ -6,4 +6,4 @@ macro_rules! impl_marker_trait {
 	};
 }
 
-pub(crate) use impl_marker_trait;
+pub(crate) use _impl_marker_trait;

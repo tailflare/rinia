@@ -1,4 +1,4 @@
-macro_rules! impl_scalar_approx_eq {
+macro_rules! _impl_scalar_approx_eq {
 	($([$ty:ty, abs: $default_abs_tol:expr, rel: $default_rel_tol:expr]),+ $(,)?) => {
 		$(
             // ApproxEqAbs trait
@@ -30,7 +30,7 @@ macro_rules! impl_scalar_approx_eq {
 	};
 }
 
-macro_rules! impl_scalar_lerp {
+macro_rules! _impl_scalar_lerp {
 	($($ty:ty),+ $(,)?) => {
 		$(
             // Lerp trait
@@ -46,5 +46,5 @@ macro_rules! impl_scalar_lerp {
 	};
 }
 
-pub(crate) use impl_scalar_approx_eq;
-pub(crate) use impl_scalar_lerp;
+pub(crate) use _impl_scalar_approx_eq;
+pub(crate) use _impl_scalar_lerp;

@@ -1,102 +1,102 @@
-macro_rules! impl_scalar_elementary_trait {
+macro_rules! _impl_scalar_elementary_trait {
 	($trait:ident, [$head:tt $(, $tail:tt)* $(,)?], $($entry:tt),+ $(,)?) => {
 		impl $crate::numeric::$trait for $head {
 			$(
-				$crate::scalar::impl_scalar_elementary_trait!(@entry_for_type $head, $entry);
+				$crate::scalar::_impl_scalar_elementary_trait!(@entry_for_type $head, $entry);
 			)+
 		}
 
-		$crate::scalar::impl_scalar_elementary_trait!($trait, [$($tail),*], $($entry),+);
+		$crate::scalar::_impl_scalar_elementary_trait!($trait, [$($tail),*], $($entry),+);
 	};
 
 	($trait:ident, [], $($entry:tt),+ $(,)?) => {};
 
 	(@entry_for_type $ty:tt, {unary, $method:ident}) => {
-		$crate::scalar::impl_scalar_elementary_trait!(@method_no_fallback $ty, unary, $method);
+		$crate::scalar::_impl_scalar_elementary_trait!(@method_no_fallback $ty, unary, $method);
 	};
 
 	(@entry_for_type $ty:tt, {unary_pair, $method:ident}) => {
-		$crate::scalar::impl_scalar_elementary_trait!(@method_no_fallback $ty, unary_pair, $method);
+		$crate::scalar::_impl_scalar_elementary_trait!(@method_no_fallback $ty, unary_pair, $method);
 	};
 
 	(@entry_for_type $ty:tt, {binary, $method:ident, $rhs:ty}) => {
-		$crate::scalar::impl_scalar_elementary_trait!(@method_no_fallback $ty, binary, $method, $rhs);
+		$crate::scalar::_impl_scalar_elementary_trait!(@method_no_fallback $ty, binary, $method, $rhs);
 	};
 
 	(@entry_for_type $ty:tt, {ternary, $method:ident, $rhs1:ty, $rhs2:ty}) => {
-		$crate::scalar::impl_scalar_elementary_trait!(@method_no_fallback $ty, ternary, $method, $rhs1, $rhs2);
+		$crate::scalar::_impl_scalar_elementary_trait!(@method_no_fallback $ty, ternary, $method, $rhs1, $rhs2);
 	};
 
 	(@entry_for_type $ty:tt, {unary, $method:ident, [f32: $f32_fallback:expr, f64: $f64_fallback:expr]}) => {
-		$crate::scalar::impl_scalar_elementary_trait!(@method $ty, unary, $method, $crate::scalar::impl_scalar_elementary_trait!(@float_fallback_for_type $ty, [f32: $f32_fallback, f64: $f64_fallback]));
+		$crate::scalar::_impl_scalar_elementary_trait!(@method $ty, unary, $method, $crate::scalar::_impl_scalar_elementary_trait!(@float_fallback_for_type $ty, [f32: $f32_fallback, f64: $f64_fallback]));
 	};
 
 	(@entry_for_type $ty:tt, {unary_pair, $method:ident, [f32: $f32_fallback:expr, f64: $f64_fallback:expr]}) => {
-		$crate::scalar::impl_scalar_elementary_trait!(@method $ty, unary_pair, $method, $crate::scalar::impl_scalar_elementary_trait!(@float_fallback_for_type $ty, [f32: $f32_fallback, f64: $f64_fallback]));
+		$crate::scalar::_impl_scalar_elementary_trait!(@method $ty, unary_pair, $method, $crate::scalar::_impl_scalar_elementary_trait!(@float_fallback_for_type $ty, [f32: $f32_fallback, f64: $f64_fallback]));
 	};
 
 	(@entry_for_type $ty:tt, {binary, $method:ident, $rhs:ty, [f32: $f32_fallback:expr, f64: $f64_fallback:expr]}) => {
-		$crate::scalar::impl_scalar_elementary_trait!(@method $ty, binary, $method, $rhs, $crate::scalar::impl_scalar_elementary_trait!(@float_fallback_for_type $ty, [f32: $f32_fallback, f64: $f64_fallback]));
+		$crate::scalar::_impl_scalar_elementary_trait!(@method $ty, binary, $method, $rhs, $crate::scalar::_impl_scalar_elementary_trait!(@float_fallback_for_type $ty, [f32: $f32_fallback, f64: $f64_fallback]));
 	};
 
 	(@entry_for_type $ty:tt, {ternary, $method:ident, $rhs1:ty, $rhs2:ty, [f32: $f32_fallback:expr, f64: $f64_fallback:expr]}) => {
-		$crate::scalar::impl_scalar_elementary_trait!(@method $ty, ternary, $method, $rhs1, $rhs2, $crate::scalar::impl_scalar_elementary_trait!(@float_fallback_for_type $ty, [f32: $f32_fallback, f64: $f64_fallback]));
+		$crate::scalar::_impl_scalar_elementary_trait!(@method $ty, ternary, $method, $rhs1, $rhs2, $crate::scalar::_impl_scalar_elementary_trait!(@float_fallback_for_type $ty, [f32: $f32_fallback, f64: $f64_fallback]));
 	};
 
 
 	(@method $ty:ty, unary, $method:ident, $fallback:expr) => {
 		#[inline]
 		fn $method(self) -> Self {
-			$crate::scalar::impl_scalar_elementary_trait!(@call_unary_with_fallback $ty, $method, self, $fallback)
+			$crate::scalar::_impl_scalar_elementary_trait!(@call_unary_with_fallback $ty, $method, self, $fallback)
 		}
 	};
 
 	(@method_no_fallback $ty:ty, unary, $method:ident) => {
 		#[inline]
 		fn $method(self) -> Self {
-			$crate::scalar::impl_scalar_elementary_trait!(@call_unary $ty, $method, self)
+			$crate::scalar::_impl_scalar_elementary_trait!(@call_unary $ty, $method, self)
 		}
 	};
 
 	(@method $ty:ty, unary_pair, $method:ident, $fallback:expr) => {
 		#[inline]
 		fn $method(self) -> (Self, Self) {
-			$crate::scalar::impl_scalar_elementary_trait!(@call_unary_pair_with_fallback $ty, $method, self, $fallback)
+			$crate::scalar::_impl_scalar_elementary_trait!(@call_unary_pair_with_fallback $ty, $method, self, $fallback)
 		}
 	};
 
 	(@method_no_fallback $ty:ty, unary_pair, $method:ident) => {
 		#[inline]
 		fn $method(self) -> (Self, Self) {
-			$crate::scalar::impl_scalar_elementary_trait!(@call_unary_pair $ty, $method, self)
+			$crate::scalar::_impl_scalar_elementary_trait!(@call_unary_pair $ty, $method, self)
 		}
 	};
 
 	(@method $ty:ty, binary, $method:ident, $rhs:ty, $fallback:expr) => {
 		#[inline]
 		fn $method(self, other: $rhs) -> Self {
-			$crate::scalar::impl_scalar_elementary_trait!(@call_binary_with_fallback $ty, $method, $rhs, self, other, $fallback)
+			$crate::scalar::_impl_scalar_elementary_trait!(@call_binary_with_fallback $ty, $method, $rhs, self, other, $fallback)
 		}
 	};
 
 	(@method_no_fallback $ty:ty, binary, $method:ident, $rhs:ty) => {
 		#[inline]
 		fn $method(self, other: $rhs) -> Self {
-			$crate::scalar::impl_scalar_elementary_trait!(@call_binary $ty, $method, $rhs, self, other)
+			$crate::scalar::_impl_scalar_elementary_trait!(@call_binary $ty, $method, $rhs, self, other)
 		}
 	};
 
 	(@method_no_fallback $ty:ty, ternary, $method:ident, $rhs1:ty, $rhs2:ty) => {
 		#[inline]
 		fn $method(self, arg1: $rhs1, arg2: $rhs2) -> Self {
-			$crate::scalar::impl_scalar_elementary_trait!(@call_ternary_inherent $ty, $method, $rhs1, $rhs2, self, arg1, arg2)
+			$crate::scalar::_impl_scalar_elementary_trait!(@call_ternary_inherent $ty, $method, $rhs1, $rhs2, self, arg1, arg2)
 		}
 	};
 
 	(@method $ty:ty, ternary, $method:ident, $rhs1:ty, $rhs2:ty, $fallback:expr) => {
 		#[inline]
 		fn $method(self, arg1: $rhs1, arg2: $rhs2) -> Self {
-			$crate::scalar::impl_scalar_elementary_trait!(@call_ternary_with_fallback $ty, $method, $rhs1, $rhs2, self, arg1, arg2, $fallback)
+			$crate::scalar::_impl_scalar_elementary_trait!(@call_ternary_with_fallback $ty, $method, $rhs1, $rhs2, self, arg1, arg2, $fallback)
 		}
 	};
 
@@ -183,4 +183,4 @@ macro_rules! impl_scalar_elementary_trait {
 
 }
 
-pub(crate) use impl_scalar_elementary_trait;
+pub(crate) use _impl_scalar_elementary_trait;

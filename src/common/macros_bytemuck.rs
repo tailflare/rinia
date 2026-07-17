@@ -1,5 +1,5 @@
 #[cfg(feature = "bytemuck")]
-macro_rules! impl_bytemuck_basic {
+macro_rules! _impl_bytemuck_basic {
 	([$($generic:tt)*], $type:ty, item: $item:ty $(,)?) => {
         // Bytemuck Zeroable trait
 		unsafe impl<$($generic)*> ::bytemuck::Zeroable for $type
@@ -18,8 +18,8 @@ macro_rules! impl_bytemuck_basic {
 }
 
 #[cfg(not(feature = "bytemuck"))]
-macro_rules! impl_bytemuck_basic {
+macro_rules! _impl_bytemuck_basic {
     ([$($generic:tt)*], $type:ty, item: $item:ty $(,)?) => {};
 }
 
-pub(crate) use impl_bytemuck_basic;
+pub(crate) use _impl_bytemuck_basic;

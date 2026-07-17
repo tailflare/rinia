@@ -50,7 +50,7 @@ where
 }
 
 // Field accessors via Deref for Vector<T, 3>
-common::impl_layout_field_access!([T], Vector<T, 3> => Vector3Fields<T>);
+common::_impl_layout_field_access!([T], Vector<T, 3> => Vector3Fields<T>);
 
 // Cross inherent
 impl<T> Vector<T, 3>

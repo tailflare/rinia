@@ -1,16 +1,16 @@
-macro_rules! impl_scalar_constants {
+macro_rules! _impl_scalar_constants {
 	($( [$ty:ty $(, $name:ident : $value:expr)* $(,)?] ),+ $(,)?) => {
 		$(
-			$crate::scalar::impl_scalar_constants!(@emit_for_type $ty; $($name : $value,)*);
+			$crate::scalar::_impl_scalar_constants!(@emit_for_type $ty; $($name : $value,)*);
 		)+
 	};
 
 	(@emit_for_type $ty:ty; $($name:ident : $value:expr,)*) => {
-		$crate::scalar::impl_scalar_constants!(@maybe_impl_zero $ty; $($name : $value,)*);
-		$crate::scalar::impl_scalar_constants!(@maybe_impl_one $ty; $($name : $value,)*);
-		$crate::scalar::impl_scalar_constants!(@maybe_impl_two $ty; $($name : $value,)*);
-		$crate::scalar::impl_scalar_constants!(@maybe_impl_neg_one $ty; $($name : $value,)*);
-		$crate::scalar::impl_scalar_constants!(@maybe_impl_half $ty; $($name : $value,)*);
+		$crate::scalar::_impl_scalar_constants!(@maybe_impl_zero $ty; $($name : $value,)*);
+		$crate::scalar::_impl_scalar_constants!(@maybe_impl_one $ty; $($name : $value,)*);
+		$crate::scalar::_impl_scalar_constants!(@maybe_impl_two $ty; $($name : $value,)*);
+		$crate::scalar::_impl_scalar_constants!(@maybe_impl_neg_one $ty; $($name : $value,)*);
+		$crate::scalar::_impl_scalar_constants!(@maybe_impl_half $ty; $($name : $value,)*);
 	};
 
 	(@maybe_impl_zero $ty:ty; zero: $zero:expr, $($rest_name:ident : $rest_value:expr,)*) => {
@@ -19,7 +19,7 @@ macro_rules! impl_scalar_constants {
 		}
 	};
 	(@maybe_impl_zero $ty:ty; $other_name:ident : $other_value:expr, $($rest_name:ident : $rest_value:expr,)*) => {
-		$crate::scalar::impl_scalar_constants!(@maybe_impl_zero $ty; $($rest_name : $rest_value,)*);
+		$crate::scalar::_impl_scalar_constants!(@maybe_impl_zero $ty; $($rest_name : $rest_value,)*);
 	};
 	(@maybe_impl_zero $ty:ty;) => {};
 
@@ -29,7 +29,7 @@ macro_rules! impl_scalar_constants {
 		}
 	};
 	(@maybe_impl_one $ty:ty; $other_name:ident : $other_value:expr, $($rest_name:ident : $rest_value:expr,)*) => {
-		$crate::scalar::impl_scalar_constants!(@maybe_impl_one $ty; $($rest_name : $rest_value,)*);
+		$crate::scalar::_impl_scalar_constants!(@maybe_impl_one $ty; $($rest_name : $rest_value,)*);
 	};
 	(@maybe_impl_one $ty:ty;) => {};
 
@@ -39,7 +39,7 @@ macro_rules! impl_scalar_constants {
 		}
 	};
 	(@maybe_impl_two $ty:ty; $other_name:ident : $other_value:expr, $($rest_name:ident : $rest_value:expr,)*) => {
-		$crate::scalar::impl_scalar_constants!(@maybe_impl_two $ty; $($rest_name : $rest_value,)*);
+		$crate::scalar::_impl_scalar_constants!(@maybe_impl_two $ty; $($rest_name : $rest_value,)*);
 	};
 	(@maybe_impl_two $ty:ty;) => {};
 
@@ -49,7 +49,7 @@ macro_rules! impl_scalar_constants {
 		}
 	};
 	(@maybe_impl_neg_one $ty:ty; $other_name:ident : $other_value:expr, $($rest_name:ident : $rest_value:expr,)*) => {
-		$crate::scalar::impl_scalar_constants!(@maybe_impl_neg_one $ty; $($rest_name : $rest_value,)*);
+		$crate::scalar::_impl_scalar_constants!(@maybe_impl_neg_one $ty; $($rest_name : $rest_value,)*);
 	};
 	(@maybe_impl_neg_one $ty:ty;) => {};
 
@@ -59,12 +59,12 @@ macro_rules! impl_scalar_constants {
 		}
 	};
 	(@maybe_impl_half $ty:ty; $other_name:ident : $other_value:expr, $($rest_name:ident : $rest_value:expr,)*) => {
-		$crate::scalar::impl_scalar_constants!(@maybe_impl_half $ty; $($rest_name : $rest_value,)*);
+		$crate::scalar::_impl_scalar_constants!(@maybe_impl_half $ty; $($rest_name : $rest_value,)*);
 	};
 	(@maybe_impl_half $ty:ty;) => {};
 }
 
-macro_rules! impl_scalar_constants_float {
+macro_rules! _impl_scalar_constants_float {
     ($($ty:ty),+ $(,)?) => {
         $(
             impl $crate::numeric::Infinite for $ty {
@@ -79,7 +79,7 @@ macro_rules! impl_scalar_constants_float {
     };
 }
 
-macro_rules! impl_scalar_predicates_float {
+macro_rules! _impl_scalar_predicates_float {
 	($($ty:ty),+ $(,)?) => {
 		$(
             impl $crate::numeric::IsZero for $ty {
@@ -113,7 +113,7 @@ macro_rules! impl_scalar_predicates_float {
 	};
 }
 
-macro_rules! impl_scalar_predicates_int {
+macro_rules! _impl_scalar_predicates_int {
 	($($ty:ty),+ $(,)?) => {
 		$(
             impl $crate::numeric::IsZero for $ty {
@@ -147,7 +147,7 @@ macro_rules! impl_scalar_predicates_int {
 	};
 }
 
-macro_rules! impl_scalar_bounded {
+macro_rules! _impl_scalar_bounded {
 	($( [$ty:ty, $min:expr, $max:expr] ),+ $(,)?) => {
 		$(
 			impl $crate::numeric::BoundedMin for $ty {
@@ -161,7 +161,7 @@ macro_rules! impl_scalar_bounded {
 	};
 }
 
-macro_rules! impl_scalar_min_max {
+macro_rules! _impl_scalar_min_max {
 	($($ty:ty),+ $(,)?) => {
 		$(
 			impl $crate::numeric::MinMax for $ty {
@@ -179,7 +179,7 @@ macro_rules! impl_scalar_min_max {
 	};
 }
 
-macro_rules! impl_scalar_clamp {
+macro_rules! _impl_scalar_clamp {
 	($($ty:ty),+ $(,)?) => {
 		$(
 			impl $crate::numeric::Clamp for $ty {
@@ -198,7 +198,7 @@ macro_rules! impl_scalar_clamp {
 	};
 }
 
-macro_rules! impl_scalar_signed_equivalent {
+macro_rules! _impl_scalar_signed_equivalent {
 	($($src:ty => $dst:ty),+ $(,)?) => {
 		$(
 			impl $crate::numeric::SignedEquivalent for $src {
@@ -208,7 +208,7 @@ macro_rules! impl_scalar_signed_equivalent {
 	};
 }
 
-macro_rules! impl_scalar_unsigned_equivalent {
+macro_rules! _impl_scalar_unsigned_equivalent {
 	($($src:ty => $dst:ty),+ $(,)?) => {
 		$(
 			impl $crate::numeric::UnsignedEquivalent for $src {
@@ -218,7 +218,7 @@ macro_rules! impl_scalar_unsigned_equivalent {
 	};
 }
 
-macro_rules! impl_scalar_arithmetic_trait {
+macro_rules! _impl_scalar_arithmetic_trait {
 	($trait:ident, [$head:tt $(, $tail:tt)* $(,)?], {unary, $method:ident, output: $output:ty}) => {
 		impl $crate::numeric::$trait for $head {
 			type Output = $output;
@@ -229,7 +229,7 @@ macro_rules! impl_scalar_arithmetic_trait {
 			}
 		}
 
-		$crate::scalar::impl_scalar_arithmetic_trait!($trait, [$($tail),*], {unary, $method, output: $output});
+		$crate::scalar::_impl_scalar_arithmetic_trait!($trait, [$($tail),*], {unary, $method, output: $output});
 	};
 
 	($trait:ident, [], {unary, $method:ident, output: $output:ty}) => {};
@@ -244,7 +244,7 @@ macro_rules! impl_scalar_arithmetic_trait {
 			}
 		}
 
-		$crate::scalar::impl_scalar_arithmetic_trait!($trait, [$($tail),*], {binary, $method, output: $output});
+		$crate::scalar::_impl_scalar_arithmetic_trait!($trait, [$($tail),*], {binary, $method, output: $output});
 	};
 
 	($trait:ident, [], {binary, $method:ident, output: $output:ty}) => {};
@@ -259,19 +259,19 @@ macro_rules! impl_scalar_arithmetic_trait {
 			}
 		}
 
-		$crate::scalar::impl_scalar_arithmetic_trait!($trait, [$($tail),*], {ternary, $method, $rhs1, $rhs2, output: $output});
+		$crate::scalar::_impl_scalar_arithmetic_trait!($trait, [$($tail),*], {ternary, $method, $rhs1, $rhs2, output: $output});
 	};
 
 	($trait:ident, [], {ternary, $method:ident, $rhs1:ty, $rhs2:ty, output: $output:ty}) => {};
 }
 
-pub(crate) use impl_scalar_arithmetic_trait;
-pub(crate) use impl_scalar_bounded;
-pub(crate) use impl_scalar_clamp;
-pub(crate) use impl_scalar_constants;
-pub(crate) use impl_scalar_constants_float;
-pub(crate) use impl_scalar_min_max;
-pub(crate) use impl_scalar_predicates_float;
-pub(crate) use impl_scalar_predicates_int;
-pub(crate) use impl_scalar_signed_equivalent;
-pub(crate) use impl_scalar_unsigned_equivalent;
+pub(crate) use _impl_scalar_arithmetic_trait;
+pub(crate) use _impl_scalar_bounded;
+pub(crate) use _impl_scalar_clamp;
+pub(crate) use _impl_scalar_constants;
+pub(crate) use _impl_scalar_constants_float;
+pub(crate) use _impl_scalar_min_max;
+pub(crate) use _impl_scalar_predicates_float;
+pub(crate) use _impl_scalar_predicates_int;
+pub(crate) use _impl_scalar_signed_equivalent;
+pub(crate) use _impl_scalar_unsigned_equivalent;

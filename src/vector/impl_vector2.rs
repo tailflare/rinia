@@ -44,7 +44,7 @@ where
 }
 
 // Field accessors via Deref for Vector<T, 2>
-common::impl_layout_field_access!([T], Vector<T, 2> => Vector2Fields<T>);
+common::_impl_layout_field_access!([T], Vector<T, 2> => Vector2Fields<T>);
 
 // Cross inherent
 impl<T> Vector<T, 2>

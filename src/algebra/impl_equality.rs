@@ -1,5 +1,6 @@
 use crate::algebra::{ApproxEqAbs, ApproxEqRel};
 
+// Blanket ApproxEqAbs for Arrays
 impl<T, U, const N: usize> ApproxEqAbs<[U; N]> for [T; N]
 where
     T: ApproxEqAbs<U>,
@@ -14,6 +15,7 @@ where
     }
 }
 
+// Blanket ApproxEqRel for Arrays
 impl<T, U, const N: usize> ApproxEqRel<[U; N]> for [T; N]
 where
     T: ApproxEqRel<U>,
@@ -28,6 +30,7 @@ where
     }
 }
 
+// Blanket ApproxEqAbs for Slices
 impl<'b, T, U> ApproxEqAbs<&'b [U]> for &[T]
 where
     T: ApproxEqAbs<U> + Clone,
@@ -47,6 +50,7 @@ where
     }
 }
 
+// Blanket ApproxEqRel for Slices
 impl<'b, T, U> ApproxEqRel<&'b [U]> for &[T]
 where
     T: ApproxEqRel<U> + Clone,
@@ -72,6 +76,7 @@ mod vec_equality {
 
     use crate::algebra::{ApproxEqAbs, ApproxEqRel};
 
+    // Blanket ApproxEqAbs for Vec
     impl<T, U> ApproxEqAbs<Vec<U>> for Vec<T>
     where
         T: ApproxEqAbs<U>,
@@ -90,6 +95,7 @@ mod vec_equality {
         }
     }
 
+    // Blanket ApproxEqRel for Vec
     impl<T, U> ApproxEqRel<Vec<U>> for Vec<T>
     where
         T: ApproxEqRel<U>,

@@ -1,4 +1,4 @@
-macro_rules! impl_scalar_infallible_casts {
+macro_rules! _impl_scalar_infallible_casts {
     (
         $(
             $src:ty => [$($dst:ty),* $(,)?]
@@ -17,7 +17,7 @@ macro_rules! impl_scalar_infallible_casts {
     };
 }
 
-macro_rules! impl_scalar_lossy_casts {
+macro_rules! _impl_scalar_lossy_casts {
     (
         $(
             $src:ty => [$($dst:ty),* $(,)?]
@@ -36,7 +36,7 @@ macro_rules! impl_scalar_lossy_casts {
     };
 }
 
-macro_rules! impl_scalar_saturating_cast_unsigned_to_unsigned_wide {
+macro_rules! _impl_scalar_saturating_cast_unsigned_to_unsigned_wide {
     ($($src:ty => [$($dst:ty),* $(,)?]),* $(,)?) => {
         $(
             $(
@@ -51,7 +51,7 @@ macro_rules! impl_scalar_saturating_cast_unsigned_to_unsigned_wide {
     };
 }
 
-macro_rules! impl_scalar_saturating_cast_unsigned_to_unsigned_narrow {
+macro_rules! _impl_scalar_saturating_cast_unsigned_to_unsigned_narrow {
     ($($src:ty => [$($dst:ty),* $(,)?]),* $(,)?) => {
         $(
             $(
@@ -70,7 +70,7 @@ macro_rules! impl_scalar_saturating_cast_unsigned_to_unsigned_narrow {
     };
 }
 
-macro_rules! impl_scalar_saturating_cast_signed_to_signed_narrow {
+macro_rules! _impl_scalar_saturating_cast_signed_to_signed_narrow {
     ($($src:ty => [$($dst:ty),* $(,)?]),* $(,)?) => {
         $(
             $(
@@ -91,7 +91,7 @@ macro_rules! impl_scalar_saturating_cast_signed_to_signed_narrow {
     };
 }
 
-macro_rules! impl_scalar_saturating_cast_signed_to_signed_wide {
+macro_rules! _impl_scalar_saturating_cast_signed_to_signed_wide {
     ($($src:ty => [$($dst:ty),* $(,)?]),* $(,)?) => {
         $(
             $(
@@ -106,7 +106,7 @@ macro_rules! impl_scalar_saturating_cast_signed_to_signed_wide {
     };
 }
 
-macro_rules! impl_scalar_saturating_cast_unsigned_to_signed {
+macro_rules! _impl_scalar_saturating_cast_unsigned_to_signed {
     ($($src:ty => [$($dst:ty),* $(,)?]),* $(,)?) => {
         $(
             $(
@@ -125,7 +125,7 @@ macro_rules! impl_scalar_saturating_cast_unsigned_to_signed {
     };
 }
 
-macro_rules! impl_scalar_saturating_cast_signed_to_unsigned_wide {
+macro_rules! _impl_scalar_saturating_cast_signed_to_unsigned_wide {
     ($($src:ty => [$($dst:ty),* $(,)?]),* $(,)?) => {
         $(
             $(
@@ -144,7 +144,7 @@ macro_rules! impl_scalar_saturating_cast_signed_to_unsigned_wide {
     };
 }
 
-macro_rules! impl_scalar_saturating_cast_signed_to_unsigned_narrow {
+macro_rules! _impl_scalar_saturating_cast_signed_to_unsigned_narrow {
     ($($src:ty => [$($dst:ty),* $(,)?]),* $(,)?) => {
         $(
             $(
@@ -165,7 +165,7 @@ macro_rules! impl_scalar_saturating_cast_signed_to_unsigned_narrow {
     };
 }
 
-macro_rules! impl_scalar_saturating_cast_int_to_float {
+macro_rules! _impl_scalar_saturating_cast_int_to_float {
     ($($src:ty => [$($dst:ty),* $(,)?]),* $(,)?) => {
         $(
             $(
@@ -180,7 +180,7 @@ macro_rules! impl_scalar_saturating_cast_int_to_float {
     };
 }
 
-macro_rules! impl_scalar_saturating_cast_float_to_int {
+macro_rules! _impl_scalar_saturating_cast_float_to_int {
     ($($src:ty => [$($dst:ty),* $(,)?]),* $(,)?) => {
         $(
             $(
@@ -203,7 +203,7 @@ macro_rules! impl_scalar_saturating_cast_float_to_int {
     };
 }
 
-macro_rules! impl_scalar_saturating_cast_float_to_float {
+macro_rules! _impl_scalar_saturating_cast_float_to_float {
     ($($src:ty => [$($dst:ty),* $(,)?]),* $(,)?) => {
         $(
             $(
@@ -226,7 +226,7 @@ macro_rules! impl_scalar_saturating_cast_float_to_float {
     };
 }
 
-macro_rules! impl_scalar_unsigned_cast {
+macro_rules! _impl_scalar_unsigned_cast {
     ($($src:ty => $dst:ty),* $(,)?) => {
         $(
             impl $crate::numeric::UnsignedCast<$dst> for $src {
@@ -239,7 +239,7 @@ macro_rules! impl_scalar_unsigned_cast {
     };
 }
 
-macro_rules! impl_scalar_signed_cast {
+macro_rules! _impl_scalar_signed_cast {
     ($($src:ty => $dst:ty),* $(,)?) => {
         $(
             impl $crate::numeric::SignedCast<$dst> for $src {
@@ -252,7 +252,7 @@ macro_rules! impl_scalar_signed_cast {
     };
 }
 
-macro_rules! impl_scalar_try_cast_int_to_int {
+macro_rules! _impl_scalar_try_cast_int_to_int {
     ($($src:ty => [$($dst:ty),* $(,)?]),* $(,)?) => {
         $(
             $(
@@ -286,7 +286,7 @@ macro_rules! impl_scalar_try_cast_int_to_int {
     };
 }
 
-macro_rules! impl_scalar_try_cast_int_to_float {
+macro_rules! _impl_scalar_try_cast_int_to_float {
     ($($src:ty => [$($dst:ty),* $(,)?]),* $(,)?) => {
         $(
             $(
@@ -314,7 +314,7 @@ macro_rules! impl_scalar_try_cast_int_to_float {
     };
 }
 
-macro_rules! impl_scalar_try_cast_float_to_int {
+macro_rules! _impl_scalar_try_cast_float_to_int {
     ($($src:ty => [$($dst:ty),* $(,)?]),* $(,)?) => {
         $(
             $(
@@ -358,7 +358,7 @@ macro_rules! impl_scalar_try_cast_float_to_int {
     };
 }
 
-macro_rules! impl_scalar_try_cast_float_to_float {
+macro_rules! _impl_scalar_try_cast_float_to_float {
     ($($src:ty => [$($dst:ty),* $(,)?]),* $(,)?) => {
         $(
             $(
@@ -386,21 +386,21 @@ macro_rules! impl_scalar_try_cast_float_to_float {
     };
 }
 
-pub(crate) use impl_scalar_infallible_casts;
-pub(crate) use impl_scalar_lossy_casts;
-pub(crate) use impl_scalar_saturating_cast_float_to_float;
-pub(crate) use impl_scalar_saturating_cast_float_to_int;
-pub(crate) use impl_scalar_saturating_cast_int_to_float;
-pub(crate) use impl_scalar_saturating_cast_signed_to_signed_narrow;
-pub(crate) use impl_scalar_saturating_cast_signed_to_signed_wide;
-pub(crate) use impl_scalar_saturating_cast_signed_to_unsigned_narrow;
-pub(crate) use impl_scalar_saturating_cast_signed_to_unsigned_wide;
-pub(crate) use impl_scalar_saturating_cast_unsigned_to_signed;
-pub(crate) use impl_scalar_saturating_cast_unsigned_to_unsigned_narrow;
-pub(crate) use impl_scalar_saturating_cast_unsigned_to_unsigned_wide;
-pub(crate) use impl_scalar_signed_cast;
-pub(crate) use impl_scalar_try_cast_float_to_float;
-pub(crate) use impl_scalar_try_cast_float_to_int;
-pub(crate) use impl_scalar_try_cast_int_to_float;
-pub(crate) use impl_scalar_try_cast_int_to_int;
-pub(crate) use impl_scalar_unsigned_cast;
+pub(crate) use _impl_scalar_infallible_casts;
+pub(crate) use _impl_scalar_lossy_casts;
+pub(crate) use _impl_scalar_saturating_cast_float_to_float;
+pub(crate) use _impl_scalar_saturating_cast_float_to_int;
+pub(crate) use _impl_scalar_saturating_cast_int_to_float;
+pub(crate) use _impl_scalar_saturating_cast_signed_to_signed_narrow;
+pub(crate) use _impl_scalar_saturating_cast_signed_to_signed_wide;
+pub(crate) use _impl_scalar_saturating_cast_signed_to_unsigned_narrow;
+pub(crate) use _impl_scalar_saturating_cast_signed_to_unsigned_wide;
+pub(crate) use _impl_scalar_saturating_cast_unsigned_to_signed;
+pub(crate) use _impl_scalar_saturating_cast_unsigned_to_unsigned_narrow;
+pub(crate) use _impl_scalar_saturating_cast_unsigned_to_unsigned_wide;
+pub(crate) use _impl_scalar_signed_cast;
+pub(crate) use _impl_scalar_try_cast_float_to_float;
+pub(crate) use _impl_scalar_try_cast_float_to_int;
+pub(crate) use _impl_scalar_try_cast_int_to_float;
+pub(crate) use _impl_scalar_try_cast_int_to_int;
+pub(crate) use _impl_scalar_unsigned_cast;

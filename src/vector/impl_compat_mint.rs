@@ -3,7 +3,7 @@
 
 use crate::vector::Vector;
 
-macro_rules! impl_mint_vector {
+macro_rules! _impl_mint_vector {
     ($n:literal, $mint:ident, [$($field:ident),+]) => {
         impl<T> From<mint::$mint<T>> for Vector<T, $n> {
             #[inline]
@@ -22,9 +22,9 @@ macro_rules! impl_mint_vector {
     };
 }
 
-impl_mint_vector!(2, Vector2, [x, y]);
-impl_mint_vector!(3, Vector3, [x, y, z]);
-impl_mint_vector!(4, Vector4, [x, y, z, w]);
+_impl_mint_vector!(2, Vector2, [x, y]);
+_impl_mint_vector!(3, Vector3, [x, y, z]);
+_impl_mint_vector!(4, Vector4, [x, y, z, w]);
 
 #[cfg(test)]
 mod tests {

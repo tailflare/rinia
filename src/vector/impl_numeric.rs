@@ -183,4 +183,4 @@ where
 }
 
 // Implement Finite/Infinite/Nan for Vector<T, N>.
-common::impl_tuple_wrapper_numeric_predicates!([T, const N: usize], Vector<T, N>, item: T, len: N);
+common::_impl_tuple_wrapper_numeric_predicates!([T, const N: usize], Vector<T, N>, item: T, len: N);

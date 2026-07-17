@@ -53,4 +53,4 @@ where
 }
 
 // Field accessors via Deref for Vector<T, 4>
-common::impl_layout_field_access!([T], Vector<T, 4> => Vector4Fields<T>);
+common::_impl_layout_field_access!([T], Vector<T, 4> => Vector4Fields<T>);

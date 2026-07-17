@@ -1,4 +1,4 @@
-macro_rules! impl_tuple_unary_op {
+macro_rules! _impl_tuple_unary_op {
 	($trait:ident, $method:ident, $op:tt) => {
 		impl<T, const N: usize> core::ops::$trait for $crate::tuple::Tuple<T, N>
 		where
@@ -14,7 +14,7 @@ macro_rules! impl_tuple_unary_op {
 	};
 }
 
-macro_rules! impl_tuple_binary_op {
+macro_rules! _impl_tuple_binary_op {
 	($trait:ident, $method:ident, $op:tt) => {
 		impl<T, const N: usize> $trait for $crate::tuple::Tuple<T, N>
 		where
@@ -45,7 +45,7 @@ macro_rules! impl_tuple_binary_op {
 	};
 }
 
-macro_rules! impl_tuple_assign_op {
+macro_rules! _impl_tuple_assign_op {
 	($trait:ident, $method:ident, $op:tt) => {
 		impl<T, const N: usize> $trait for $crate::tuple::Tuple<T, N>
 		where
@@ -76,6 +76,6 @@ macro_rules! impl_tuple_assign_op {
 	};
 }
 
-pub(crate) use impl_tuple_assign_op;
-pub(crate) use impl_tuple_binary_op;
-pub(crate) use impl_tuple_unary_op;
+pub(crate) use _impl_tuple_assign_op;
+pub(crate) use _impl_tuple_binary_op;
+pub(crate) use _impl_tuple_unary_op;

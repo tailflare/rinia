@@ -39,7 +39,7 @@ where
 }
 
 // Bytemuck trait implementations for Quaternion<T>
-common::impl_bytemuck_basic!([T], Quaternion<T>, item: T);
+common::_impl_bytemuck_basic!([T], Quaternion<T>, item: T);
 
 // Blanket impl for HasScalar for Quaternion<T> where T implements Scalar
 impl<T> HasScalar for Quaternion<T>

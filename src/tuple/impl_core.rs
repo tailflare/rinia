@@ -146,10 +146,10 @@ impl<T, const N: usize> Tuple<T, N> {
 }
 
 // TupleLike trait implementation for Tuple<T, N>
-common::impl_tuplelike_for_wrapper!([T, const N: usize], Tuple<T, N>, item: T, len: N);
+common::_impl_tuplelike_for_wrapper!([T, const N: usize], Tuple<T, N>, item: T, len: N);
 
 // Bytemuck trait implementations for Tuple<T, N>
-common::impl_bytemuck_basic!([T, const N: usize], Tuple<T, N>, item: T);
+common::_impl_bytemuck_basic!([T, const N: usize], Tuple<T, N>, item: T);
 
 // Blanket impl for HasScalar for Tuple<T, N> where T implements Scalar
 impl<T, const N: usize> HasScalar for Tuple<T, N>

@@ -1,4 +1,4 @@
-macro_rules! impl_tuple_wrapper_finite {
+macro_rules! _impl_tuple_wrapper_finite {
 	([$($impl_generics:tt)*], $outer:ty, item: $item:ty, len: $len:expr $(,)?) => {
 		// IsFinite inherent
         impl<$($impl_generics)*> $outer
@@ -25,7 +25,7 @@ macro_rules! impl_tuple_wrapper_finite {
 	};
 }
 
-macro_rules! impl_tuple_wrapper_infinite {
+macro_rules! _impl_tuple_wrapper_infinite {
 	([$($impl_generics:tt)*], $outer:ty, item: $item:ty, len: $len:expr $(,)?) => {
 		// Infinite inherent
         impl<$($impl_generics)*> $outer
@@ -75,7 +75,7 @@ macro_rules! impl_tuple_wrapper_infinite {
 	};
 }
 
-macro_rules! impl_tuple_wrapper_nan {
+macro_rules! _impl_tuple_wrapper_nan {
 	([$($impl_generics:tt)*], $outer:ty, item: $item:ty, len: $len:expr $(,)?) => {
 		// Nan inherent
         impl<$($impl_generics)*> $outer
@@ -120,15 +120,15 @@ macro_rules! impl_tuple_wrapper_nan {
 	};
 }
 
-macro_rules! impl_tuple_wrapper_numeric_predicates {
+macro_rules! _impl_tuple_wrapper_numeric_predicates {
 	([$($impl_generics:tt)*], $outer:ty, item: $item:ty, len: $len:expr $(,)?) => {
-		$crate::common::impl_tuple_wrapper_finite!([$($impl_generics)*], $outer, item: $item, len: $len);
-		$crate::common::impl_tuple_wrapper_infinite!([$($impl_generics)*], $outer, item: $item, len: $len);
-		$crate::common::impl_tuple_wrapper_nan!([$($impl_generics)*], $outer, item: $item, len: $len);
+		$crate::common::_impl_tuple_wrapper_finite!([$($impl_generics)*], $outer, item: $item, len: $len);
+		$crate::common::_impl_tuple_wrapper_infinite!([$($impl_generics)*], $outer, item: $item, len: $len);
+		$crate::common::_impl_tuple_wrapper_nan!([$($impl_generics)*], $outer, item: $item, len: $len);
 	};
 }
 
-pub(crate) use impl_tuple_wrapper_finite;
-pub(crate) use impl_tuple_wrapper_infinite;
-pub(crate) use impl_tuple_wrapper_nan;
-pub(crate) use impl_tuple_wrapper_numeric_predicates;
+pub(crate) use _impl_tuple_wrapper_finite;
+pub(crate) use _impl_tuple_wrapper_infinite;
+pub(crate) use _impl_tuple_wrapper_nan;
+pub(crate) use _impl_tuple_wrapper_numeric_predicates;

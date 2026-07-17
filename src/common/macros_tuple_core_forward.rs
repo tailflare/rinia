@@ -1,4 +1,4 @@
-macro_rules! impl_tuple_wrapper_from_array {
+macro_rules! _impl_tuple_wrapper_from_array {
 	([$($impl_generics:tt)*], $outer:ty, item: $item:ty, len: $len:expr, field: $field:ident $(,)?) => {
 		// FromArray inherent
         impl<$($impl_generics)*> $outer {
@@ -11,7 +11,7 @@ macro_rules! impl_tuple_wrapper_from_array {
 	};
 }
 
-macro_rules! impl_tuple_wrapper_from_tuple {
+macro_rules! _impl_tuple_wrapper_from_tuple {
 	([$($impl_generics:tt)*], $outer:ty, item: $item:ty, len: $len:expr, field: $field:ident $(,)?) => {
 		// FromTuple inherent
         impl<$($impl_generics)*> $outer {
@@ -24,7 +24,7 @@ macro_rules! impl_tuple_wrapper_from_tuple {
 	};
 }
 
-macro_rules! impl_tuple_wrapper_array_accessors {
+macro_rules! _impl_tuple_wrapper_array_accessors {
 	([$($impl_generics:tt)*], $outer:ty, item: $item:ty, len: $len:expr, field: $field:ident $(,)?) => {
 		// Array access inherent
         impl<$($impl_generics)*> $outer {
@@ -43,7 +43,7 @@ macro_rules! impl_tuple_wrapper_array_accessors {
 	};
 }
 
-macro_rules! impl_tuple_wrapper_tuple_accessors {
+macro_rules! _impl_tuple_wrapper_tuple_accessors {
 	([$($impl_generics:tt)*], $outer:ty, item: $item:ty, len: $len:expr, field: $field:ident $(,)?) => {
 		impl<$($impl_generics)*> $outer {
 			/// Returns a reference to the inner [Tuple] field.
@@ -67,7 +67,7 @@ macro_rules! impl_tuple_wrapper_tuple_accessors {
 	};
 }
 
-macro_rules! impl_tuple_wrapper_slice_accessors {
+macro_rules! _impl_tuple_wrapper_slice_accessors {
 	([$($impl_generics:tt)*], $outer:ty, item: $item:ty, field: $field:ident $(,)?) => {
 		// Slice access inherent
         impl<$($impl_generics)*> $outer {
@@ -86,7 +86,7 @@ macro_rules! impl_tuple_wrapper_slice_accessors {
 	};
 }
 
-macro_rules! impl_tuple_wrapper_iter_accessors {
+macro_rules! _impl_tuple_wrapper_iter_accessors {
 	([$($impl_generics:tt)*], $outer:ty, item: $item:ty, field: $field:ident $(,)?) => {
 		// Iter access inherent
         impl<$($impl_generics)*> $outer {
@@ -105,7 +105,7 @@ macro_rules! impl_tuple_wrapper_iter_accessors {
 	};
 }
 
-macro_rules! impl_tuple_wrapper_index_traits {
+macro_rules! _impl_tuple_wrapper_index_traits {
 	([$($impl_generics:tt)*], $outer:ty, item: $item:ty $(,)?) => {
 		// Index trait
         impl<$($impl_generics)*> core::ops::Index<usize> for $outer {
@@ -127,7 +127,7 @@ macro_rules! impl_tuple_wrapper_index_traits {
 	};
 }
 
-macro_rules! impl_tuple_wrapper_into_iter_traits {
+macro_rules! _impl_tuple_wrapper_into_iter_traits {
 	([$($impl_generics:tt)*], $outer:ty, item: $item:ty, len: $len:expr $(,)?) => {
 		// IntoIterator ref trait
         impl<'a, $($impl_generics)*> core::iter::IntoIterator for &'a $outer {
@@ -164,7 +164,7 @@ macro_rules! impl_tuple_wrapper_into_iter_traits {
 	};
 }
 
-macro_rules! impl_tuple_wrapper_from_array_trait {
+macro_rules! _impl_tuple_wrapper_from_array_trait {
 	([$($impl_generics:tt)*], $outer:ty, item: $item:ty, len: $len:expr $(,)?) => {
         // From<[$item; $len]> trait
 		impl<$($impl_generics)*> core::convert::From<[$item; $len]> for $outer {
@@ -184,7 +184,7 @@ macro_rules! impl_tuple_wrapper_from_array_trait {
 	};
 }
 
-macro_rules! impl_tuplelike_for_wrapper {
+macro_rules! _impl_tuplelike_for_wrapper {
 	([$($impl_generics:tt)*], $outer:ty, item: $item:ty, len: $len:expr $(,)?) => {
         // TupleLike trait
 		impl<$($impl_generics)*> $crate::tuple::TupleLike for $outer {
@@ -204,13 +204,13 @@ macro_rules! impl_tuplelike_for_wrapper {
 	};
 }
 
-pub(crate) use impl_tuple_wrapper_array_accessors;
-pub(crate) use impl_tuple_wrapper_from_array;
-pub(crate) use impl_tuple_wrapper_from_array_trait;
-pub(crate) use impl_tuple_wrapper_from_tuple;
-pub(crate) use impl_tuple_wrapper_index_traits;
-pub(crate) use impl_tuple_wrapper_into_iter_traits;
-pub(crate) use impl_tuple_wrapper_iter_accessors;
-pub(crate) use impl_tuple_wrapper_slice_accessors;
-pub(crate) use impl_tuple_wrapper_tuple_accessors;
-pub(crate) use impl_tuplelike_for_wrapper;
+pub(crate) use _impl_tuple_wrapper_array_accessors;
+pub(crate) use _impl_tuple_wrapper_from_array;
+pub(crate) use _impl_tuple_wrapper_from_array_trait;
+pub(crate) use _impl_tuple_wrapper_from_tuple;
+pub(crate) use _impl_tuple_wrapper_index_traits;
+pub(crate) use _impl_tuple_wrapper_into_iter_traits;
+pub(crate) use _impl_tuple_wrapper_iter_accessors;
+pub(crate) use _impl_tuple_wrapper_slice_accessors;
+pub(crate) use _impl_tuple_wrapper_tuple_accessors;
+pub(crate) use _impl_tuplelike_for_wrapper;

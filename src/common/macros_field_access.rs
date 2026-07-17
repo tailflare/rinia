@@ -1,4 +1,4 @@
-macro_rules! impl_layout_field_access {
+macro_rules! _impl_layout_field_access {
 	([$($impl_generics:tt)*], $outer:ty => $fields:ty $(,)?) => {
         // Field access deref impl
 		impl<$($impl_generics)*> core::ops::Deref for $outer {
@@ -28,4 +28,4 @@ macro_rules! impl_layout_field_access {
 	};
 }
 
-pub(crate) use impl_layout_field_access;
+pub(crate) use _impl_layout_field_access;

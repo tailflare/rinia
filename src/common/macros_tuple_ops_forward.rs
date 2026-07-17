@@ -1,4 +1,4 @@
-macro_rules! impl_tuple_wrapper_unary_op {
+macro_rules! _impl_tuple_wrapper_unary_op {
     ([$($impl_generics:tt)*], $outer:ty, item: $item:ty, len: $len:expr, $trait:ident, $method:ident $(,)?) => {
         impl<$($impl_generics)*> core::ops::$trait for $outer
         where
@@ -15,7 +15,7 @@ macro_rules! impl_tuple_wrapper_unary_op {
     };
 }
 
-macro_rules! impl_tuple_wrapper_binary_op {
+macro_rules! _impl_tuple_wrapper_binary_op {
     ([$($impl_generics:tt)*], $outer:ty, item: $item:ty, len: $len:expr, $trait:ident, $method:ident $(,)?) => {
         impl<$($impl_generics)*> core::ops::$trait for $outer
         where
@@ -50,7 +50,7 @@ macro_rules! impl_tuple_wrapper_binary_op {
     };
 }
 
-macro_rules! impl_tuple_wrapper_assign_op {
+macro_rules! _impl_tuple_wrapper_assign_op {
     ([$($impl_generics:tt)*], $outer:ty, item: $item:ty, len: $len:expr, $trait:ident, $method:ident $(,)?) => {
         impl<$($impl_generics)*> core::ops::$trait for $outer
         where
@@ -77,6 +77,6 @@ macro_rules! impl_tuple_wrapper_assign_op {
     };
 }
 
-pub(crate) use impl_tuple_wrapper_assign_op;
-pub(crate) use impl_tuple_wrapper_binary_op;
-pub(crate) use impl_tuple_wrapper_unary_op;
+pub(crate) use _impl_tuple_wrapper_assign_op;
+pub(crate) use _impl_tuple_wrapper_binary_op;
+pub(crate) use _impl_tuple_wrapper_unary_op;
