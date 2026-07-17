@@ -97,7 +97,7 @@ dependencies = [
 
 [[package]]
 name = "rinia"
-version = "0.0.15"
+version = "0.0.16"
 dependencies = [
  "bytemuck",
  "libm",
