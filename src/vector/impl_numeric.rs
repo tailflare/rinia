@@ -8,7 +8,7 @@ use crate::{
 };
 
 // Implement casts
-crate::impl_numeric_casts_transparent!([T, const N: usize], wrapper: Vector, Vector<T, N> => Vector<U, N>, item: T, field: data);
+crate::impl_numeric_casts_wrapper!([T, const N: usize], wrapper: Vector, Vector<T, N> => Vector<U, N>, item: T, field: data);
 
 // Zero inherent
 impl<T, const N: usize> Vector<T, N>

@@ -4,7 +4,7 @@ use crate::{
 };
 
 // Implement casts
-crate::impl_numeric_casts_transparent!(
+crate::impl_numeric_casts_wrapper!(
     [T, const N: usize],
     wrapper: Tuple,
     Tuple<T, N> => Tuple<U, N>,

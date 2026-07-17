@@ -19,9 +19,11 @@ struct ThickConst<T, const N: usize> {
     pub value2: T,
 }
 
-crate::impl_numeric_casts_transparent!(Thin<T>);
-crate::impl_numeric_casts_named_fields!(Thick<T>, [value1, value2]);
-crate::impl_numeric_casts_named_fields!(
+crate::impl_numeric_casts_wrapper!(Thin<T>);
+
+crate::impl_numeric_casts_wrapper!(Thick<T>, [value1, value2]);
+
+crate::impl_numeric_casts_wrapper!(
     [T, const N: usize],
     wrapper: ThickConst,
     ThickConst<T, N> => ThickConst<U, N>,
