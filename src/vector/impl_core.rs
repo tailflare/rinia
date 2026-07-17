@@ -30,7 +30,7 @@ where
 }
 
 // Implement casts
-common::impl_tuple_wrapper_casts!([T, const N: usize], Vector<T, N> => Vector<U, N>, item: T, len: N);
+crate::impl_numeric_casts_transparent!([T, const N: usize], wrapper: Vector, Vector<T, N> => Vector<U, N>, item: T, field: data);
 
 // Bytemuck trait implementations for Vector<T, N>
 common::impl_bytemuck_basic!([T, const N: usize], Vector<T, N>, item: T);

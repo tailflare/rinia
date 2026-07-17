@@ -12,6 +12,7 @@ include = ["src/**", "README.md", "LICENSE*"]
 default = ["std"]
 
 std = ["sakka?/std", "zerocopy?/std"]
+alloc = []
 
 sakka = ["dep:sakka"]
 bytemuck = ["dep:bytemuck"]
