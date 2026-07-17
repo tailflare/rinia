@@ -8,7 +8,12 @@ use crate::numeric::{Cast, CastError, LossyCast, SaturatingCast, TryCast, TryExa
 struct Thin<T>(T);
 
 #[derive(Clone, Copy, Debug, PartialEq, Eq)]
-struct Thick<T> {
+struct ThickSingle<T> {
+    pub value: T,
+}
+
+#[derive(Clone, Copy, Debug, PartialEq, Eq)]
+struct ThickMulti<T> {
     pub value1: T,
     pub value2: T,
 }
@@ -21,7 +26,9 @@ struct ThickConst<T, const N: usize> {
 
 crate::impl_numeric_casts_wrapper!(Thin<T>);
 
-crate::impl_numeric_casts_wrapper!(Thick<T>, [value1, value2]);
+crate::impl_numeric_casts_wrapper!(ThickSingle<T>, [value]);
+
+crate::impl_numeric_casts_wrapper!(ThickMulti<T>, [value1, value2]);
 
 crate::impl_numeric_casts_wrapper!(
     [T, const N: usize],
@@ -32,7 +39,7 @@ crate::impl_numeric_casts_wrapper!(
 );
 
 #[test]
-fn transparent_casts_inherent_surface() {
+fn transparent_casts_thin_inherent_surface() {
     let src = Thin(123_i32);
 
     assert_eq!(src.cast::<i64>(), Thin(123_i64));
@@ -54,7 +61,7 @@ fn transparent_casts_inherent_surface() {
 }
 
 #[test]
-fn transparent_casts_trait_surface() {
+fn transparent_casts_thin_trait_surface() {
     let src = Thin(200_i32);
 
     let casted = <Thin<i32> as Cast<Thin<i64>>>::cast(src);
@@ -80,72 +87,126 @@ fn transparent_casts_trait_surface() {
 }
 
 #[test]
-fn transparent_casts_named_fields_inherent_surface() {
-    let src = Thick { value1: 100_i32, value2: 300_i32 };
+fn transparent_casts_thick_multi_inherent_surface() {
+    let src = ThickMulti { value1: 100_i32, value2: 300_i32 };
 
-    assert_eq!(src.cast::<i64>(), Thick { value1: 100_i64, value2: 300_i64 });
-    assert_eq!(Thick::<i64>::cast_from(src), Thick { value1: 100_i64, value2: 300_i64 });
+    assert_eq!(src.cast::<i64>(), ThickMulti { value1: 100_i64, value2: 300_i64 });
+    assert_eq!(ThickMulti::<i64>::cast_from(src), ThickMulti { value1: 100_i64, value2: 300_i64 });
 
-    assert_eq!(src.lossy_cast::<u8>(), Thick { value1: 100_u8, value2: 44_u8 });
-
-    assert_eq!(Thick::<u8>::lossy_cast_from(src), Thick { value1: 100_u8, value2: 44_u8 });
-
-    assert_eq!(src.saturating_cast::<u8>(), Thick { value1: 100_u8, value2: u8::MAX });
-
-    assert_eq!(Thick::<u8>::saturating_cast_from(src), Thick { value1: 100_u8, value2: u8::MAX });
+    assert_eq!(src.lossy_cast::<u8>(), ThickMulti { value1: 100_u8, value2: 44_u8 });
 
     assert_eq!(
-        Thick { value1: 10_i32, value2: 255_i32 }.try_cast::<u8>(),
-        Ok(Thick { value1: 10_u8, value2: 255_u8 })
+        ThickMulti::<u8>::lossy_cast_from(src),
+        ThickMulti { value1: 100_u8, value2: 44_u8 }
+    );
+
+    assert_eq!(src.saturating_cast::<u8>(), ThickMulti { value1: 100_u8, value2: u8::MAX });
+
+    assert_eq!(
+        ThickMulti::<u8>::saturating_cast_from(src),
+        ThickMulti { value1: 100_u8, value2: u8::MAX }
     );
 
     assert_eq!(
-        Thick::<u8>::try_cast_from(Thick { value1: 10_i32, value2: 300_i32 }),
+        ThickMulti { value1: 10_i32, value2: 255_i32 }.try_cast::<u8>(),
+        Ok(ThickMulti { value1: 10_u8, value2: 255_u8 })
+    );
+
+    assert_eq!(
+        ThickMulti::<u8>::try_cast_from(ThickMulti { value1: 10_i32, value2: 300_i32 }),
         Err(CastError::OutOfRange)
     );
 
     assert_eq!(
-        Thick::<i64>::try_exact_cast_from(Thick { value1: 1_i32, value2: 2_i32 }),
-        Ok(Thick { value1: 1_i64, value2: 2_i64 })
+        ThickMulti::<i64>::try_exact_cast_from(ThickMulti { value1: 1_i32, value2: 2_i32 }),
+        Ok(ThickMulti { value1: 1_i64, value2: 2_i64 })
     );
 }
 
 #[test]
-fn transparent_casts_named_fields_trait_surface() {
-    let src = Thick { value1: 7_i32, value2: 8_i32 };
+fn transparent_casts_thick_multi_trait_surface() {
+    let src = ThickMulti { value1: 7_i32, value2: 8_i32 };
 
-    let casted = <Thick<i32> as Cast<Thick<i64>>>::cast(src);
-    assert_eq!(casted, Thick { value1: 7_i64, value2: 8_i64 });
+    let casted = <ThickMulti<i32> as Cast<ThickMulti<i64>>>::cast(src);
+    assert_eq!(casted, ThickMulti { value1: 7_i64, value2: 8_i64 });
 
-    let lossy = <Thick<i32> as LossyCast<Thick<u8>>>::lossy_cast(Thick {
+    let lossy = <ThickMulti<i32> as LossyCast<ThickMulti<u8>>>::lossy_cast(ThickMulti {
         value1: 300_i32,
         value2: 511_i32,
     });
-    assert_eq!(lossy, Thick { value1: 44_u8, value2: 255_u8 });
+    assert_eq!(lossy, ThickMulti { value1: 44_u8, value2: 255_u8 });
 
-    let saturating = <Thick<i32> as SaturatingCast<Thick<u8>>>::saturating_cast(Thick {
-        value1: 300_i32,
-        value2: -1_i32,
+    let saturating =
+        <ThickMulti<i32> as SaturatingCast<ThickMulti<u8>>>::saturating_cast(ThickMulti {
+            value1: 300_i32,
+            value2: -1_i32,
+        });
+    assert_eq!(saturating, ThickMulti { value1: u8::MAX, value2: 0_u8 });
+
+    let try_ok = <ThickMulti<i32> as TryCast<ThickMulti<u8>>>::try_cast(ThickMulti {
+        value1: 1_i32,
+        value2: 2_i32,
     });
-    assert_eq!(saturating, Thick { value1: u8::MAX, value2: 0_u8 });
+    assert_eq!(try_ok, Ok(ThickMulti { value1: 1_u8, value2: 2_u8 }));
 
-    let try_ok =
-        <Thick<i32> as TryCast<Thick<u8>>>::try_cast(Thick { value1: 1_i32, value2: 2_i32 });
-    assert_eq!(try_ok, Ok(Thick { value1: 1_u8, value2: 2_u8 }));
-
-    let try_err =
-        <Thick<i32> as TryCast<Thick<u8>>>::try_cast(Thick { value1: 1_i32, value2: 300_i32 });
+    let try_err = <ThickMulti<i32> as TryCast<ThickMulti<u8>>>::try_cast(ThickMulti {
+        value1: 1_i32,
+        value2: 300_i32,
+    });
     assert_eq!(try_err, Err(CastError::OutOfRange));
 
-    let try_exact_err = <Thick<f32> as TryExactCast<Thick<i32>>>::try_exact_cast(Thick {
-        value1: 1.0_f32,
-        value2: 1.5_f32,
-    });
+    let try_exact_err =
+        <ThickMulti<f32> as TryExactCast<ThickMulti<i32>>>::try_exact_cast(ThickMulti {
+            value1: 1.0_f32,
+            value2: 1.5_f32,
+        });
     assert_eq!(try_exact_err, Err(CastError::Fractional));
 }
 
 #[test]
-fn transparent_casts_named_fields_complex_form_surface() {
+fn transparent_casts_thick_single_surface() {
+    let src = ThickSingle { value: 300_i32 };
+
+    assert_eq!(src.cast::<i64>(), ThickSingle { value: 300_i64 });
+    assert_eq!(ThickSingle::<i64>::cast_from(src), ThickSingle { value: 300_i64 });
+
+    assert_eq!(src.lossy_cast::<u8>(), ThickSingle { value: 44_u8 });
+    assert_eq!(ThickSingle::<u8>::lossy_cast_from(src), ThickSingle { value: 44_u8 });
+
+    assert_eq!(src.saturating_cast::<u8>(), ThickSingle { value: u8::MAX });
+    assert_eq!(ThickSingle::<u8>::saturating_cast_from(src), ThickSingle { value: u8::MAX });
+
+    assert_eq!(src.try_cast::<u8>(), Err(CastError::OutOfRange));
+    assert_eq!(ThickSingle::<u8>::try_cast_from(src), Err(CastError::OutOfRange));
+
+    assert_eq!(
+        ThickSingle::<i64>::try_exact_cast_from(ThickSingle { value: 7_i32 }),
+        Ok(ThickSingle { value: 7_i64 })
+    );
+
+    let trait_casted =
+        <ThickSingle<i32> as Cast<ThickSingle<i64>>>::cast(ThickSingle { value: 7_i32 });
+    assert_eq!(trait_casted, ThickSingle { value: 7_i64 });
+
+    let trait_lossy = <ThickSingle<i32> as LossyCast<ThickSingle<u8>>>::lossy_cast(src);
+    assert_eq!(trait_lossy, ThickSingle { value: 44_u8 });
+
+    let trait_saturating =
+        <ThickSingle<i32> as SaturatingCast<ThickSingle<u8>>>::saturating_cast(src);
+    assert_eq!(trait_saturating, ThickSingle { value: u8::MAX });
+
+    let trait_try = <ThickSingle<i32> as TryCast<ThickSingle<u8>>>::try_cast(src);
+    assert_eq!(trait_try, Err(CastError::OutOfRange));
+
+    let trait_try_exact =
+        <ThickSingle<i32> as TryExactCast<ThickSingle<i64>>>::try_exact_cast(ThickSingle {
+            value: 7_i32,
+        });
+    assert_eq!(trait_try_exact, Ok(ThickSingle { value: 7_i64 }));
+}
+
+#[test]
+fn transparent_casts_thick_const_surface() {
     let src = ThickConst::<i32, 2> { value1: 7_i32, value2: 300_i32 };
 
     let casted: ThickConst<i64, 2> = src.cast();
@@ -195,6 +256,23 @@ fn transparent_casts_named_fields_complex_form_surface() {
 
     let trait_casted = <ThickConst<i32, 2> as Cast<ThickConst<i64, 2>>>::cast(src);
     assert_eq!(trait_casted, ThickConst { value1: 7_i64, value2: 300_i64 });
+
+    let trait_lossy = <ThickConst<i32, 2> as LossyCast<ThickConst<u8, 2>>>::lossy_cast(src);
+    assert_eq!(trait_lossy, ThickConst { value1: 7_u8, value2: 44_u8 });
+
+    let trait_saturating =
+        <ThickConst<i32, 2> as SaturatingCast<ThickConst<u8, 2>>>::saturating_cast(src);
+    assert_eq!(trait_saturating, ThickConst { value1: 7_u8, value2: u8::MAX });
+
+    let trait_try = <ThickConst<i32, 2> as TryCast<ThickConst<u8, 2>>>::try_cast(src);
+    assert_eq!(trait_try, Err(CastError::OutOfRange));
+
+    let trait_try_exact =
+        <ThickConst<i32, 2> as TryExactCast<ThickConst<i64, 2>>>::try_exact_cast(ThickConst {
+            value1: 1_i32,
+            value2: 2_i32,
+        });
+    assert_eq!(trait_try_exact, Ok(ThickConst { value1: 1_i64, value2: 2_i64 }));
 }
 
 #[test]

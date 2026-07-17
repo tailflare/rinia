@@ -1,81 +1,18 @@
 use core::ops::{Add, Div, Mul, Sub};
 
 use crate::{
-    algebra::{ApproxEqAbs, ApproxEqRel, Dot, Length, LengthSquared, Lerp, Normalize},
+    algebra::{Dot, Length, LengthSquared, Lerp, Normalize},
     numeric::Sqrt,
     vector::Vector,
 };
 
-// Approx eq abs inherent
-impl<T, const N: usize> Vector<T, N>
-where
-    T: ApproxEqAbs<Tolerance = T> + Copy,
-{
-    /// Default absolute tolerance for approximate equality checks.
-    const DEFAULT_TOLERANCE_ABS: T = T::DEFAULT_TOLERANCE_ABS;
+crate::impl_approx_eq_wrapper!(
+    [T, const N: usize],
+    impl: Vector<T, N>,
+    item: T,
+    field: data,
+);
 
-    /// Checks if two vectors are approximately equal within a given absolute tolerance.
-    #[inline]
-    pub fn approx_eq_abs_tol(self, rhs: Self, tolerance: T) -> bool {
-        self.into_tuple().approx_eq_abs_tol(rhs.into_tuple(), tolerance)
-    }
-
-    /// Checks if two vectors are approximately equal within a given default absolute tolerance.
-    #[inline]
-    pub fn approx_eq_abs(self, rhs: Self) -> bool {
-        self.approx_eq_abs_tol(rhs, Self::DEFAULT_TOLERANCE_ABS)
-    }
-}
-
-// Approx eq abs trait
-impl<T, const N: usize> ApproxEqAbs for Vector<T, N>
-where
-    T: ApproxEqAbs<Tolerance = T> + Copy,
-{
-    type Tolerance = T;
-
-    const DEFAULT_TOLERANCE_ABS: Self::Tolerance = T::DEFAULT_TOLERANCE_ABS;
-
-    #[inline]
-    fn approx_eq_abs_tol(self, other: Self, tol: Self::Tolerance) -> bool {
-        Vector::approx_eq_abs_tol(self, other, tol)
-    }
-}
-
-// Approx eq rel inherent
-impl<T, const N: usize> Vector<T, N>
-where
-    T: ApproxEqRel<Tolerance = T> + Copy,
-{
-    /// Default relative tolerance for approximate equality checks.
-    const DEFAULT_TOLERANCE_REL: T = T::DEFAULT_TOLERANCE_REL;
-
-    /// Checks if two vectors are approximately equal within a given relative tolerance.
-    #[inline]
-    pub fn approx_eq_rel_tol(self, rhs: Self, tolerance: T) -> bool {
-        self.into_tuple().approx_eq_rel_tol(rhs.into_tuple(), tolerance)
-    }
-
-    /// Checks if two vectors are approximately equal within a given default relative tolerance.
-    #[inline]
-    pub fn approx_eq_rel(self, rhs: Self) -> bool {
-        self.approx_eq_rel_tol(rhs, Self::DEFAULT_TOLERANCE_REL)
-    }
-}
-
-// Approx eq rel trait
-impl<T, const N: usize> ApproxEqRel for Vector<T, N>
-where
-    T: ApproxEqRel<Tolerance = T> + Copy,
-{
-    type Tolerance = T;
-    const DEFAULT_TOLERANCE_REL: Self::Tolerance = T::DEFAULT_TOLERANCE_REL;
-
-    #[inline]
-    fn approx_eq_rel_tol(self, other: Self, tol: Self::Tolerance) -> bool {
-        Vector::approx_eq_rel_tol(self, other, tol)
-    }
-}
 // Length and length squared inherent
 impl<T, const N: usize> Vector<T, N>
 where

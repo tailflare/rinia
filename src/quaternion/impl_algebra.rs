@@ -2,9 +2,7 @@ use core::ops::{Add, Div, Mul, Neg, Sub};
 
 use crate::{
     Vector,
-    algebra::{
-        ApproxEqAbs, ApproxEqRel, Dot, Identity, Inverse, Length, LengthSquared, Lerp, Normalize,
-    },
+    algebra::{ApproxEqAbs, Dot, Identity, Inverse, Length, LengthSquared, Lerp, Normalize},
     numeric::{Clamp, NegOne, One, Sqrt, Trigonometry, Two, Zero},
     quaternion::Quaternion,
 };
@@ -26,80 +24,22 @@ where
     const IDENTITY: Self = Quaternion::IDENTITY;
 }
 
-// Approx eq abs inherent
-impl<T> Quaternion<T>
-where
-    T: Copy + ApproxEqAbs<Tolerance = T> + Neg<Output = T>,
-{
-    /// Default absolute tolerance for approximate equality checks.
-    const DEFAULT_TOLERANCE_ABS: T = T::DEFAULT_TOLERANCE_ABS;
-
-    /// Checks if two quaternions are approximately equal within a given absolute tolerance.
-    #[inline]
-    pub fn approx_eq_abs_tol(self, rhs: Self, tolerance: T) -> bool {
-        let lhs = self.into_tuple();
-        let rhs = rhs.into_tuple();
-
-        lhs.approx_eq_abs_tol(rhs, tolerance) || lhs.approx_eq_abs_tol(-rhs, tolerance)
-    }
-
-    /// Checks if two quaternions are approximately equal within a given default absolute tolerance.
-    #[inline]
-    pub fn approx_eq_abs(self, rhs: Self) -> bool {
-        self.approx_eq_abs_tol(rhs, Self::DEFAULT_TOLERANCE_ABS)
-    }
-}
-
-// Approx eq abs trait
-impl<T> ApproxEqAbs for Quaternion<T>
-where
-    T: Copy + ApproxEqAbs<Tolerance = T> + Neg<Output = T>,
-{
-    type Tolerance = T;
-    const DEFAULT_TOLERANCE_ABS: Self::Tolerance = T::DEFAULT_TOLERANCE_ABS;
-
-    #[inline]
-    fn approx_eq_abs_tol(self, other: Self, tol: Self::Tolerance) -> bool {
-        Quaternion::approx_eq_abs_tol(self, other, tol)
-    }
-}
-
-// Approx eq rel inherent
-impl<T> Quaternion<T>
-where
-    T: Copy + ApproxEqRel<Tolerance = T> + Neg<Output = T>,
-{
-    /// Default relative tolerance for approximate equality checks.
-    const DEFAULT_TOLERANCE_REL: T = T::DEFAULT_TOLERANCE_REL;
-
-    /// Checks if two quaternions are approximately equal within a given relative tolerance.
-    #[inline]
-    pub fn approx_eq_rel_tol(self, rhs: Self, tolerance: T) -> bool {
-        let lhs = self.into_tuple();
-        let rhs = rhs.into_tuple();
-        lhs.approx_eq_rel_tol(rhs, tolerance) || lhs.approx_eq_rel_tol(-rhs, tolerance)
-    }
-
-    /// Checks if two quaternions are approximately equal within a given default relative tolerance.
-    #[inline]
-    pub fn approx_eq_rel(self, rhs: Self) -> bool {
-        self.approx_eq_rel_tol(rhs, Self::DEFAULT_TOLERANCE_REL)
-    }
-}
-
-// Approx eq rel trait
-impl<T> ApproxEqRel for Quaternion<T>
-where
-    T: Copy + ApproxEqRel<Tolerance = T> + Neg<Output = T>,
-{
-    type Tolerance = T;
-    const DEFAULT_TOLERANCE_REL: Self::Tolerance = T::DEFAULT_TOLERANCE_REL;
-
-    #[inline]
-    fn approx_eq_rel_tol(self, other: Self, tol: Self::Tolerance) -> bool {
-        Quaternion::approx_eq_rel_tol(self, other, tol)
-    }
-}
+crate::impl_approx_eq_wrapper!(
+    [T],
+    impl: Quaternion<T>,
+    item: T,
+    extra_bounds: [Neg<Output = T>],
+    compare_abs: |lhs, rhs, tol| {
+        let lhs_data = lhs.data;
+        let rhs_data = rhs.data;
+        lhs_data.approx_eq_abs_tol(rhs_data, tol) || lhs_data.approx_eq_abs_tol(-rhs_data, tol)
+    },
+    compare_rel: |lhs, rhs, tol| {
+        let lhs_data = lhs.data;
+        let rhs_data = rhs.data;
+        lhs_data.approx_eq_rel_tol(rhs_data, tol) || lhs_data.approx_eq_rel_tol(-rhs_data, tol)
+    },
+);
 
 // Length and length squared inherent
 impl<T> Quaternion<T>

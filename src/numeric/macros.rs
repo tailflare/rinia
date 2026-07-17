@@ -1,3 +1,8 @@
+/// Implements numeric cast surfaces for thin/thick wrapper types.
+///
+/// Generates inherent and trait impls for `cast`, `lossy_cast`, `saturating_cast`,
+/// `try_cast`, and `try_exact_cast` (plus corresponding `*_from` helpers).
+/// Supports transparent wrappers (`Wrapper<T>`) and explicit field forwarding.
 #[macro_export]
 macro_rules! impl_numeric_casts_wrapper {
     (@emit_ctor fields, $wrapper:ident, $self:ident, $cast:path, [$($field:ident),+]) => {
