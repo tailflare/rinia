@@ -3,7 +3,7 @@
 use alloc::vec::Vec;
 
 use crate::{
-    algebra::{Dot, Identity, Inverse, Length, LengthSquared, Lerp, Normalize},
+    algebra::{Dot, Identity, Inverse, IsNormalized, Length, LengthSquared, Lerp, Normalize},
     assert_approx_eq_abs, assert_approx_eq_rel, assert_approx_ne_abs, assert_approx_ne_rel,
     numeric::{
         Cast, CastFrom, Infinite, IsFinite, IsZero, LossyCast, LossyCastFrom, Nan, Negate,
@@ -402,6 +402,25 @@ fn length_and_normalize_surface() {
     let a = Quaternion::from_array([1_i32, 2, 3, 4]);
     assert_eq!(a.negate().into_array(), [-1, -2, -3, -4]);
     assert_eq!(<Quaternion<i32> as Negate>::negate(a).into_array(), [-1, -2, -3, -4]);
+}
+
+#[test]
+fn is_normalized_surface() {
+    let normalized = Quaternion::<f32>::from_array([0.0, 0.0, 0.6, 0.8]);
+    let near_normalized = Quaternion::<f32>::from_array([0.0, 0.0, 0.600004, 0.8]);
+    let non_normalized = Quaternion::<f32>::from_array([0.0, 0.0, 3.0, 4.0]);
+
+    assert!(normalized.is_normalized());
+    assert!(<Quaternion<f32> as IsNormalized>::is_normalized(normalized));
+
+    assert!(!near_normalized.is_normalized());
+    assert!(near_normalized.is_normalized_tol(1e-5));
+    assert!(<Quaternion<f32> as IsNormalized>::is_normalized_tol(near_normalized, 1e-5,));
+    assert!(!near_normalized.is_normalized_tol(1e-8));
+
+    assert!(!non_normalized.is_normalized());
+    assert!(!<Quaternion<f32> as IsNormalized>::is_normalized(non_normalized));
+    assert!(!non_normalized.is_normalized_tol(1e-5));
 }
 
 #[cfg(feature = "bytemuck")]

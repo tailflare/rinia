@@ -2,7 +2,9 @@ use core::ops::{Add, Div, Mul, Neg, Sub};
 
 use crate::{
     Vector,
-    algebra::{ApproxEqAbs, Dot, Identity, Inverse, Length, LengthSquared, Lerp, Normalize},
+    algebra::{
+        ApproxEqAbs, Dot, Identity, Inverse, IsNormalized, Length, LengthSquared, Lerp, Normalize,
+    },
     numeric::{Clamp, NegOne, One, Sqrt, Trigonometry, Two, Zero},
     quaternion::Quaternion,
 };
@@ -69,6 +71,24 @@ where
     {
         self / self.length()
     }
+
+    /// Checks if the quaternion is normalized.
+    #[inline]
+    pub fn is_normalized(self) -> bool
+    where
+        T: One + ApproxEqAbs<Tolerance = T>,
+    {
+        self.length_squared().approx_eq_abs(&T::ONE)
+    }
+
+    /// Checks if the quaternion is normalized within a given tolerance.
+    #[inline]
+    pub fn is_normalized_tol(self, tol: T) -> bool
+    where
+        T: One + ApproxEqAbs<Tolerance = T>,
+    {
+        self.length_squared().approx_eq_abs_tol(&T::ONE, tol)
+    }
 }
 
 // Length squared trait
@@ -103,6 +123,24 @@ where
     #[inline]
     fn normalize(self) -> Self {
         Quaternion::normalize(self)
+    }
+}
+
+// IsNormalized trait
+impl<T> IsNormalized for Quaternion<T>
+where
+    T: Copy + One + Mul<Output = T> + Add<Output = T> + ApproxEqAbs<Tolerance = T> + Sqrt,
+{
+    type Tolerance = T;
+
+    #[inline]
+    fn is_normalized(self) -> bool {
+        Quaternion::is_normalized(self)
+    }
+
+    #[inline]
+    fn is_normalized_tol(self, tol: Self::Tolerance) -> bool {
+        Quaternion::is_normalized_tol(self, tol)
     }
 }
 

@@ -3,7 +3,7 @@
 use alloc::vec::Vec;
 
 use crate::{
-    algebra::{Dot, Length, LengthSquared, Lerp, Normalize},
+    algebra::{Dot, IsNormalized, Length, LengthSquared, Lerp, Normalize},
     assert_approx_eq_abs, assert_approx_eq_rel, assert_approx_ne_abs, assert_approx_ne_rel,
     numeric::{
         Abs, Cast, CastFrom, Infinite, IsFinite, IsZero, LossyCast, LossyCastFrom, MinMax, Nan,
@@ -307,6 +307,25 @@ fn length_and_normalize_surface() {
     let a = Vector::<i32, 3>::from_array([1, 2, 3]);
     assert_eq!(a.negate().into_array(), [-1, -2, -3]);
     assert_eq!(<Vector<i32, 3> as Negate>::negate(a).into_array(), [-1, -2, -3]);
+}
+
+#[test]
+fn is_normalized_surface() {
+    let normalized = Vector::<f32, 2>::from_array([0.6, 0.8]);
+    let near_normalized = Vector::<f32, 2>::from_array([0.600004, 0.8]);
+    let non_normalized = Vector::<f32, 2>::from_array([3.0, 4.0]);
+
+    assert!(normalized.is_normalized());
+    assert!(<Vector<f32, 2> as IsNormalized>::is_normalized(normalized));
+
+    assert!(!near_normalized.is_normalized());
+    assert!(near_normalized.is_normalized_tol(1e-5));
+    assert!(<Vector<f32, 2> as IsNormalized>::is_normalized_tol(near_normalized, 1e-5,));
+    assert!(!near_normalized.is_normalized_tol(1e-8));
+
+    assert!(!non_normalized.is_normalized());
+    assert!(!<Vector<f32, 2> as IsNormalized>::is_normalized(non_normalized));
+    assert!(!non_normalized.is_normalized_tol(1e-5));
 }
 
 #[test]

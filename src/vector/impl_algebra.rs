@@ -1,8 +1,8 @@
 use core::ops::{Add, Div, Mul, Sub};
 
 use crate::{
-    algebra::{Dot, Length, LengthSquared, Lerp, Normalize},
-    numeric::Sqrt,
+    algebra::{ApproxEqAbs, Dot, IsNormalized, Length, LengthSquared, Lerp, Normalize},
+    numeric::{One, Sqrt},
     vector::Vector,
 };
 
@@ -13,7 +13,7 @@ crate::impl_approx_eq_wrapper!(
     field: data,
 );
 
-// Length and length squared inherent
+// Length, length squared and normalize inherent
 impl<T, const N: usize> Vector<T, N>
 where
     T: Copy + Mul<Output = T> + Add<Output = T>,
@@ -40,6 +40,24 @@ where
         T: Sqrt + Div<Output = T>,
     {
         self / self.length()
+    }
+
+    /// Checks if the vector is normalized.
+    #[inline]
+    pub fn is_normalized(self) -> bool
+    where
+        T: One + ApproxEqAbs<Tolerance = T>,
+    {
+        self.length_squared().approx_eq_abs(&T::ONE)
+    }
+
+    /// Checks if the vector is normalized within a given tolerance.
+    #[inline]
+    pub fn is_normalized_tol(self, tol: T) -> bool
+    where
+        T: One + ApproxEqAbs<Tolerance = T>,
+    {
+        self.length_squared().approx_eq_abs_tol(&T::ONE, tol)
     }
 }
 
@@ -75,6 +93,24 @@ where
     #[inline]
     fn normalize(self) -> Self {
         Vector::normalize(self)
+    }
+}
+
+// IsNormalized trait
+impl<T, const N: usize> IsNormalized for Vector<T, N>
+where
+    T: Copy + One + Mul<Output = T> + Add<Output = T> + ApproxEqAbs<Tolerance = T> + Sqrt,
+{
+    type Tolerance = T;
+
+    #[inline]
+    fn is_normalized(self) -> bool {
+        Vector::is_normalized(self)
+    }
+
+    #[inline]
+    fn is_normalized_tol(self, tol: Self::Tolerance) -> bool {
+        Vector::is_normalized_tol(self, tol)
     }
 }
 
