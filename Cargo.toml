@@ -1,6 +1,6 @@
 [package]
 name = "rinia"
-version = "0.0.18"
+version = "0.0.19"
 publish = true
 edition = "2024"
 license = "MIT OR Apache-2.0"
