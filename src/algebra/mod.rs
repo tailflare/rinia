@@ -7,6 +7,4 @@ mod operations;
 mod predicates;
 mod tests;
 
-pub use self::{
-    equality::*, identities::*, interpolation::*, operations::*, predicates::IsNormalized,
-};
+pub use self::{equality::*, identities::*, interpolation::*, operations::*, predicates::*};
