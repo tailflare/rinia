@@ -28,10 +28,10 @@ libm = { version = "0.2.16", default-features = false }
 sakka = { version = "0.0.20", optional = true, default-features = false, features = [
     "derive",
 ] }
-bytemuck = { version = "1.25.1", optional = true, default-features = false, features = [
+bytemuck = { version = "1.25.2", optional = true, default-features = false, features = [
     "derive",
 ] }
-zerocopy = { version = "0.8.54", optional = true, default-features = false, features = [
+zerocopy = { version = "0.8.55", optional = true, default-features = false, features = [
     "derive",
 ] }
 mint = { version = "0.5.9", optional = true }
