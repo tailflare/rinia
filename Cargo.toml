@@ -25,7 +25,7 @@ _all_optional = ["sakka", "bytemuck", "zerocopy", "mint"]
 [dependencies]
 libm = { version = "0.2.16", default-features = false }
 
-sakka = { version = "0.0.20", optional = true, default-features = false, features = [
+sakka = { version = "0.0.21", optional = true, default-features = false, features = [
     "derive",
 ] }
 bytemuck = { version = "1.25.2", optional = true, default-features = false, features = [
